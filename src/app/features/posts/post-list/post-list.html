@@ -1,0 +1,66 @@
+﻿<div class="post-list-container">
+  <div class="header">
+    <h1>Posts</h1>
+    <a *ngIf="canCreate" routerLink="/posts/create" class="btn-primary">
+      <span></span> Novo Post
+    </a>
+  </div>
+
+  <div class="filters">
+    <div class="search-box">
+      <input
+        type="text"
+        [(ngModel)]="searchTerm"
+        (input)="onSearchChange()"
+        placeholder="Buscar posts..."
+        class="search-input"
+      />
+      <span class="search-icon"></span>
+    </div>
+
+    <div class="type-filters">
+      <button class="filter-btn" [class.active]="selectedType === null" (click)="onTypeFilterChange(null)">Todos</button>
+      <button class="filter-btn" [class.active]="selectedType === postTypes.Aviso" (click)="onTypeFilterChange(postTypes.Aviso)">Avisos</button>
+      <button class="filter-btn" [class.active]="selectedType === postTypes.Reflexao" (click)="onTypeFilterChange(postTypes.Reflexao)">Reflexões</button>
+      <button class="filter-btn" [class.active]="selectedType === postTypes.Comunicado" (click)="onTypeFilterChange(postTypes.Comunicado)">Comunicados</button>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="loading">
+    <div class="spinner"></div>
+    <p>Carregando posts...</p>
+  </div>
+
+  <div *ngIf="!loading && filteredPosts.length === 0" class="empty-state">
+    <div class="empty-icon"></div>
+    <h2>Nenhum post encontrado</h2>
+    <p>Tente ajustar os filtros ou crie um novo post.</p>
+    <a *ngIf="canCreate" routerLink="/posts/create" class="btn-primary">Criar Post</a>
+  </div>
+
+  <div class="posts-grid" *ngIf="!loading && filteredPosts.length > 0">
+    <article class="post-card" *ngFor="let post of filteredPosts">
+      <div class="post-header">
+        <span class="post-type" [attr.data-type]="post.tipo">{{ getPostTypeLabel(post.tipo) }}</span>
+        <span class="post-date" *ngIf="post.createdAt">{{ formatDate(post.createdAt) }}</span>
+      </div>
+
+      <h2 class="post-title">
+        <a [routerLink]="['/posts', post.id]">{{ post.titulo }}</a>
+      </h2>
+
+      <p class="post-content">{{ post.conteudo }}</p>
+
+      <div class="post-tags" *ngIf="post.tags && post.tags.length > 0">
+        <span class="tag" *ngFor="let tag of post.tags">#{{ tag }}</span>
+      </div>
+
+      <div class="post-footer">
+        <div class="post-actions">
+          <a [routerLink]="['/posts', post.id]" class="btn-view">Ver</a>
+          <button *ngIf="canCreate && post.id" class="btn-delete" (click)="deletePost(post.id)"></button>
+        </div>
+      </div>
+    </article>
+  </div>
+</div>

@@ -1,0 +1,78 @@
+<div class="evento-list-container">
+  <div class="header">
+    <h1>Eventos</h1>
+    @if (canCreate) {
+      <a routerLink="/eventos/create" class="btn btn-primary">
+        <span class="icon">+</span>
+        Novo Evento
+      </a>
+    }
+  </div>
+
+  <div class="filters">
+    <input 
+      type="text" 
+      [(ngModel)]="searchTerm" 
+      (ngModelChange)="onSearchChange()"
+      placeholder="Buscar eventos..."
+      class="search-input"
+    />
+    
+    <label class="checkbox-label">
+      <input 
+        type="checkbox" 
+        [(ngModel)]="showPastEvents"
+        (ngModelChange)="togglePastEvents()"
+      />
+      Mostrar eventos passados
+    </label>
+  </div>
+
+  @if (loading) {
+    <div class="loading">Carregando eventos...</div>
+  } @else if (filteredEventos.length === 0) {
+    <div class="empty-state">
+      <p>Nenhum evento encontrado</p>
+    </div>
+  } @else {
+    <div class="eventos-grid">
+      @for (evento of filteredEventos; track evento.id) {
+        <div class="evento-card" [class.past]="isPastEvent(evento.dataInicio)">
+          <div class="evento-header">
+            <h3>{{ evento.titulo }}</h3>
+            @if (isPastEvent(evento.dataInicio)) {
+              <span class="badge badge-past">Encerrado</span>
+            } @else {
+              <span class="badge badge-active">Em breve</span>
+            }
+          </div>
+          
+          <p class="evento-description">{{ evento.descricao }}</p>
+          
+          <div class="evento-info">
+            <div class="info-item">
+              <span class="icon">📅</span>
+              <span>{{ formatDate(evento.dataInicio) }}</span>
+            </div>
+            <div class="info-item">
+              <span class="icon">📍</span>
+              <span>{{ evento.local }}</span>
+            </div>
+            @if (evento.inscricoesAbertas && !isPastEvent(evento.dataInicio)) {
+              <div class="info-item">
+                <span class="badge badge-success">Inscrições abertas</span>
+              </div>
+            }
+          </div>
+
+          <div class="evento-actions">
+            <a [routerLink]="['/eventos', evento.id]" class="btn btn-outline">Ver detalhes</a>
+            @if (canCreate) {
+              <button (click)="deleteEvento(evento.id!)" class="btn btn-danger">Excluir</button>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
