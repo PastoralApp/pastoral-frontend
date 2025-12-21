@@ -18,9 +18,14 @@ export class PostList implements OnInit {
   filteredPosts: Post[] = [];
   loading = true;
   searchTerm = '';
-  selectedType: PostType | null = null;
-  postTypes = PostType;
-  canCreate = false;
+  selectedType = '';
+
+  typeOptions = [
+    { value: 'Comum', label: 'Comum' },
+    { value: 'Oficial', label: 'Oficial' },
+    { value: 'Fixada', label: 'Fixada' },
+    { value: 'Anuncio', label: 'Anúncio' }
+  ];
 
   constructor(
     private postService: PostService,
@@ -28,9 +33,12 @@ export class PostList implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const user = this.authService.currentUserValue;
-    this.canCreate = user?.role?.type! >= 1; // CoordenadorGrupo ou superior
     this.loadPosts();
+  }
+
+  canCreate(): boolean {
+    const user = this.authService.currentUserValue;
+    return (user?.role?.type ?? 0) >= 1;
   }
 
   loadPosts(): void {
@@ -51,32 +59,45 @@ export class PostList implements OnInit {
   applyFilters(): void {
     this.filteredPosts = this.posts.filter(post => {
       const matchesSearch = !this.searchTerm || 
-        post.titulo.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-        post.conteudo.toLowerCase().includes(this.searchTerm.toLowerCase());
-      
-      const matchesType = this.selectedType === null || post.tipo === this.selectedType;
-      
+        post.content.toLowerCase().includes(this.searchTerm.toLowerCase());
+
+      const matchesType = !this.selectedType || post.type === this.selectedType;
+
       return matchesSearch && matchesType;
     });
+  }
+
+  getTypeBadgeClass(type: string): string {
+    switch (type) {
+      case 'Comum': return 'bg-info';
+      case 'Oficial': return 'bg-success';
+      case 'Fixada': return 'bg-warning text-dark';
+      case 'Anuncio': return 'bg-secondary';
+      default: return 'bg-secondary';
+    }
+  }
+
+  getTypeLabel(type: string): string {
+    const found = this.typeOptions.find((t: { value: string; label: string }) => t.value === type);
+    return found ? found.label : type;
   }
 
   onSearchChange(): void {
     this.applyFilters();
   }
 
-  onTypeFilterChange(type: PostType | null): void {
-    this.selectedType = type;
+  onTypeFilterChange(type: string | null): void {
     this.applyFilters();
   }
 
-  getPostTypeLabel(type: PostType): string {
-    const labels: { [key in PostType]: string } = {
-      [PostType.Aviso]: 'Aviso',
-      [PostType.Evento]: 'Evento',
-      [PostType.Reflexao]: 'Reflexão',
-      [PostType.Comunicado]: 'Comunicado'
+  getPostTypeLabel(type: string): string {
+    const labels: { [key: string]: string } = {
+      'Comum': 'Comum',
+      'Oficial': 'Oficial',
+      'Fixada': 'Fixada',
+      'Anuncio': 'Anúncio'
     };
-    return labels[type];
+    return labels[type] || type;
   }
 
   formatDate(date: Date | string): string {

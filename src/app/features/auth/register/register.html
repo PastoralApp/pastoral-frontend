@@ -1,104 +1,137 @@
-ï»¿<div class="auth-container">
-  <div class="auth-card">
-    <div class="auth-header">
-      <div class="logo">
-        <div class="logo-circle">PA</div>
-        <h1>PastoralApp</h1>
-      </div>
-      <p class="subtitle">Crie sua conta</p>
-    </div>
+<div class="auth-page">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-6 col-lg-5">
+        <div class="card shadow-lg border-0 my-5">
+          <div class="card-body p-4">
 
-    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
-      <div class="form-group">
-        <label for="name">Nome completo</label>
-        <input
-          id="name"
-          type="text"
-          formControlName="name"
-          placeholder="JoÃ£o Silva"
-          [class.error]="registerForm.get('name')?.invalid && registerForm.get('name')?.touched"
-        />
-        <small class="error-message" *ngIf="registerForm.get('name')?.invalid && registerForm.get('name')?.touched">
-          {{ getErrorMessage('name') }}
-        </small>
-      </div>
+            <div class="text-center mb-4">
+              <div class="logo-circle mx-auto mb-3">
+                <span class="material-icons">church</span>
+              </div>
+              <h4 class="fw-bold text-success">PastoralApp</h4>
+              <p class="text-muted small">Crie sua conta</p>
+            </div>
 
-      <div class="form-group">
-        <label for="email">E-mail</label>
-        <input
-          id="email"
-          type="email"
-          formControlName="email"
-          placeholder="seu@email.com"
-          [class.error]="registerForm.get('email')?.invalid && registerForm.get('email')?.touched"
-        />
-        <small class="error-message" *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched">
-          {{ getErrorMessage('email') }}
-        </small>
-      </div>
+            <div *ngIf="errorMessage" class="alert alert-danger d-flex align-items-center" role="alert">
+              <span class="material-icons me-2">error</span>
+              <div>{{ errorMessage }}</div>
+            </div>
 
-      <div class="form-group">
-        <label for="telefone">Telefone (opcional)</label>
-        <input
-          id="telefone"
-          type="tel"
-          formControlName="telefone"
-          placeholder="(11) 98765-4321"
-        />
-      </div>
+            <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
 
-      <div class="form-group">
-        <label for="password">Senha</label>
-        <div class="password-wrapper">
-          <input
-            id="password"
-            [type]="hidePassword ? 'password' : 'text'"
-            formControlName="password"
-            placeholder="MÃ­nimo 6 caracteres"
-            [class.error]="registerForm.get('password')?.invalid && registerForm.get('password')?.touched"
-          />
-          <button type="button" class="toggle-password" (click)="togglePasswordVisibility()">
-            <span *ngIf="hidePassword">Mostrar</span>
-            <span *ngIf="!hidePassword">Ocultar</span>
-          </button>
+              <div class="mb-3">
+                <label class="form-label fw-semibold">
+                  <span class="material-icons align-middle me-1" style="font-size: 18px;">person</span>
+                  Nome completo
+                </label>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  formControlName="name"
+                  placeholder="Seu nome"
+                  [class.is-invalid]="registerForm.get('name')?.invalid && registerForm.get('name')?.touched">
+                <div class="invalid-feedback" *ngIf="registerForm.get('name')?.touched">
+                  {{ getErrorMessage('name') }}
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label fw-semibold">
+                  <span class="material-icons align-middle me-1" style="font-size: 18px;">email</span>
+                  Email
+                </label>
+                <input 
+                  type="email" 
+                  class="form-control" 
+                  formControlName="email"
+                  placeholder="seu@email.com"
+                  [class.is-invalid]="registerForm.get('email')?.invalid && registerForm.get('email')?.touched">
+                <div class="invalid-feedback" *ngIf="registerForm.get('email')?.touched">
+                  {{ getErrorMessage('email') }}
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label fw-semibold">
+                  <span class="material-icons align-middle me-1" style="font-size: 18px;">phone</span>
+                  Telefone
+                  <span class="text-muted fw-normal">(opcional)</span>
+                </label>
+                <input 
+                  type="tel" 
+                  class="form-control" 
+                  formControlName="telefone"
+                  placeholder="(00) 00000-0000">
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label fw-semibold">
+                  <span class="material-icons align-middle me-1" style="font-size: 18px;">lock</span>
+                  Senha
+                </label>
+                <div class="input-group">
+                  <input 
+                    [type]="hidePassword ? 'password' : 'text'" 
+                    class="form-control" 
+                    formControlName="password"
+                    placeholder="Mínimo 6 caracteres"
+                    [class.is-invalid]="registerForm.get('password')?.invalid && registerForm.get('password')?.touched">
+                  <button 
+                    class="btn btn-outline-secondary" 
+                    type="button" 
+                    (click)="togglePasswordVisibility()">
+                    <span class="material-icons">{{ hidePassword ? 'visibility' : 'visibility_off' }}</span>
+                  </button>
+                </div>
+                <div class="invalid-feedback d-block" *ngIf="registerForm.get('password')?.touched && registerForm.get('password')?.invalid">
+                  {{ getErrorMessage('password') }}
+                </div>
+              </div>
+
+              <div class="mb-4">
+                <label class="form-label fw-semibold">
+                  <span class="material-icons align-middle me-1" style="font-size: 18px;">lock_reset</span>
+                  Confirmar senha
+                </label>
+                <div class="input-group">
+                  <input 
+                    [type]="hideConfirmPassword ? 'password' : 'text'" 
+                    class="form-control" 
+                    formControlName="confirmPassword"
+                    placeholder="Repita a senha"
+                    [class.is-invalid]="registerForm.get('confirmPassword')?.touched && (registerForm.get('confirmPassword')?.invalid || registerForm.get('confirmPassword')?.value !== registerForm.get('password')?.value)">
+                  <button 
+                    class="btn btn-outline-secondary" 
+                    type="button" 
+                    (click)="toggleConfirmPasswordVisibility()">
+                    <span class="material-icons">{{ hideConfirmPassword ? 'visibility' : 'visibility_off' }}</span>
+                  </button>
+                </div>
+                <div class="invalid-feedback d-block" *ngIf="registerForm.get('confirmPassword')?.touched && registerForm.get('confirmPassword')?.value !== registerForm.get('password')?.value">
+                  As senhas não coincidem
+                </div>
+              </div>
+
+              <button 
+                type="submit" 
+                class="btn btn-success w-100 py-2 fw-semibold" 
+                [disabled]="loading || registerForm.invalid">
+                <span *ngIf="!loading" class="material-icons align-middle me-1" style="font-size: 20px;">person_add</span>
+                <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+                {{ loading ? 'Criando conta...' : 'Criar conta' }}
+              </button>
+            </form>
+
+            <div class="text-center mt-4">
+              <p class="text-muted small mb-0">
+                Já tem uma conta?
+                <a routerLink="/auth/login" class="text-success fw-semibold text-decoration-none">Entrar</a>
+              </p>
+            </div>
+          </div>
         </div>
-        <small class="error-message" *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched">
-          {{ getErrorMessage('password') }}
-        </small>
       </div>
-
-      <div class="form-group">
-        <label for="confirmPassword">Confirmar senha</label>
-        <div class="password-wrapper">
-          <input
-            id="confirmPassword"
-            [type]="hideConfirmPassword ? 'password' : 'text'"
-            formControlName="confirmPassword"
-            placeholder="Digite a senha novamente"
-            [class.error]="registerForm.get('confirmPassword')?.invalid && registerForm.get('confirmPassword')?.touched"
-          />
-          <button type="button" class="toggle-password" (click)="toggleConfirmPasswordVisibility()">
-            <span *ngIf="hideConfirmPassword">Mostrar</span>
-            <span *ngIf="!hideConfirmPassword">Ocultar</span>
-          </button>
-        </div>
-        <small class="error-message" *ngIf="registerForm.get('confirmPassword')?.invalid && registerForm.get('confirmPassword')?.touched">
-          {{ getErrorMessage('confirmPassword') }}
-        </small>
-      </div>
-
-      <div class="error-banner" *ngIf="errorMessage">
-        {{ errorMessage }}
-      </div>
-
-      <button type="submit" class="btn btn-primary" [disabled]="loading">
-        <span *ngIf="!loading">Criar conta</span>
-        <span *ngIf="loading">Criando conta...</span>
-      </button>
-    </form>
-
-    <div class="auth-footer">
-      <p>JÃ¡ tem uma conta? <a routerLink="/login">Entrar</a></p>
     </div>
   </div>
 </div>

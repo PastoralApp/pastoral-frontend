@@ -1,78 +1,112 @@
-<div class="evento-list-container">
-  <div class="header">
-    <h1>Eventos</h1>
-    @if (canCreate) {
-      <a routerLink="/eventos/create" class="btn btn-primary">
-        <span class="icon">+</span>
-        Novo Evento
-      </a>
-    }
-  </div>
+<div class="evento-list">
 
-  <div class="filters">
-    <input 
-      type="text" 
-      [(ngModel)]="searchTerm" 
-      (ngModelChange)="onSearchChange()"
-      placeholder="Buscar eventos..."
-      class="search-input"
-    />
-    
-    <label class="checkbox-label">
-      <input 
-        type="checkbox" 
-        [(ngModel)]="showPastEvents"
-        (ngModelChange)="togglePastEvents()"
-      />
-      Mostrar eventos passados
-    </label>
-  </div>
-
-  @if (loading) {
-    <div class="loading">Carregando eventos...</div>
-  } @else if (filteredEventos.length === 0) {
-    <div class="empty-state">
-      <p>Nenhum evento encontrado</p>
+  <div class="page-header mb-4">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col">
+          <h2 class="mb-1">
+            <span class="material-icons align-middle me-2">event</span>
+            Eventos
+          </h2>
+          <p class="text-muted mb-0">Confira os próximos eventos</p>
+        </div>
+        <div class="col-auto" *ngIf="canCreate()">
+          <a routerLink="/eventos/create" class="btn btn-success">
+            <span class="material-icons align-middle me-1">event_note</span>
+            Novo Evento
+          </a>
+        </div>
+      </div>
     </div>
-  } @else {
-    <div class="eventos-grid">
-      @for (evento of filteredEventos; track evento.id) {
-        <div class="evento-card" [class.past]="isPastEvent(evento.dataInicio)">
-          <div class="evento-header">
-            <h3>{{ evento.titulo }}</h3>
-            @if (isPastEvent(evento.dataInicio)) {
-              <span class="badge badge-past">Encerrado</span>
-            } @else {
-              <span class="badge badge-active">Em breve</span>
-            }
-          </div>
-          
-          <p class="evento-description">{{ evento.descricao }}</p>
-          
-          <div class="evento-info">
-            <div class="info-item">
-              <span class="icon">📅</span>
-              <span>{{ formatDate(evento.dataInicio) }}</span>
-            </div>
-            <div class="info-item">
-              <span class="icon">📍</span>
-              <span>{{ evento.local }}</span>
-            </div>
-            @if (evento.inscricoesAbertas && !isPastEvent(evento.dataInicio)) {
-              <div class="info-item">
-                <span class="badge badge-success">Inscrições abertas</span>
-              </div>
-            }
-          </div>
+  </div>
 
-          <div class="evento-actions">
-            <a [routerLink]="['/eventos', evento.id]" class="btn btn-outline">Ver detalhes</a>
-            @if (canCreate) {
-              <button (click)="deleteEvento(evento.id!)" class="btn btn-danger">Excluir</button>
-            }
+  <div class="container">
+
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <div class="input-group">
+              <span class="input-group-text bg-white">
+                <span class="material-icons text-muted">search</span>
+              </span>
+              <input 
+                type="text" 
+                class="form-control" 
+                placeholder="Buscar eventos..."
+                [(ngModel)]="searchTerm"
+                (input)="applyFilters()">
+            </div>
+          </div>
+          <div class="col-md-3">
+            <select class="form-select" [(ngModel)]="filterStatus" (change)="applyFilters()">
+              <option value="">Todos</option>
+              <option value="upcoming">Próximos</option>
+              <option value="past">Encerrados</option>
+              <option value="open">Inscrições Abertas</option>
+            </select>
+          </div>
+          <div class="col-md-3 text-end">
+            <span class="text-muted">{{ filteredEventos.length }} evento(s)</span>
           </div>
         </div>
-      }
+      </div>
     </div>
-  }
+
+    <div *ngIf="loading" class="text-center py-5">
+      <div class="spinner-border text-success" role="status">
+        <span class="visually-hidden">Carregando...</span>
+      </div>
+    </div>
+
+    <div *ngIf="!loading && filteredEventos.length === 0" class="text-center py-5">
+      <span class="material-icons text-muted mb-3" style="font-size: 64px;">event_busy</span>
+      <h4 class="text-muted">Nenhum evento encontrado</h4>
+      <p class="text-muted">Crie o primeiro evento!</p>
+      <a *ngIf="canCreate()" routerLink="/eventos/create" class="btn btn-success mt-2">
+        <span class="material-icons align-middle me-1">event_note</span>
+        Criar Evento
+      </a>
+    </div>
+
+    <div class="row g-4" *ngIf="!loading && filteredEventos.length > 0">
+      <div *ngFor="let evento of filteredEventos" class="col-md-6 col-lg-4">
+        <div class="card border-0 shadow-sm h-100 evento-card">
+          <div class="card-body">
+
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <span class="badge" [ngClass]="getStatusBadge(evento).class">
+                {{ getStatusBadge(evento).label }}
+              </span>
+              <span *ngIf="evento.requireInscription" class="badge bg-info">
+                <span class="material-icons me-1" style="font-size: 12px;">how_to_reg</span>
+                Inscrição
+              </span>
+            </div>
+
+            <h5 class="card-title">
+              <a [routerLink]="['/eventos', evento.id]" class="text-decoration-none text-dark stretched-link">
+                {{ evento.title }}
+              </a>
+            </h5>
+
+            <p class="card-text text-muted small">
+              {{ evento.description | slice:0:80 }}{{ evento.description && evento.description.length > 80 ? '...' : '' }}
+            </p>
+
+            <div class="event-details mt-3">
+              <div class="d-flex align-items-center mb-2">
+                <span class="material-icons text-success me-2" style="font-size: 18px;">calendar_today</span>
+                <small>{{ evento.eventDate | date:'dd/MM/yyyy HH:mm' }}</small>
+              </div>
+              <div class="d-flex align-items-center">
+                <span class="material-icons text-success me-2" style="font-size: 18px;">location_on</span>
+                <small>{{ evento.location || 'Local a definir' }}</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

@@ -2,10 +2,15 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  telefone?: string;
+  photoUrl?: string;
+  birthDate?: Date;
+  isActive?: boolean;
   roleId: string;
+  roleName?: string;
   grupoId?: string;
+  grupoName?: string;
   role?: Role;
+  tags?: Tag[];
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -17,17 +22,23 @@ export interface Role {
   description: string;
 }
 
+export interface Tag {
+  id: string;
+  name: string;
+  color: string;
+}
+
 export interface CreateUserDto {
   name: string;
   email: string;
-  telefone?: string;
   password: string;
-  roleType: number;
+  roleId: string;
+  grupoId?: string;
 }
 
 export interface UpdateUserDto {
   name: string;
   email: string;
-  telefone?: string;
-  roleType?: number;
+  photoUrl?: string;
+  birthDate?: Date;
 }

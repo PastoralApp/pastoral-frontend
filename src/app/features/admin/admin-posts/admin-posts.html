@@ -1,0 +1,112 @@
+<div class="admin-posts">
+
+  <div class="page-header mb-4">
+    <div class="container-fluid">
+      <div class="row align-items-center">
+        <div class="col">
+          <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-2">
+              <li class="breadcrumb-item"><a routerLink="/admin" class="text-decoration-none">Admin</a></li>
+              <li class="breadcrumb-item active">Posts</li>
+            </ol>
+          </nav>
+          <h2 class="mb-0">
+            <span class="material-icons align-middle me-2">article</span>
+            Gerenciar Posts
+          </h2>
+        </div>
+        <div class="col-auto">
+          <a routerLink="/posts/create" class="btn btn-success">
+            <span class="material-icons align-middle me-1">post_add</span>
+            Novo Post
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container-fluid">
+
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <div class="input-group">
+              <span class="input-group-text bg-white">
+                <span class="material-icons text-muted">search</span>
+              </span>
+              <input 
+                type="text" 
+                class="form-control" 
+                placeholder="Buscar por título ou conteúdo..."
+                [(ngModel)]="searchTerm"
+                (input)="applyFilters()">
+            </div>
+          </div>
+          <div class="col-md-3">
+            <select class="form-select" [(ngModel)]="selectedTipo" (change)="applyFilters()">
+              <option value="">Todos os tipos</option>
+              <option *ngFor="let tipo of tipos" [value]="tipo.value">{{ tipo.label }}</option>
+            </select>
+          </div>
+          <div class="col-md-3 text-end">
+            <span class="text-muted">{{ filteredPosts.length }} post(s) encontrado(s)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      <div *ngIf="loading" class="col-12 text-center py-5">
+        <div class="spinner-border text-success" role="status">
+          <span class="visually-hidden">Carregando...</span>
+        </div>
+      </div>
+
+      <div *ngIf="!loading && filteredPosts.length === 0" class="col-12 text-center py-5 text-muted">
+        <span class="material-icons d-block mb-2" style="font-size: 48px;">search_off</span>
+        Nenhum post encontrado
+      </div>
+
+      <div *ngFor="let post of filteredPosts" class="col-md-6 col-lg-4">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <span class="badge" [ngClass]="getTipoBadgeClass(post.type)">
+                {{ getTipoLabel(post.type) }}
+              </span>
+              <div class="dropdown">
+                <button class="btn btn-sm btn-link text-muted p-0" data-bs-toggle="dropdown">
+                  <span class="material-icons">more_vert</span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                  <li><a class="dropdown-item" [routerLink]="['/posts', post.id]">
+                    <span class="material-icons me-2" style="font-size: 18px;">visibility</span>Ver
+                  </a></li>
+                  <li><a class="dropdown-item" [routerLink]="['/posts', post.id, 'edit']">
+                    <span class="material-icons me-2" style="font-size: 18px;">edit</span>Editar
+                  </a></li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li><button class="dropdown-item text-danger" (click)="deletePost(post)">
+                    <span class="material-icons me-2" style="font-size: 18px;">delete</span>Excluir
+                  </button></li>
+                </ul>
+              </div>
+            </div>
+            <h5 class="card-title">{{ (post.content | slice:0:40) }}...</h5>
+            <p class="card-text text-muted small">{{ post.content | slice:0:100 }}...</p>
+          </div>
+          <div class="card-footer bg-transparent border-0">
+            <div class="d-flex justify-content-between align-items-center">
+              <small class="text-muted">
+                <span class="material-icons align-middle me-1" style="font-size: 16px;">person</span>
+                {{ post.authorName }}
+              </small>
+              <small class="text-muted">{{ post.createdAt | date:'dd/MM/yyyy' }}</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

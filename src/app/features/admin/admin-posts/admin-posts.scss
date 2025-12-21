@@ -1,0 +1,52 @@
+.admin-posts {
+  padding: 1.5rem 0;
+}
+
+.page-header {
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    
+    .material-icons {
+      color: #2e7d32;
+    }
+  }
+}
+
+.card {
+  border-radius: 12px;
+  transition: transform 0.2s ease;
+  
+  &:hover {
+    transform: translateY(-2px);
+  }
+}
+
+.form-control, .form-select {
+  border-radius: 8px;
+  
+  &:focus {
+    border-color: #2e7d32;
+    box-shadow: 0 0 0 0.2rem rgba(46, 125, 50, 0.15);
+  }
+}
+
+.btn-success {
+  background-color: #2e7d32;
+  border-color: #2e7d32;
+  
+  &:hover {
+    background-color: #1b5e20;
+    border-color: #1b5e20;
+  }
+}
+
+.badge {
+  font-weight: 500;
+  padding: 0.4rem 0.75rem;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+}

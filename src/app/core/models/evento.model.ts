@@ -1,32 +1,32 @@
 export interface Evento {
-  id?: string;
-  titulo: string;
-  descricao: string;
-  local: string;
-  dataInicio: Date;
-  dataFim: Date;
-  inscricoesAbertas: boolean;
-  organizadorId: string;
-  pastoralId?: string;
-  grupoId?: string;
-  createdAt?: Date;
+  id: string;
+  title: string;
+  description: string;
+  eventDate: Date;
+  location?: string;
+  imageUrl?: string;
+  maxParticipants: number;
+  requireInscription: boolean;
+  createdByUserId: string;
+  createdByName?: string;
+  createdAt: Date;
   updatedAt?: Date;
+  userHasSaved?: boolean;
 }
 
 export interface CreateEventoDto {
-  titulo: string;
-  descricao: string;
-  local: string;
-  dataInicio: string;
-  dataFim: string;
-  inscricoesAbertas: boolean;
+  title: string;
+  description: string;
+  eventDate: Date;
+  location?: string;
+  imageUrl?: string;
+  maxParticipants: number;
+  requireInscription: boolean;
 }
 
 export interface UpdateEventoDto {
-  titulo: string;
-  descricao: string;
-  local: string;
-  dataInicio: string;
-  dataFim: string;
-  inscricoesAbertas: boolean;
+  title: string;
+  description: string;
+  eventDate: Date;
+  location?: string;
 }

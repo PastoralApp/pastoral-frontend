@@ -1,0 +1,81 @@
+.post-detail {
+  padding: 2rem 0;
+}
+
+.card {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.post-image {
+  max-height: 400px;
+  overflow: hidden;
+  
+  img {
+    width: 100%;
+    object-fit: cover;
+  }
+}
+
+.post-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #212529;
+  line-height: 1.3;
+}
+
+.post-content {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  color: #4a4a4a;
+  
+  p {
+    margin-bottom: 1rem;
+  }
+}
+
+.badge {
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+}
+
+.bg-info {
+  background-color: #0dcaf0 !important;
+}
+
+.bg-success {
+  background-color: #2e7d32 !important;
+}
+
+.bg-warning {
+  background-color: #ffc107 !important;
+}
+
+.btn-outline-primary {
+  border-color: #2e7d32;
+  color: #2e7d32;
+  
+  &:hover {
+    background-color: #2e7d32;
+    border-color: #2e7d32;
+    color: white;
+  }
+}
+
+.btn-outline-secondary {
+  &:hover {
+    background-color: #6c757d;
+    color: white;
+  }
+}
+
+.avatar {
+  font-size: 1.5rem;
+}
+
+.alert-danger {
+  background-color: #ffebee;
+  border-color: #ffcdd2;
+  color: #c62828;
+  border-radius: 8px;
+}

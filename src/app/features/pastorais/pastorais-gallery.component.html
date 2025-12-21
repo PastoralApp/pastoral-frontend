@@ -1,0 +1,91 @@
+<div class="gallery-container">
+  <div class="header">
+    <h1>
+      <span class="material-icons">groups</span>
+      Pastorais e Grupos
+    </h1>
+  </div>
+
+  <div class="loading" *ngIf="loading">
+    <span class="material-icons spinning">refresh</span>
+    Carregando...
+  </div>
+
+  <div class="pastorais-grid" *ngIf="!loading">
+    <div 
+      *ngFor="let pastoral of pastorais" 
+      class="pastoral-card"
+      [style.border-left-color]="pastoral.primaryColor"
+    >
+      <div class="pastoral-header" (click)="togglePastoral(pastoral.id)">
+        <div class="pastoral-info">
+          <div class="pastoral-logo" [style.background-color]="pastoral.primaryColor + '20'">
+            <img *ngIf="pastoral.logoUrl" [src]="pastoral.logoUrl" [alt]="pastoral.name">
+            <span *ngIf="!pastoral.logoUrl" class="pastoral-sigla" [style.color]="pastoral.primaryColor">
+              {{ pastoral.sigla }}
+            </span>
+          </div>
+
+          <div class="pastoral-details">
+            <h2 [style.color]="pastoral.primaryColor">{{ pastoral.name }}</h2>
+            <p class="tipo-badge">{{ pastoral.tipoPastoral }}</p>
+            <p class="description">{{ pastoral.description }}</p>
+          </div>
+        </div>
+
+        <button class="expand-btn">
+          <span class="material-icons">
+            {{ isExpanded(pastoral.id) ? 'expand_less' : 'expand_more' }}
+          </span>
+        </button>
+      </div>
+
+      <div class="grupos-list" *ngIf="isExpanded(pastoral.id) && pastoral.grupos && pastoral.grupos.length > 0">
+        <div *ngFor="let grupo of pastoral.grupos" class="grupo-item">
+          <div class="grupo-logo" [style.background-color]="grupo.primaryColor + '20'">
+            <img *ngIf="grupo.logoUrl" [src]="grupo.logoUrl" [alt]="grupo.name">
+            <span *ngIf="!grupo.logoUrl" class="grupo-sigla" [style.color]="grupo.primaryColor">
+              {{ grupo.sigla }}
+            </span>
+          </div>
+
+          <div class="grupo-info">
+            <h3>{{ grupo.name }}</h3>
+            <p>{{ grupo.description }}</p>
+            <span class="membros-count">
+              <span class="material-icons">people</span>
+              {{ grupo.membersCount || 0 }} membros
+            </span>
+          </div>
+
+          <div class="grupo-actions">
+            <button 
+              class="icon-btn" 
+              title="Silenciar notificações"
+              (click)="silenciarGrupo(grupo.id, $event)"
+            >
+              <span class="material-icons">notifications_off</span>
+            </button>
+            <button 
+              class="icon-btn" 
+              title="Ativar notificações"
+              (click)="ativarNotificacoesGrupo(grupo.id, $event)"
+            >
+              <span class="material-icons">notifications_active</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="empty-grupos" *ngIf="isExpanded(pastoral.id) && (!pastoral.grupos || pastoral.grupos.length === 0)">
+        <span class="material-icons">groups_off</span>
+        <p>Nenhum grupo cadastrado</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="empty-state" *ngIf="!loading && pastorais.length === 0">
+    <span class="material-icons">church</span>
+    <p>Nenhuma pastoral cadastrada</p>
+  </div>
+</div>

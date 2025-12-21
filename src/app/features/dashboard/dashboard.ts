@@ -17,7 +17,8 @@ import { User } from '../../core/models/user.model';
 })
 export class Dashboard implements OnInit {
   canManageUsers(): boolean {
-    return false;
+    const user = this.authService.currentUserValue;
+    return (user?.role?.type ?? 0) >= 2;
   }
   currentUser: User | null = null;
   recentPosts: Post[] = [];
@@ -42,8 +43,6 @@ export class Dashboard implements OnInit {
 
   loadDashboardData(): void {
     this.loading = true;
-
-    // Carregar posts recentes
     this.postService.getAll().subscribe({
       next: (posts) => {
         this.recentPosts = posts.slice(0, 5);
@@ -51,14 +50,12 @@ export class Dashboard implements OnInit {
       },
       error: (error) => console.error('Erro ao carregar posts:', error)
     });
-
-    // Carregar próximos eventos
     this.eventoService.getAll().subscribe({
       next: (eventos) => {
         const now = new Date();
         this.upcomingEvents = eventos
-          .filter(e => new Date(e.dataInicio) > now)
-          .sort((a, b) => new Date(a.dataInicio).getTime() - new Date(b.dataInicio).getTime())
+          .filter(e => new Date(e.eventDate) > now)
+          .sort((a, b) => new Date(a.eventDate).getTime() - new Date(b.eventDate).getTime())
           .slice(0, 5);
         this.stats.totalEvents = eventos.length;
         this.loading = false;
@@ -85,8 +82,25 @@ export class Dashboard implements OnInit {
     });
   }
 
-  getPostTypeLabel(type: number): string {
+  getPostTypeLabel(type: string | number): string {
+    if (typeof type === 'string') {
+      switch (type) {
+        case 'Comum': return 'Comum';
+        case 'Aviso': return 'Aviso';
+        case 'Evento': return 'Evento';
+        case 'Reflexao': return 'Reflexão';
+        default: return 'Post';
+      }
+    }
     const types = ['Aviso', 'Evento', 'Reflexão', 'Comunicado'];
     return types[type] || 'Post';
+  }
+
+  formatDay(date: Date | string): string {
+    return new Date(date).getDate().toString().padStart(2, '0');
+  }
+
+  formatMonth(date: Date | string): string {
+    return new Date(date).toLocaleDateString('pt-BR', { month: 'short' });
   }
 }

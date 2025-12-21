@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { EventoService } from '../../../core/services/evento.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { Evento } from '../../../core/models/evento.model';
@@ -9,7 +9,7 @@ import { User } from '../../../core/models/user.model';
 @Component({
   selector: 'app-evento-detail',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './evento-detail.html',
   styleUrl: './evento-detail.scss',
 })
@@ -56,8 +56,8 @@ export class EventoDetail implements OnInit {
   checkPermissions(): void {
     if (!this.evento || !this.currentUser) return;
 
-    const isOrganizer = this.evento.organizadorId === this.currentUser.id;
-    const isAdmin = this.currentUser.role?.type! >= 2;
+    const isOrganizer = this.evento.createdByUserId === this.currentUser.id;
+    const isAdmin = (this.currentUser.role?.type ?? 0) >= 2;
 
     this.canEdit = isOrganizer || isAdmin;
     this.canDelete = isOrganizer || isAdmin;
@@ -65,14 +65,11 @@ export class EventoDetail implements OnInit {
 
   checkRegistration(): void {
     if (!this.evento || !this.currentUser) return;
-    // TODO: Implement inscriptions feature
     this.isRegistered = false;
   }
 
   registerForEvent(): void {
     if (!this.evento || !this.currentUser) return;
-
-    // Implementar lógica de inscrição
     console.log('Inscrição no evento:', this.evento.id);
     this.isRegistered = true;
   }
@@ -81,7 +78,6 @@ export class EventoDetail implements OnInit {
     if (!this.evento || !this.currentUser) return;
 
     if (confirm('Deseja realmente cancelar sua inscrição?')) {
-      // Implementar lógica de cancelamento
       console.log('Cancelar inscrição:', this.evento.id);
       this.isRegistered = false;
     }
@@ -115,11 +111,11 @@ export class EventoDetail implements OnInit {
 
   isPastEvent(): boolean {
     if (!this.evento) return false;
-    return new Date(this.evento.dataFim) < new Date();
+    return new Date(this.evento.eventDate) < new Date();
   }
 
   canRegister(): boolean {
-    return !!this.evento?.inscricoesAbertas && !this.isPastEvent() && !this.isRegistered;
+    return !!this.evento && this.evento.requireInscription && !this.isPastEvent() && !this.isRegistered;
   }
 
   goBack(): void {

@@ -14,7 +14,7 @@ import { User } from '../../../core/models/user.model';
 export class Sidebar implements OnInit {
   @Input() isOpen = false;
   @Output() closeSidebar = new EventEmitter<void>();
-  
+
   currentUser: User | null = null;
 
   menuItems = [

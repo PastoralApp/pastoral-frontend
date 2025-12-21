@@ -18,8 +18,7 @@ export class EventoList implements OnInit {
   filteredEventos: Evento[] = [];
   loading = true;
   searchTerm = '';
-  showPastEvents = false;
-  canCreate = false;
+  filterStatus = '';
 
   constructor(
     private eventoService: EventoService,
@@ -27,9 +26,12 @@ export class EventoList implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const user = this.authService.currentUserValue;
-    this.canCreate = user?.role?.type! >= 1;
     this.loadEventos();
+  }
+
+  canCreate(): boolean {
+    const user = this.authService.currentUserValue;
+    return (user?.role?.type ?? 0) >= 1;
   }
 
   loadEventos(): void {
@@ -37,7 +39,7 @@ export class EventoList implements OnInit {
     this.eventoService.getAll().subscribe({
       next: (eventos) => {
         this.eventos = eventos.sort((a, b) => 
-          new Date(b.dataInicio).getTime() - new Date(a.dataInicio).getTime()
+          new Date(b.eventDate).getTime() - new Date(a.eventDate).getTime()
         );
         this.applyFilters();
         this.loading = false;
@@ -51,30 +53,42 @@ export class EventoList implements OnInit {
 
   applyFilters(): void {
     let filtered = [...this.eventos];
+    const now = new Date();
 
     if (this.searchTerm) {
       const term = this.searchTerm.toLowerCase();
       filtered = filtered.filter(e => 
-        e.titulo.toLowerCase().includes(term) ||
-        e.descricao.toLowerCase().includes(term) ||
-        e.local.toLowerCase().includes(term)
+        e.title.toLowerCase().includes(term) ||
+        e.description.toLowerCase().includes(term) ||
+        (e.location?.toLowerCase().includes(term) ?? false)
       );
     }
 
-    if (!this.showPastEvents) {
-      const now = new Date();
-      filtered = filtered.filter(e => new Date(e.dataInicio) >= now);
+    if (this.filterStatus === 'upcoming') {
+      filtered = filtered.filter(e => new Date(e.eventDate) >= now);
+    } else if (this.filterStatus === 'past') {
+      filtered = filtered.filter(e => new Date(e.eventDate) < now);
+    } else if (this.filterStatus === 'open') {
+      filtered = filtered.filter(e => e.requireInscription && new Date(e.eventDate) >= now);
     }
 
     this.filteredEventos = filtered;
   }
 
-  onSearchChange(): void {
-    this.applyFilters();
+  getStatusBadge(evento: Evento): { label: string; class: string } {
+    const now = new Date();
+    const eventDate = new Date(evento.eventDate);
+
+    if (eventDate < now) {
+      return { label: 'Encerrado', class: 'bg-secondary' };
+    } else if (evento.requireInscription) {
+      return { label: 'Inscrições Abertas', class: 'bg-success' };
+    } else {
+      return { label: 'Evento Aberto', class: 'bg-primary' };
+    }
   }
 
-  togglePastEvents(): void {
-    this.showPastEvents = !this.showPastEvents;
+  onSearchChange(): void {
     this.applyFilters();
   }
 

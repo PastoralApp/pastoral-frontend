@@ -1,1 +1,80 @@
-<p>post-detail works!</p>
+<div class="post-detail">
+  <div class="container py-4">
+
+    <div *ngIf="loading" class="text-center py-5">
+      <div class="spinner-border text-success" role="status">
+        <span class="visually-hidden">Carregando...</span>
+      </div>
+    </div>
+
+    <div *ngIf="errorMessage" class="alert alert-danger d-flex align-items-center" role="alert">
+      <span class="material-icons me-2">error</span>
+      <div>{{ errorMessage }}</div>
+    </div>
+
+    <div *ngIf="post && !loading" class="row justify-content-center">
+      <div class="col-lg-8">
+
+        <div class="mb-4">
+          <a routerLink="/posts" class="btn btn-outline-secondary btn-sm">
+            <span class="material-icons align-middle me-1" style="font-size: 18px;">arrow_back</span>
+            Voltar
+          </a>
+        </div>
+
+        <article class="card border-0 shadow-sm">
+
+          <div *ngIf="post.imageUrl" class="post-image">
+            <img [src]="post.imageUrl" alt="Post image" class="card-img-top">
+          </div>
+
+          <div class="card-body p-4">
+
+            <div class="d-flex align-items-center justify-content-between mb-3">
+              <span class="badge" [ngClass]="getTypeBadgeClass(post.type)">
+                {{ getTypeLabel(post.type) }}
+              </span>
+              <small class="text-muted">
+                <span class="material-icons align-middle me-1" style="font-size: 16px;">calendar_today</span>
+                {{ post.createdAt | date:'dd/MM/yyyy HH:mm' }}
+              </small>
+            </div>
+
+            <div class="d-flex align-items-center mb-4 pb-3 border-bottom">
+              <div class="avatar bg-success bg-opacity-10 text-success rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                <span class="material-icons">person</span>
+              </div>
+              <div>
+                <div class="fw-semibold">{{ post.authorName || 'Autor desconhecido' }}</div>
+                <small class="text-muted">Por: {{ post.authorName }}</small>
+              </div>
+            </div>
+
+            <div class="post-content">
+              <p style="white-space: pre-line; font-size: 1.1rem; line-height: 1.8;">{{ post.content }}</p>
+            </div>
+
+            <div class="d-flex align-items-center mt-4 pt-3 border-top">
+              <span class="material-icons text-danger me-1">favorite</span>
+              <span class="text-muted">{{ post.likesCount }} curtidas</span>
+            </div>
+
+          </div>
+
+          <div *ngIf="canEdit()" class="card-footer bg-transparent border-0 p-4">
+            <div class="d-flex justify-content-end gap-2">
+              <a [routerLink]="['/posts/edit', post.id]" class="btn btn-outline-success">
+                <span class="material-icons align-middle me-1" style="font-size: 18px;">edit</span>
+                Editar
+              </a>
+              <button class="btn btn-outline-danger" (click)="deletePost()">
+                <span class="material-icons align-middle me-1" style="font-size: 18px;">delete</span>
+                Excluir
+              </button>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,6 +1,19 @@
+﻿@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
 @import './styles/themes.scss';
 
-/* Reset e configurações globais */
+:root {
+  --primary-color: #2e7d32;
+  --primary-dark: #1b5e20;
+  --primary-light: #4caf50;
+  --secondary-color: #757575;
+  --accent-color: #ff9800;
+  --background: #f5f5f5;
+  --surface: #ffffff;
+  --error: #f44336;
+  --text-primary: #212121;
+  --text-secondary: #757575;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -8,19 +21,25 @@
 }
 
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: #f5f5f5;
+  background-color: var(--background);
+  color: var(--text-primary);
 }
 
-/* Customizações PrimeNG */
-:root {
-  --primary-color: #2e7d32;
-  --primary-dark: #1b5e20;
-  --surface-ground: #f5f5f5;
-}
-
-.p-component {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+.material-icons {
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
 }

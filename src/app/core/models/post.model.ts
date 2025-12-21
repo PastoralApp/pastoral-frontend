@@ -1,36 +1,65 @@
 export enum PostType {
-  Aviso = 0,
-  Evento = 1,
-  Reflexao = 2,
-  Comunicado = 3
+  Comum = 'Comum',
+  Aviso = 'Aviso',
+  Evento = 'Evento',
+  Reflexao = 'Reflexao'
 }
 
 export interface Post {
-  id?: string;
-  titulo: string;
-  conteudo: string;
-  tipo: PostType;
-  imagemUrl?: string;
-  autorId: string;
-  pastoralId?: string;
-  grupoId?: string;
-  tags: string[];
-  createdAt?: Date;
+  id: string;
+  content: string;
+  imageUrl?: string;
+  type: string;
+  isPinned: boolean;
+  likesCount: number;
+  authorId: string;
+  authorName?: string;
+  authorPhotoUrl?: string;
+  createdAt: Date;
   updatedAt?: Date;
+  reactions?: PostReaction[];
+  comments?: PostComment[];
+  shares?: PostShare[];
+  userHasReacted?: boolean;
+  userHasSaved?: boolean;
+}
+
+export interface PostReaction {
+  id: string;
+  postId: string;
+  userId: string;
+  userName?: string;
+  dataReacao: Date;
+}
+
+export interface PostComment {
+  id: string;
+  postId: string;
+  userId: string;
+  userName?: string;
+  conteudo: string;
+  isAtivo: boolean;
+  dataComentario: Date;
+}
+
+export interface PostShare {
+  id: string;
+  postId: string;
+  userId: string;
+  dataCompartilhamento: Date;
 }
 
 export interface CreatePostDto {
-  titulo: string;
+  content: string;
+  imageUrl?: string;
+  type: string;
+}
+
+export interface CreateCommentDto {
   conteudo: string;
-  tipo: PostType;
-  imagemUrl?: string;
-  tags?: string[];
 }
 
 export interface UpdatePostDto {
-  titulo: string;
-  conteudo: string;
-  tipo: PostType;
-  imagemUrl?: string;
-  tags?: string[];
+  content: string;
+  imageUrl?: string;
 }

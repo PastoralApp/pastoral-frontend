@@ -1,0 +1,61 @@
+.coordenacao-dashboard {
+  padding: 1.5rem 0;
+}
+
+.page-header {
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    
+    .material-icons {
+      color: #2e7d32;
+    }
+  }
+}
+
+.stat-card {
+  border-radius: 12px;
+  transition: transform 0.2s ease;
+  
+  &:hover {
+    transform: translateY(-2px);
+  }
+}
+
+.icon-box {
+  .material-icons {
+    font-size: 28px;
+  }
+}
+
+.card {
+  border-radius: 12px;
+}
+
+.card-footer {
+  font-weight: 500;
+}
+
+.list-group-item {
+  border-left: none;
+  border-right: none;
+  
+  &:first-child {
+    border-top: none;
+  }
+  
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.btn-outline-primary,
+.btn-outline-success,
+.btn-outline-warning,
+.btn-outline-info {
+  border-width: 2px;
+  
+  .material-icons {
+    font-size: 28px;
+  }
+}

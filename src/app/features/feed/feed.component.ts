@@ -1,118 +1,211 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { FeedService } from '../../core/services/feed.service';
-import { AuthService } from '../../core/services/auth.service';
-import { CardComponent } from '../../shared/components/card/card.component';
-import { Post } from '../../core/models/post.model';
+import { PostService } from '../../core/services/post.service';
+import { Post, CreatePostDto, PostType, CreateCommentDto } from '../../core/models/post.model';
 
 @Component({
   selector: 'app-feed',
   standalone: true,
-  imports: [CommonModule, FormsModule, CardComponent],
-  template: `
-    <div class="feed-container">
-      <app-card [elevated]="true" class="create-post">
-        <form (ngSubmit)="createPost()" class="post-form">
-          <textarea
-            [(ngModel)]="newPostContent"
-            name="content"
-            placeholder="Compartilhe algo com a comunidade..."
-            rows="3"
-          ></textarea>
-          <button type="submit" [disabled]="!newPostContent.trim()">
-            Publicar
-          </button>
-        </form>
-      </app-card>
-
-      <div class="posts-list">
-        @for (post of posts(); track post.id) {
-          <app-card [elevated]="true" class="post-card">
-            <div class="post-header">
-              <div class="post-author">
-                <div class="author-avatar">
-                  {{ post.authorName.charAt(0) }}
-                </div>
-                <div class="author-info">
-                  <h3 class="author-name">{{ post.authorName }}</h3>
-                  <span class="post-date">{{ formatDate(post.createdAt) }}</span>
-                </div>
-              </div>
-              <span class="pastoral-badge" [attr.data-pastoral]="post.pastoral">
-                {{ post.pastoral }}
-              </span>
-            </div>
-
-            <p class="post-content">{{ post.content }}</p>
-
-            <div class="post-actions">
-              <button class="action-btn" (click)="likePost(post.id)">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                </svg>
-                <span>{{ post.likes }}</span>
-              </button>
-
-              <button class="action-btn">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                </svg>
-                <span>{{ post.comments.length }}</span>
-              </button>
-            </div>
-          </app-card>
-        }
-      </div>
-    </div>
-  `,
+  imports: [CommonModule, FormsModule],
+  templateUrl: './feed.component.html',
   styleUrls: ['./feed.component.scss']
 })
 export class FeedComponent implements OnInit {
-  private feedService = inject(FeedService);
-  private authService = inject(AuthService);
+  posts: Post[] = [];
+  loading = false;
+  showCreateForm = false;
 
-  posts = signal<Post[]>([]);
-  newPostContent = '';
+  newPost: CreatePostDto = {
+    content: '',
+    imageUrl: '',
+    type: 'Comum'
+  };
+
+  PostType = PostType;
+
+  commentTexts: { [postId: string]: string } = {};
+  showComments: { [postId: string]: boolean } = {};
+
+  constructor(private postService: PostService) {}
 
   ngOnInit(): void {
     this.loadPosts();
   }
 
   loadPosts(): void {
-    this.feedService.getPosts().subscribe(posts => {
-      this.posts.set(posts);
+    this.loading = true;
+    this.postService.getAll().subscribe({
+      next: (posts: Post[]) => {
+        this.posts = posts.sort((a, b) => {
+          if (a.isPinned && !b.isPinned) return -1;
+          if (!a.isPinned && b.isPinned) return 1;
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        });
+        this.loading = false;
+      },
+      error: (err: any) => {
+        console.error('Erro ao carregar posts:', err);
+        this.loading = false;
+      }
     });
+  }
+
+  toggleCreateForm(): void {
+    this.showCreateForm = !this.showCreateForm;
+    if (!this.showCreateForm) {
+      this.resetForm();
+    }
   }
 
   createPost(): void {
-    const user = this.authService.user();
-    if (!user || !this.newPostContent.trim()) return;
+    if (!this.newPost.content) {
+      return;
+    }
 
-    this.feedService.createPost(
-      this.newPostContent,
-      user.id,
-      user.name,
-      user.pastoral
-    ).subscribe(() => {
-      this.newPostContent = '';
-      this.loadPosts();
+    this.loading = true;
+    this.postService.create(this.newPost).subscribe({
+      next: (post: Post) => {
+        this.posts.unshift(post);
+        this.toggleCreateForm();
+        this.loading = false;
+      },
+      error: (err: any) => {
+        console.error('Erro ao criar post:', err);
+        this.loading = false;
+      }
     });
   }
 
-  likePost(postId: string): void {
-    this.feedService.likePost(postId);
+  resetForm(): void {
+    this.newPost = {
+      content: '',
+      imageUrl: '',
+      type: 'Comum'
+    };
+  }
+
+  toggleReaction(post: Post): void {
+    this.postService.toggleReaction(post.id).subscribe({
+      next: (result: { likesCount: number; userHasReacted: boolean }) => {
+        post.likesCount = result.likesCount;
+        post.userHasReacted = result.userHasReacted;
+      },
+      error: (err: any) => console.error('Erro ao reagir:', err)
+    });
+  }
+
+  toggleComments(postId: string): void {
+    this.showComments[postId] = !this.showComments[postId];
+
+    if (this.showComments[postId]) {
+      this.loadComments(postId);
+    }
+  }
+
+  loadComments(postId: string): void {
+    this.postService.getComments(postId).subscribe({
+      next: (comments: any[]) => {
+        const post = this.posts.find(p => p.id === postId);
+        if (post) {
+          post.comments = comments;
+        }
+      },
+      error: (err: any) => console.error('Erro ao carregar comentários:', err)
+    });
+  }
+
+  addComment(post: Post): void {
+    const commentText = this.commentTexts[post.id];
+    if (!commentText?.trim()) {
+      return;
+    }
+
+    const comment: CreateCommentDto = { conteudo: commentText };
+
+    this.postService.addComment(post.id, comment).subscribe({
+      next: (newComment: any) => {
+        if (!post.comments) {
+          post.comments = [];
+        }
+        post.comments.push(newComment);
+        this.commentTexts[post.id] = '';
+      },
+      error: (err: any) => console.error('Erro ao adicionar comentário:', err)
+    });
+  }
+
+  deleteComment(post: Post, commentId: string): void {
+    if (!confirm('Deseja realmente excluir este comentário?')) {
+      return;
+    }
+
+    this.postService.deleteComment(commentId).subscribe({
+      next: () => {
+        if (post.comments) {
+          post.comments = post.comments.filter(c => c.id !== commentId);
+        }
+      },
+      error: (err: any) => console.error('Erro ao excluir comentário:', err)
+    });
+  }
+
+  sharePost(post: Post): void {
+    this.postService.sharePost(post.id).subscribe({
+      next: () => {
+        alert('Post compartilhado!');
+      },
+      error: (err: any) => console.error('Erro ao compartilhar:', err)
+    });
+  }
+
+  toggleSave(post: Post): void {
+    this.postService.toggleSave(post.id).subscribe({
+      next: (result: { saved: boolean }) => {
+        post.userHasSaved = result.saved;
+      },
+      error: (err: any) => console.error('Erro ao salvar:', err)
+    });
   }
 
   formatDate(date: Date): string {
     const now = new Date();
-    const diff = now.getTime() - new Date(date).getTime();
-    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const postDate = new Date(date);
+    const diffMs = now.getTime() - postDate.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
 
-    if (hours < 1) return 'Agora';
-    if (hours < 24) return `${hours}h atrás`;
-    const days = Math.floor(hours / 24);
-    if (days < 7) return `${days}d atrás`;
-    return new Date(date).toLocaleDateString('pt-BR');
+    if (diffMins < 1) return 'Agora';
+    if (diffMins < 60) return `${diffMins}min atrás`;
+    if (diffHours < 24) return `${diffHours}h atrás`;
+    if (diffDays === 1) return 'Ontem';
+    if (diffDays < 7) return `${diffDays} dias atrás`;
+
+    return postDate.toLocaleDateString('pt-BR', { 
+      day: '2-digit', 
+      month: '2-digit', 
+      year: 'numeric' 
+    });
+  }
+
+  getPostTypeLabel(type: string): string {
+    switch (type) {
+      case 'Comum': return 'Comum';
+      case 'Aviso': return 'Aviso';
+      case 'Evento': return 'Evento';
+      case 'Reflexao': return 'Reflexão';
+      default: return 'Post';
+    }
+  }
+
+  getPostTypeBadgeClass(type: string): string {
+    switch (type) {
+      case 'Comum': return 'bg-secondary';
+      case 'Aviso': return 'bg-warning text-dark';
+      case 'Evento': return 'bg-success';
+      case 'Reflexao': return 'bg-primary';
+      default: return 'bg-secondary';
+    }
   }
 }

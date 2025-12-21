@@ -1,13 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { EventoService } from '../../../core/services/evento.service';
 
 @Component({
   selector: 'app-evento-create',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './evento-create.html',
   styleUrl: './evento-create.scss',
 })
@@ -34,12 +34,12 @@ export class EventoCreate implements OnInit {
     this.isEditMode = !!this.eventoId;
 
     this.eventoForm = this.fb.group({
-      titulo: ['', [Validators.required, Validators.minLength(3)]],
-      descricao: ['', [Validators.required, Validators.minLength(10)]],
-      local: ['', Validators.required],
-      dataInicio: ['', Validators.required],
-      dataFim: ['', Validators.required],
-      inscricoesAbertas: [true]
+      title: ['', [Validators.required, Validators.minLength(3)]],
+      description: ['', [Validators.required, Validators.minLength(10)]],
+      location: [''],
+      eventDate: ['', Validators.required],
+      maxParticipants: [0],
+      requireInscription: [false]
     });
 
     if (this.isEditMode && this.eventoId) {
@@ -52,12 +52,12 @@ export class EventoCreate implements OnInit {
     this.eventoService.getById(id).subscribe({
       next: (evento) => {
         this.eventoForm.patchValue({
-          titulo: evento.titulo,
-          descricao: evento.descricao,
-          local: evento.local,
-          dataInicio: new Date(evento.dataInicio).toISOString().slice(0, 16),
-          dataFim: new Date(evento.dataFim).toISOString().slice(0, 16),
-          inscricoesAbertas: evento.inscricoesAbertas
+          title: evento.title,
+          description: evento.description,
+          location: evento.location,
+          eventDate: new Date(evento.eventDate).toISOString().slice(0, 16),
+          maxParticipants: evento.maxParticipants,
+          requireInscription: evento.requireInscription
         });
         this.loading = false;
       },
@@ -75,21 +75,12 @@ export class EventoCreate implements OnInit {
       return;
     }
 
-    const dataInicio = new Date(this.eventoForm.value.dataInicio);
-    const dataFim = new Date(this.eventoForm.value.dataFim);
-
-    if (dataFim <= dataInicio) {
-      this.errorMessage = 'A data de término deve ser posterior à data de início';
-      return;
-    }
-
     this.loading = true;
     this.errorMessage = '';
 
     const formData = {
       ...this.eventoForm.value,
-      dataInicio: dataInicio.toISOString(),
-      dataFim: dataFim.toISOString()
+      eventDate: new Date(this.eventoForm.value.eventDate).toISOString()
     };
 
     const request = this.isEditMode && this.eventoId

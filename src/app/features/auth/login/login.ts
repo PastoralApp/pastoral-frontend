@@ -55,7 +55,7 @@ export class Login implements OnInit {
   loginWithGoogle(): void {
     this.loading = true;
     this.errorMessage = '';
-    
+
     window.location.href = `${this.authService.getApiUrl()}/auth/google-login`;
   }
 

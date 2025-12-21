@@ -1,0 +1,334 @@
+.gallery-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.header {
+  margin-bottom: 32px;
+
+  h1 {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 32px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0;
+
+    .material-icons {
+      font-size: 36px;
+      color: #2196F3;
+    }
+  }
+}
+
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px;
+  color: #666;
+  gap: 12px;
+
+  .material-icons {
+    font-size: 48px;
+    animation: spin 1s linear infinite;
+  }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.pastorais-grid {
+  display: grid;
+  gap: 24px;
+}
+
+.pastoral-card {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-left: 4px solid #2196F3;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: box-shadow 0.2s;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.pastoral-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px;
+  cursor: pointer;
+  transition: background 0.2s;
+
+  &:hover {
+    background: #fafafa;
+  }
+}
+
+.pastoral-info {
+  display: flex;
+  gap: 20px;
+  flex: 1;
+}
+
+.pastoral-logo {
+  width: 80px;
+  height: 80px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 12px;
+  }
+
+  .pastoral-sigla {
+    font-size: 28px;
+    font-weight: 700;
+  }
+}
+
+.pastoral-details {
+  flex: 1;
+
+  h2 {
+    font-size: 24px;
+    font-weight: 600;
+    margin: 0 0 8px 0;
+  }
+
+  .tipo-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    background: #E3F2FD;
+    color: #2196F3;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .description {
+    color: #666;
+    font-size: 14px;
+    margin: 8px 0 0 0;
+    line-height: 1.5;
+  }
+}
+
+.expand-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  transition: background 0.2s;
+
+  &:hover {
+    background: #f0f0f0;
+  }
+
+  .material-icons {
+    font-size: 32px;
+    color: #666;
+  }
+}
+
+.grupos-list {
+  padding: 0 24px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border-top: 1px solid #f0f0f0;
+  margin-top: 0;
+  padding-top: 16px;
+}
+
+.grupo-item {
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  background: #fafafa;
+  border-radius: 8px;
+  border: 1px solid #e8e8e8;
+  transition: all 0.2s;
+
+  &:hover {
+    background: #f5f5f5;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+}
+
+.grupo-logo {
+  width: 56px;
+  height: 56px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+
+  .grupo-sigla {
+    font-size: 18px;
+    font-weight: 700;
+  }
+}
+
+.grupo-info {
+  flex: 1;
+  min-width: 0;
+
+  h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0 0 4px 0;
+  }
+
+  p {
+    font-size: 13px;
+    color: #666;
+    margin: 0 0 8px 0;
+    line-height: 1.4;
+  }
+
+  .membros-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: #888;
+
+    .material-icons {
+      font-size: 16px;
+    }
+  }
+}
+
+.grupo-actions {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.icon-btn {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    background: #f0f0f0;
+    border-color: #bbb;
+  }
+
+  .material-icons {
+    font-size: 20px;
+    color: #666;
+  }
+
+  &:hover .material-icons {
+    color: #333;
+  }
+}
+
+.empty-grupos {
+  padding: 32px;
+  text-align: center;
+  color: #999;
+
+  .material-icons {
+    font-size: 48px;
+    margin-bottom: 8px;
+  }
+
+  p {
+    margin: 0;
+    font-size: 14px;
+  }
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 24px;
+  color: #999;
+
+  .material-icons {
+    font-size: 64px;
+    margin-bottom: 16px;
+  }
+
+  p {
+    font-size: 16px;
+    margin: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .gallery-container {
+    padding: 16px;
+  }
+
+  .header h1 {
+    font-size: 24px;
+  }
+
+  .pastoral-header {
+    padding: 16px;
+  }
+
+  .pastoral-logo {
+    width: 60px;
+    height: 60px;
+
+    .pastoral-sigla {
+      font-size: 20px;
+    }
+  }
+
+  .pastoral-details h2 {
+    font-size: 18px;
+  }
+
+  .grupos-list {
+    padding: 0 16px 16px 16px;
+  }
+
+  .grupo-item {
+    flex-wrap: wrap;
+  }
+
+  .grupo-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}

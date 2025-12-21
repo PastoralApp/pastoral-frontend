@@ -35,10 +35,7 @@ export class GoogleSuccess implements OnInit {
       }
 
       if (token) {
-        // Salva o token
         localStorage.setItem('token', token);
-        
-        // Redireciona para o dashboard
         this.router.navigate(['/dashboard']);
       } else {
         this.router.navigate(['/login'], { 

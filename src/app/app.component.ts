@@ -45,7 +45,6 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // Carregar usuário do localStorage ao iniciar app
     const token = localStorage.getItem('token');
     if (token) {
       this.authService.loadUserFromToken();

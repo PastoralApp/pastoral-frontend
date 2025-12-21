@@ -66,8 +66,6 @@ export class Register implements OnInit {
   loginWithGoogle(): void {
     this.loading = true;
     this.errorMessage = '';
-
-    // Implementar lógica do Google OAuth
     console.log('Login com Google');
   }
 

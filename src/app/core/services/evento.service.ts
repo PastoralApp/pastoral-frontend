@@ -39,4 +39,20 @@ export class EventoService {
   delete(id: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
+
+  toggleSave(eventoId: string): Observable<{ saved: boolean }> {
+    return this.http.post<{ saved: boolean }>(`${this.apiUrl}/${eventoId}/save`, {});
+  }
+
+  getSavedEventos(): Observable<Evento[]> {
+    return this.http.get<Evento[]>(`${this.apiUrl}/saved`);
+  }
+
+  activateEvento(eventoId: string): Observable<void> {
+    return this.http.patch<void>(`${this.apiUrl}/${eventoId}/ativar`, {});
+  }
+
+  deactivateEvento(eventoId: string): Observable<void> {
+    return this.http.patch<void>(`${this.apiUrl}/${eventoId}/desativar`, {});
+  }
 }

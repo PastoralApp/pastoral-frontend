@@ -1,24 +1,23 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { PostService } from '../../../core/services/post.service';
 import { AuthService } from '../../../core/services/auth.service';
-import { Post } from '../../../core/models/post.model';
+import { Post, PostType } from '../../../core/models/post.model';
 import { User } from '../../../core/models/user.model';
 
 @Component({
   selector: 'app-post-detail',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './post-detail.html',
   styleUrl: './post-detail.scss',
 })
 export class PostDetail implements OnInit {
   post: Post | null = null;
   loading = true;
+  errorMessage = '';
   currentUser: User | null = null;
-  canEdit = false;
-  canDelete = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -40,25 +39,41 @@ export class PostDetail implements OnInit {
     this.postService.getById(id).subscribe({
       next: (post) => {
         this.post = post;
-        this.checkPermissions();
         this.loading = false;
       },
       error: (error) => {
         console.error('Erro ao carregar post:', error);
+        this.errorMessage = 'Post não encontrado';
         this.loading = false;
-        this.router.navigate(['/posts']);
       }
     });
   }
 
-  checkPermissions(): void {
-    if (!this.post || !this.currentUser) return;
+  canEdit(): boolean {
+    if (!this.post || !this.currentUser) return false;
+    const isAuthor = this.post.authorId === this.currentUser.id;
+    const isAdmin = (this.currentUser.role?.type ?? 0) >= 2;
+    return isAuthor || isAdmin;
+  }
 
-    const isAuthor = this.post.autorId === this.currentUser.id;
-    const isAdmin = this.currentUser.role?.type! >= 2;
+  getTypeBadgeClass(type: string): string {
+    switch (type) {
+      case 'Comum': return 'bg-info';
+      case 'Oficial': return 'bg-success';
+      case 'Fixada': return 'bg-warning text-dark';
+      case 'Anuncio': return 'bg-secondary';
+      default: return 'bg-secondary';
+    }
+  }
 
-    this.canEdit = isAuthor || isAdmin;
-    this.canDelete = isAuthor || isAdmin;
+  getTypeLabel(type: string): string {
+    switch (type) {
+      case 'Comum': return 'Comum';
+      case 'Oficial': return 'Oficial';
+      case 'Fixada': return 'Fixada';
+      case 'Anuncio': return 'Anúncio';
+      default: return type;
+    }
   }
 
   deletePost(): void {

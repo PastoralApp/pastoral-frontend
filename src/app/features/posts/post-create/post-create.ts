@@ -1,14 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { PostService } from '../../../core/services/post.service';
 import { PostType } from '../../../core/models/post.model';
 
 @Component({
   selector: 'app-post-create',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './post-create.html',
   styleUrl: './post-create.scss',
 })
@@ -23,10 +23,10 @@ export class PostCreate implements OnInit {
   imagePreview: string | null = null;
 
   postTypeOptions = [
-    { value: PostType.Aviso, label: 'Aviso' },
-    { value: PostType.Evento, label: 'Evento' },
-    { value: PostType.Reflexao, label: 'Reflex\u00e3o' },
-    { value: PostType.Comunicado, label: 'Comunicado' }
+    { value: 'Comum', label: 'Comum' },
+    { value: 'Oficial', label: 'Oficial' },
+    { value: 'Fixada', label: 'Fixada' },
+    { value: 'Anuncio', label: 'Anúncio' }
   ];
 
   constructor(
@@ -41,10 +41,9 @@ export class PostCreate implements OnInit {
     this.isEditMode = !!this.postId;
 
     this.postForm = this.fb.group({
-      titulo: ['', [Validators.required, Validators.minLength(3)]],
-      conteudo: ['', [Validators.required, Validators.minLength(10)]],
-      tipo: [PostType.Aviso, Validators.required],
-      tags: [[]]
+      content: ['', [Validators.required, Validators.minLength(10)]],
+      type: ['Comum', Validators.required],
+      imageUrl: [null]
     });
 
     if (this.isEditMode && this.postId) {
@@ -57,13 +56,12 @@ export class PostCreate implements OnInit {
     this.postService.getById(id).subscribe({
       next: (post) => {
         this.postForm.patchValue({
-          titulo: post.titulo,
-          conteudo: post.conteudo,
-          tipo: post.tipo,
-          tags: post.tags
+          content: post.content,
+          type: post.type,
+          imageUrl: post.imageUrl
         });
-        if (post.imagemUrl) {
-          this.imagePreview = post.imagemUrl;
+        if (post.imageUrl) {
+          this.imagePreview = post.imageUrl;
         }
         this.loading = false;
       },
@@ -79,7 +77,7 @@ export class PostCreate implements OnInit {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {
       this.selectedImage = input.files[0];
-      
+
       const reader = new FileReader();
       reader.onload = (e) => {
         this.imagePreview = e.target?.result as string;
@@ -88,7 +86,10 @@ export class PostCreate implements OnInit {
     }
   }
 
-  removeImage(): void {
+  removeImage(event?: Event): void {
+    if (event) {
+      event.stopPropagation();
+    }
     this.selectedImage = null;
     this.imagePreview = null;
   }

@@ -61,7 +61,7 @@ export class UserForm implements OnInit {
         this.userForm.patchValue({
           name: user.name,
           email: user.email,
-          telefone: user.telefone,
+          telefone: '',
           roleType: user.role?.type || 0
         });
         this.loading = false;
@@ -94,7 +94,7 @@ export class UserForm implements OnInit {
     const formData: any = {
       name: this.userForm.value.name,
       email: this.userForm.value.email,
-      telefone: this.userForm.value.telefone,
+      phoneNumber: this.userForm.value.telefone,
       roleType: this.userForm.value.roleType
     };
 

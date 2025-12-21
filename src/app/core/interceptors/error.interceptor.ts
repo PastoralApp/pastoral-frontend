@@ -11,10 +11,8 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
       let errorMessage = 'Ocorreu um erro desconhecido';
 
       if (error.error instanceof ErrorEvent) {
-        // Erro client-side
         errorMessage = `Erro: ${error.error.message}`;
       } else {
-        // Erro server-side
         if (error.status === 401) {
           router.navigate(['/login']);
           errorMessage = 'Sessão expirada. Por favor, faça login novamente.';

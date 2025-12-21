@@ -8,26 +8,102 @@ export const routes: Routes = [
     redirectTo: '/dashboard',
     pathMatch: 'full'
   },
-  // Auth Routes (Public)
+  {
+    path: 'auth',
+    children: [
+      {
+        path: 'login',
+        loadComponent: () => import('./features/auth/login/login').then(m => m.Login)
+      },
+      {
+        path: 'register',
+        loadComponent: () => import('./features/auth/register/register').then(m => m.Register)
+      },
+      {
+        path: 'google-success',
+        loadComponent: () => import('./features/auth/google-success/google-success').then(m => m.GoogleSuccess)
+      }
+    ]
+  },
   {
     path: 'login',
-    loadComponent: () => import('./features/auth/login/login').then(m => m.Login)
+    redirectTo: '/auth/login',
+    pathMatch: 'full'
   },
   {
     path: 'register',
-    loadComponent: () => import('./features/auth/register/register').then(m => m.Register)
+    redirectTo: '/auth/register',
+    pathMatch: 'full'
   },
-  {
-    path: 'auth/google-success',
-    loadComponent: () => import('./features/auth/google-success/google-success').then(m => m.GoogleSuccess)
-  },
-  // Dashboard (Protected)
   {
     path: 'dashboard',
     loadComponent: () => import('./features/dashboard/dashboard').then(m => m.Dashboard),
     canActivate: [authGuard]
   },
-  // Posts Routes (Protected)
+  {
+    path: 'admin',
+    canActivate: [authGuard, roleGuard([3])],
+    children: [
+      {
+        path: '',
+        loadComponent: () => import('./features/admin/admin-dashboard/admin-dashboard').then(m => m.AdminDashboard)
+      },
+      {
+        path: 'users',
+        loadComponent: () => import('./features/admin/admin-users/admin-users').then(m => m.AdminUsers)
+      },
+      {
+        path: 'posts',
+        loadComponent: () => import('./features/admin/admin-posts/admin-posts').then(m => m.AdminPosts)
+      },
+      {
+        path: 'eventos',
+        loadComponent: () => import('./features/admin/admin-eventos/admin-eventos').then(m => m.AdminEventos)
+      },
+      {
+        path: 'pastorais',
+        loadComponent: () => import('./features/admin/admin-pastorais/admin-pastorais').then(m => m.AdminPastorais)
+      }
+    ]
+  },
+  {
+    path: 'coordenacao',
+    canActivate: [authGuard, roleGuard([2, 3])],
+    children: [
+      {
+        path: '',
+        loadComponent: () => import('./features/coordenacao/coordenacao-dashboard/coordenacao-dashboard').then(m => m.CoordenacaoDashboard)
+      },
+      {
+        path: 'grupos',
+        loadComponent: () => import('./features/coordenacao/coordenacao-grupos/coordenacao-grupos').then(m => m.CoordenacaoGrupos)
+      },
+      {
+        path: 'membros',
+        loadComponent: () => import('./features/coordenacao/coordenacao-membros/coordenacao-membros').then(m => m.CoordenacaoMembros)
+      }
+    ]
+  },
+  {
+    path: 'feed',
+    loadComponent: () => import('./features/feed/feed.component').then(m => m.FeedComponent),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'salvados',
+    loadComponent: () => import('./features/salvados/salvados.component').then(m => m.SalvadosComponent),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'notificacoes',
+    loadComponent: () => import('./features/notificacoes/notificacoes.component').then(m => m.NotificacoesComponent),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'pastorais',
+    loadComponent: () => import('./features/pastorais/pastorais-gallery.component').then(m => m.PastoraisGalleryComponent),
+    canActivate: [authGuard]
+  },
   {
     path: 'posts',
     canActivate: [authGuard],
@@ -47,7 +123,6 @@ export const routes: Routes = [
       }
     ]
   },
-  // Eventos Routes (Protected)
   {
     path: 'eventos',
     canActivate: [authGuard],
@@ -67,7 +142,6 @@ export const routes: Routes = [
       }
     ]
   },
-  // Users Routes (Admin Only)
   {
     path: 'users',
     canActivate: [authGuard, roleGuard([2, 3])],
@@ -86,7 +160,6 @@ export const routes: Routes = [
       }
     ]
   },
-  // Fallback
   {
     path: '**',
     redirectTo: '/dashboard'
