@@ -1,0 +1,129 @@
+<article class="post-card" [class.pinned]="isPinned" [class.oficial]="post.type === 'Oficial'" [class.anuncio]="post.type === 'Anuncio'">
+  <header class="post-header">
+    <div class="author-info">
+      @if (post.authorPhotoUrl) {
+        <img [src]="post.authorPhotoUrl" [alt]="post.authorName" class="author-avatar">
+      } @else {
+        <div class="author-avatar placeholder">
+          {{ post.authorName.charAt(0).toUpperCase() }}
+        </div>
+      }
+      <div class="author-details">
+        <span class="author-name">{{ post.authorName }}</span>
+        <div class="post-meta">
+          <span class="post-time">{{ formatDate(post.createdAt) }}</span>
+          @if (post.type !== 'Comum') {
+            <span class="post-type">{{ postTypeLabel }}</span>
+          }
+        </div>
+      </div>
+    </div>
+    <div class="post-options">
+      <button class="options-btn" (click)="toggleOptions()">
+        <span class="material-icons">more_vert</span>
+      </button>
+      @if (showOptions()) {
+        <div class="options-menu">
+          @if (isAuthor) {
+            <button (click)="deletePost()">
+              <span class="material-icons">delete</span>
+              Excluir
+            </button>
+          }
+          <button (click)="save()">
+            <span class="material-icons">bookmark_border</span>
+            Salvar
+          </button>
+        </div>
+      }
+    </div>
+  </header>
+
+  <div class="post-content">
+    <p>{{ post.content }}</p>
+    @if (post.imageUrl) {
+      <img [src]="post.imageUrl" alt="Imagem do post" class="post-image">
+    }
+  </div>
+
+  <footer class="post-footer">
+    <div class="post-stats">
+      @if (post.likesCount > 0) {
+        <span>{{ post.likesCount }} curtida{{ post.likesCount > 1 ? 's' : '' }}</span>
+      }
+    </div>
+
+    <div class="post-actions">
+      <button 
+        class="action-btn" 
+        [disabled]="isReacting()"
+        (click)="react()"
+      >
+        <span class="material-icons">favorite_border</span>
+        <span>Curtir</span>
+      </button>
+      <button class="action-btn" (click)="toggleComments()">
+        <span class="material-icons">chat_bubble_outline</span>
+        <span>Comentar</span>
+      </button>
+      <button class="action-btn" (click)="share()">
+        <span class="material-icons">share</span>
+        <span>Compartilhar</span>
+      </button>
+    </div>
+
+    @if (showComments()) {
+      <div class="comments-section">
+        @if (loadingComments()) {
+          <div class="loading-comments">
+            <div class="spinner"></div>
+          </div>
+        } @else {
+          <div class="comments-list">
+            @for (comment of comments(); track comment.id) {
+              <div class="comment">
+                <div class="comment-avatar">
+                  @if (comment.userPhotoUrl) {
+                    <img [src]="comment.userPhotoUrl" [alt]="comment.userName">
+                  } @else {
+                    <div class="placeholder">{{ (comment.userName ?? '?').charAt(0).toUpperCase() }}</div>
+                  }
+                </div>
+                <div class="comment-content">
+                  <div class="comment-header">
+                    <span class="comment-author">{{ comment.userName }}</span>
+                    <span class="comment-time">{{ formatDate(comment.dataComentario) }}</span>
+                    @if (comment.userId === currentUserId) {
+                      <button class="delete-comment" (click)="deleteComment(comment.id)">
+                        <span class="material-icons">close</span>
+                      </button>
+                    }
+                  </div>
+                  <p>{{ comment.conteudo }}</p>
+                </div>
+              </div>
+            } @empty {
+              <p class="no-comments">Nenhum comentário ainda</p>
+            }
+          </div>
+
+          <div class="add-comment">
+            <input
+              type="text"
+              placeholder="Escreva um comentário..."
+              [ngModel]="newComment()"
+              (ngModelChange)="newComment.set($event)"
+              (keyup.enter)="submitComment()"
+            >
+            <button 
+              [disabled]="!newComment().trim() || submittingComment()"
+              (click)="submitComment()"
+            >
+              <span class="material-icons">send</span>
+            </button>
+          </div>
+        }
+      </div>
+    }
+  </footer>
+</article>

@@ -1,199 +1,85 @@
-<div class="container py-4">
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="mb-0">
-      <span class="material-icons align-middle me-2">feed</span>
-      Feed
-    </h2>
-    <button class="btn btn-success" (click)="toggleCreateForm()">
-      <span class="material-icons align-middle me-1">add</span>
-      Novo Post
-    </button>
-  </div>
-
-  <div class="card mb-4" *ngIf="showCreateForm">
-    <div class="card-body">
-      <h5 class="card-title">Criar Post</h5>
-      <form (ngSubmit)="createPost()">
-        <div class="mb-3">
-          <label class="form-label">Conteúdo</label>
-          <textarea 
-            class="form-control" 
-            rows="4"
-            [(ngModel)]="newPost.content"
-            name="content"
-            placeholder="O que você quer compartilhar?"
-            required></textarea>
-        </div>
-
-        <div class="row">
-          <div class="col-md-6 mb-3">
-            <label class="form-label">Tipo</label>
-            <select class="form-select" [(ngModel)]="newPost.type" name="type">
-              <option value="Comum">Comum</option>
-              <option value="Aviso">Aviso</option>
-              <option value="Evento">Evento</option>
-              <option value="Reflexao">Reflexão</option>
-            </select>
-          </div>
-
-          <div class="col-md-6 mb-3">
-            <label class="form-label">URL da Imagem (opcional)</label>
-            <input 
-              type="url" 
-              class="form-control" 
-              [(ngModel)]="newPost.imageUrl"
-              name="imageUrl"
-              placeholder="https://...">
-          </div>
-        </div>
-
-        <div class="d-flex gap-2">
-          <button type="submit" class="btn btn-success" [disabled]="loading">
-            <span class="material-icons align-middle me-1">send</span>
-            Publicar
-          </button>
-          <button type="button" class="btn btn-outline-secondary" (click)="toggleCreateForm()">
-            <span class="material-icons align-middle me-1">close</span>
-            Cancelar
-          </button>
-        </div>
-      </form>
+<div class="feed-container">
+  <div class="feed-content">
+    <!-- Filtro de Pastoral -->
+    <div class="feed-filters">
+      <button 
+        class="filter-btn" 
+        [class.active]="selectedFilter() === 'all'"
+        (click)="setFilter('all')"
+      >
+        <span class="material-icons">public</span>
+        Todos
+      </button>
+      <button 
+        class="filter-btn filter-pa" 
+        [class.active]="selectedFilter() === 'PA'"
+        (click)="setFilter('PA')"
+      >
+        <span class="material-icons">child_care</span>
+        Adolescentes
+      </button>
+      <button 
+        class="filter-btn filter-pj" 
+        [class.active]="selectedFilter() === 'PJ'"
+        (click)="setFilter('PJ')"
+      >
+        <span class="material-icons">groups</span>
+        Jovens
+      </button>
     </div>
-  </div>
 
-  <div class="text-center py-5" *ngIf="loading && posts.length === 0">
-    <div class="spinner-border text-success" role="status">
-      <span class="visually-hidden">Carregando...</span>
-    </div>
-  </div>
+    <app-create-post (postCreated)="onPostCreated($event)"></app-create-post>
 
-  <div class="posts-list">
-    <div class="card mb-3 shadow-sm" *ngFor="let post of posts">
-      <div class="card-header bg-white d-flex justify-content-between align-items-start py-3">
-        <div class="d-flex align-items-center flex-grow-1">
-          <div class="avatar-circle me-3">
-            <img 
-              *ngIf="post.authorPhotoUrl" 
-              [src]="post.authorPhotoUrl" 
-              [alt]="post.authorName"
-              class="rounded-circle"
-              width="40"
-              height="40">
-            <span *ngIf="!post.authorPhotoUrl" class="material-icons">person</span>
-          </div>
-          <div>
-            <h6 class="mb-0">{{ post.authorName || 'Usuário' }}</h6>
-            <small class="text-muted">{{ formatDate(post.createdAt) }}</small>
-          </div>
-        </div>
-        <div>
-          <span 
-            class="badge rounded-pill me-2"
-            [ngClass]="getPostTypeBadgeClass(post.type)">
-            {{ getPostTypeLabel(post.type) }}
-          </span>
-          <span *ngIf="post.isPinned" class="badge bg-danger rounded-pill">
-            <span class="material-icons align-middle" style="font-size: 14px;">push_pin</span>
-            Fixado
-          </span>
-        </div>
+    @if (isLoading()) {
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Carregando posts...</p>
       </div>
+    }
 
-      <div class="card-body">
-        <p class="card-text">{{ post.content }}</p>
-        <img 
-          *ngIf="post.imageUrl" 
-          [src]="post.imageUrl" 
-          class="img-fluid rounded mb-3"
-          alt="Imagem do post">
+    @if (error()) {
+      <div class="error-state">
+        <span class="material-icons">error</span>
+        <p>{{ error() }}</p>
+        <button class="btn btn-primary" (click)="loadPosts()">Tentar novamente</button>
       </div>
+    }
 
-      <div class="card-footer bg-white border-top">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-          <div class="d-flex gap-3">
-            <button 
-              class="btn btn-sm"
-              [class.btn-success]="post.userHasReacted"
-              [class.btn-outline-success]="!post.userHasReacted"
-              (click)="toggleReaction(post)">
-              <span class="material-icons align-middle" style="font-size: 18px;">favorite</span>
-              <span class="ms-1">{{ post.likesCount || 0 }}</span>
-            </button>
-
-            <button 
-              class="btn btn-sm btn-outline-secondary"
-              (click)="toggleComments(post.id)">
-              <span class="material-icons align-middle" style="font-size: 18px;">comment</span>
-              <span class="ms-1">{{ post.comments?.length || 0 }}</span>
-            </button>
-
-            <button 
-              class="btn btn-sm btn-outline-secondary"
-              (click)="sharePost(post)">
-              <span class="material-icons align-middle" style="font-size: 18px;">share</span>
-            </button>
-          </div>
-
-          <button 
-            class="btn btn-sm"
-            [class.btn-warning]="post.userHasSaved"
-            [class.btn-outline-warning]="!post.userHasSaved"
-            (click)="toggleSave(post)">
-            <span class="material-icons align-middle" style="font-size: 18px;">
-              {{ post.userHasSaved ? 'bookmark' : 'bookmark_border' }}
-            </span>
-          </button>
+    @if (!isLoading() && !error()) {
+      @if (pinnedPosts().length > 0) {
+        <div class="pinned-section">
+          <h3><span class="material-icons">push_pin</span> Posts Fixados</h3>
+          @for (post of pinnedPosts(); track post.id) {
+            <app-post-card 
+              [post]="post" 
+              [isPinned]="true"
+              (deleted)="onPostDeleted($event)"
+              (updated)="onPostUpdated($event)"
+            ></app-post-card>
+          }
         </div>
+      }
 
-        <div *ngIf="showComments[post.id]" class="comments-section mt-3 pt-3 border-top">
-          <div class="comments-list mb-3">
-            <div 
-              class="comment-item d-flex align-items-start mb-3"
-              *ngFor="let comment of post.comments">
-              <div class="avatar-circle-sm me-2">
-                <span class="material-icons" style="font-size: 20px;">person</span>
-              </div>
-              <div class="flex-grow-1">
-                <div class="comment-content bg-light p-2 rounded">
-                  <strong class="d-block">{{ comment.userName || 'Usuário' }}</strong>
-                  <p class="mb-1">{{ comment.conteudo }}</p>
-                  <small class="text-muted">{{ formatDate(comment.dataComentario) }}</small>
-                </div>
-              </div>
-              <button 
-                class="btn btn-sm btn-link text-danger"
-                (click)="deleteComment(post, comment.id)"
-                title="Excluir comentário">
-                <span class="material-icons" style="font-size: 18px;">delete</span>
-              </button>
-            </div>
-
-            <p class="text-muted text-center" *ngIf="!post.comments || post.comments.length === 0">
-              Nenhum comentário ainda. Seja o primeiro!
-            </p>
+      <div class="posts-section">
+        @for (post of posts(); track post.id) {
+          <app-post-card 
+            [post]="post"
+            (deleted)="onPostDeleted($event)"
+            (updated)="onPostUpdated($event)"
+          ></app-post-card>
+        } @empty {
+          <div class="empty-state">
+            <span class="material-icons">article</span>
+            @if (selectedFilter() === 'all') {
+              <h3>Nenhum post ainda</h3>
+              <p>Seja o primeiro a compartilhar algo!</p>
+            } @else {
+              <h3>Nenhum post nesta pastoral</h3>
+              <p>Não há posts da {{ selectedFilter() === 'PA' ? 'Pastoral de Adolescentes' : 'Pastoral de Jovens' }} ainda.</p>
+            }
           </div>
-
-          <div class="d-flex gap-2">
-            <input 
-              type="text" 
-              class="form-control form-control-sm" 
-              placeholder="Escreva um comentário..."
-              [(ngModel)]="commentTexts[post.id]"
-              (keyup.enter)="addComment(post)">
-            <button 
-              class="btn btn-success btn-sm"
-              (click)="addComment(post)"
-              [disabled]="!commentTexts[post.id]?.trim()">
-              <span class="material-icons" style="font-size: 18px;">send</span>
-            </button>
-          </div>
-        </div>
+        }
       </div>
-    </div>
-
-    <div class="text-center py-5" *ngIf="!loading && posts.length === 0">
-      <span class="material-icons text-muted" style="font-size: 64px;">feed</span>
-      <p class="text-muted mt-3">Nenhum post ainda. Crie o primeiro!</p>
-    </div>
+    }
   </div>
 </div>

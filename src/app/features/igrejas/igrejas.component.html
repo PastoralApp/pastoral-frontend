@@ -1,0 +1,54 @@
+<div class="igrejas-container">
+  <header class="igrejas-header">
+    <h1>Igrejas</h1>
+  </header>
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Carregando igrejas...</p>
+    </div>
+  }
+
+  @if (error()) {
+    <div class="error-state">
+      <span class="material-icons">error</span>
+      <p>{{ error() }}</p>
+      <button class="btn btn-primary" (click)="loadIgrejas()">Tentar novamente</button>
+    </div>
+  }
+
+  @if (!isLoading() && !error()) {
+    <div class="igrejas-grid">
+      @for (igreja of igrejas(); track igreja.id) {
+        <article class="igreja-card" [routerLink]="['/igrejas', igreja.id]">
+          <div class="igreja-icon">
+            <span class="material-icons">church</span>
+          </div>
+          <div class="igreja-content">
+            <h3>{{ igreja.nome }}</h3>
+            @if (formatEndereco(igreja)) {
+              <p class="igreja-endereco">
+                <span class="material-icons">location_on</span>
+                {{ formatEndereco(igreja) }}
+              </p>
+            }
+            @if (igreja.horariosMissas && igreja.horariosMissas.length > 0) {
+              <p class="igreja-horarios">
+                <span class="material-icons">schedule</span>
+                {{ igreja.horariosMissas.length }} horário{{ igreja.horariosMissas.length > 1 ? 's' : '' }} de missa
+              </p>
+            }
+          </div>
+          <span class="material-icons arrow">chevron_right</span>
+        </article>
+      } @empty {
+        <div class="empty-state">
+          <span class="material-icons">church</span>
+          <h3>Nenhuma igreja encontrada</h3>
+          <p>Não há igrejas cadastradas</p>
+        </div>
+      }
+    </div>
+  }
+</div>

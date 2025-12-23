@@ -1,0 +1,142 @@
+<div class="profile-container">
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Carregando perfil...</p>
+    </div>
+  }
+
+  @if (error() && !isLoading()) {
+    <div class="error-state">
+      <span class="material-icons">error</span>
+      <p>{{ error() }}</p>
+      <button class="btn btn-primary" (click)="loadProfile()">Tentar novamente</button>
+    </div>
+  }
+
+  @if (!isLoading() && user()) {
+    <div class="profile-card">
+      <div class="profile-header">
+        <div class="profile-avatar">
+          @if (user()?.photoUrl) {
+            <img [src]="user()?.photoUrl" [alt]="user()?.name">
+          } @else {
+            <div class="avatar-placeholder">{{ userInitial }}</div>
+          }
+        </div>
+        <div class="profile-info">
+          <h1>{{ user()?.name }}</h1>
+          <p class="email">{{ user()?.email }}</p>
+          @if (user()?.roleName) {
+            <span class="role-badge">{{ user()?.roleName }}</span>
+          }
+        </div>
+        @if (!isEditing()) {
+          <button class="btn btn-outline" (click)="startEditing()">
+            <span class="material-icons">edit</span>
+            Editar
+          </button>
+        }
+      </div>
+
+      @if (successMessage()) {
+        <div class="success-message">
+          <span class="material-icons">check_circle</span>
+          {{ successMessage() }}
+        </div>
+      }
+
+      @if (isEditing()) {
+        <form class="edit-form" (ngSubmit)="saveProfile()">
+          <div class="form-group">
+            <label for="nome">Nome</label>
+            <input
+              type="text"
+              id="nome"
+              [ngModel]="editForm().name"
+              (ngModelChange)="updateFormField('name', $event)"
+              name="nome"
+              required
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="dataNascimento">Data de Nascimento</label>
+            <input
+              type="date"
+              id="dataNascimento"
+              [ngModel]="editForm().birthDate || ''"
+              (ngModelChange)="updateFormField('birthDate', $event)"
+              name="dataNascimento"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="fotoUrl">URL da Foto</label>
+            <input
+              type="url"
+              id="fotoUrl"
+              [ngModel]="editForm().photoUrl || ''"
+              (ngModelChange)="updateFormField('photoUrl', $event)"
+              name="fotoUrl"
+              placeholder="https://..."
+            >
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" (click)="cancelEditing()">
+              Cancelar
+            </button>
+            <button type="submit" class="btn btn-primary" [disabled]="isSaving()">
+              @if (isSaving()) {
+                <span class="spinner"></span>
+                Salvando...
+              } @else {
+                Salvar
+              }
+            </button>
+          </div>
+        </form>
+      } @else {
+        <div class="profile-details">
+          <div class="detail-item">
+            <span class="label">Telefone</span>
+            <span class="value">{{ user()?.telefone || '-' }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Data de Nascimento</span>
+            <span class="value">{{ formatDate(user()?.birthDate || null) }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Membro desde</span>
+            <span class="value">{{ formatDate(user()?.createdAt || null) }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Status</span>
+            <span class="value status" [class.active]="user()?.isActive">
+              {{ user()?.isActive ? 'Ativo' : 'Inativo' }}
+            </span>
+          </div>
+        </div>
+
+        @if (user()?.tags && user()!.tags!.length > 0) {
+          <div class="section">
+            <h3>Tags</h3>
+            <div class="tags">
+              @for (tag of user()?.tags; track tag.id) {
+                <span class="tag">{{ tag.name }}</span>
+              }
+            </div>
+          </div>
+        }
+      }
+
+      <div class="profile-footer">
+        <button class="btn btn-danger" (click)="logout()">
+          <span class="material-icons">logout</span>
+          Sair
+        </button>
+      </div>
+    </div>
+  }
+</div>

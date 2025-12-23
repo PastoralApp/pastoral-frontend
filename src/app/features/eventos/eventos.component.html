@@ -1,0 +1,82 @@
+<div class="eventos-container">
+  <header class="eventos-header">
+    <h1>Eventos</h1>
+    <div class="header-actions">
+      <a routerLink="/eventos/novo" class="btn btn-primary">
+        <span class="material-icons">add</span>
+        Novo Evento
+      </a>
+      <div class="view-toggle">
+        <button 
+          [class.active]="view() === 'list'"
+          (click)="toggleView('list')"
+        >
+          <span class="material-icons">view_list</span>
+        </button>
+        <button 
+          [class.active]="view() === 'calendar'"
+          (click)="toggleView('calendar')"
+        >
+          <span class="material-icons">calendar_month</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Carregando eventos...</p>
+    </div>
+  }
+
+  @if (error()) {
+    <div class="error-state">
+      <span class="material-icons">error</span>
+      <p>{{ error() }}</p>
+      <button class="btn btn-primary" (click)="loadEventos()">Tentar novamente</button>
+    </div>
+  }
+
+  @if (!isLoading() && !error()) {
+    @if (view() === 'list') {
+      @if (proximosEventos().length > 0) {
+        <section class="eventos-section">
+          <h2><span class="material-icons">upcoming</span> Próximos Eventos</h2>
+          <div class="eventos-grid">
+            @for (evento of proximosEventos(); track evento.id) {
+              <app-evento-card 
+                [evento]="evento"
+                (participacaoChanged)="onParticipacaoChanged()"
+              ></app-evento-card>
+            }
+          </div>
+        </section>
+      }
+
+      <section class="eventos-section">
+        <h2><span class="material-icons">event</span> Todos os Eventos</h2>
+        <div class="eventos-grid">
+          @for (evento of eventos(); track evento.id) {
+            <app-evento-card 
+              [evento]="evento"
+              (participacaoChanged)="onParticipacaoChanged()"
+            ></app-evento-card>
+          } @empty {
+            <div class="empty-state">
+              <span class="material-icons">event_busy</span>
+              <h3>Nenhum evento encontrado</h3>
+              <p>Não há eventos cadastrados no momento</p>
+            </div>
+          }
+        </div>
+      </section>
+    }
+
+    @if (view() === 'calendar') {
+      <div class="calendar-view">
+        <p class="coming-soon">Visualização de calendário em breve</p>
+      </div>
+    }
+  }
+</div>

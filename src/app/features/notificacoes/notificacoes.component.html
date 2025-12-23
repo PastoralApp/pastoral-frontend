@@ -1,64 +1,50 @@
 <div class="notificacoes-container">
-  <div class="header">
-    <h1>
-      <span class="material-icons">notifications</span>
-      Notificações
-    </h1>
-    <button class="filter-btn" (click)="toggleFilter()" [class.active]="showOnlyUnread">
-      <span class="material-icons">filter_list</span>
-      {{ showOnlyUnread ? 'Mostrar Todas' : 'Apenas Não Lidas' }}
-    </button>
-  </div>
+  <header class="notificacoes-header">
+    <h1>Notificações</h1>
+  </header>
 
-  <div class="badge-counter" *ngIf="naoLidas.length > 0">
-    {{ naoLidas.length }} não {{ naoLidas.length === 1 ? 'lida' : 'lidas' }}
-  </div>
-
-  <div class="loading" *ngIf="loading">
-    <span class="material-icons spinning">refresh</span>
-    Carregando...
-  </div>
-
-  <div class="notificacoes-list" *ngIf="!loading && filteredNotificacoes.length > 0">
-    <div 
-      *ngFor="let notificacao of filteredNotificacoes" 
-      class="notificacao-card"
-      [class.lida]="notificacao.lida"
-      [class.geral]="notificacao.isGeral"
-      (click)="marcarComoLida(notificacao)"
-    >
-      <div class="notificacao-icon">
-        <span class="material-icons">
-          {{ notificacao.isGeral ? 'campaign' : 'group' }}
-        </span>
-      </div>
-
-      <div class="notificacao-content">
-        <div class="notificacao-header">
-          <h3>{{ notificacao.titulo }}</h3>
-          <span class="badge" *ngIf="notificacao.isGeral">Geral</span>
-          <span class="badge grupo" *ngIf="!notificacao.isGeral">{{ notificacao.grupoSigla }}</span>
-        </div>
-
-        <p>{{ notificacao.mensagem }}</p>
-
-        <div class="notificacao-footer">
-          <span class="remetente">
-            <span class="material-icons">person</span>
-            {{ notificacao.remetenteNome }}
-          </span>
-          <span class="data">{{ formatDate(notificacao.dataEnvio) }}</span>
-        </div>
-      </div>
-
-      <div class="status-indicator" *ngIf="!notificacao.lida">
-        <span class="material-icons">circle</span>
-      </div>
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Carregando notificações...</p>
     </div>
-  </div>
+  }
 
-  <div class="empty-state" *ngIf="!loading && filteredNotificacoes.length === 0">
-    <span class="material-icons">notifications_none</span>
-    <p>{{ showOnlyUnread ? 'Nenhuma notificação não lida' : 'Nenhuma notificação' }}</p>
-  </div>
+  @if (error()) {
+    <div class="error-state">
+      <span class="material-icons">error</span>
+      <p>{{ error() }}</p>
+      <button class="btn btn-primary" (click)="loadNotificacoes()">Tentar novamente</button>
+    </div>
+  }
+
+  @if (!isLoading() && !error()) {
+    <div class="notificacoes-list">
+      @for (notificacao of notificacoes(); track notificacao.id) {
+        <article 
+          class="notificacao-item" 
+          [class.nao-lida]="!notificacao.lida"
+          (click)="marcarComoLida(notificacao)"
+        >
+          <div class="notificacao-icon">
+            <span class="material-icons">{{ getIcone(notificacao) }}</span>
+          </div>
+          <div class="notificacao-content">
+            <h3>{{ notificacao.titulo }}</h3>
+            <p>{{ notificacao.mensagem }}</p>
+            <span class="notificacao-time">{{ formatDate(notificacao.dataEnvio) }}</span>
+          </div>
+          @if (!notificacao.lida) {
+            <div class="unread-indicator"></div>
+          }
+        </article>
+      } @empty {
+        <div class="empty-state">
+          <span class="material-icons">notifications_off</span>
+          <h3>Nenhuma notificação</h3>
+          <p>Você não tem notificações no momento</p>
+        </div>
+      }
+    </div>
+  }
 </div>

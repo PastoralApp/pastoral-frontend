@@ -1,0 +1,76 @@
+<div class="horarios-container">
+  <header class="horarios-header">
+    <h1>Horários de Missa</h1>
+    <p class="subtitle">Confira os horários das missas em nossa região</p>
+  </header>
+
+  <div class="dias-tabs">
+    @for (dia of dias; track dia.value) {
+      <button 
+        class="dia-tab"
+        [class.active]="dia.value === diaAtual()"
+        [class.hoje]="isHoje(dia.value)"
+        (click)="selectDia(dia.value)"
+      >
+        <span class="dia-short">{{ dia.short }}</span>
+        <span class="dia-full">{{ dia.label }}</span>
+        @if (isHoje(dia.value)) {
+          <span class="badge-hoje">Hoje</span>
+        }
+      </button>
+    }
+  </div>
+
+  <div class="horarios-content">
+    @if (isLoading()) {
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Carregando horários...</p>
+      </div>
+    } @else if (error()) {
+      <div class="error-state">
+        <span class="material-icons">error_outline</span>
+        <p>{{ error() }}</p>
+        <button class="btn btn-primary" (click)="loadHorarios(diaAtual())">Tentar novamente</button>
+      </div>
+    } @else if (horarios().length === 0) {
+      <div class="empty-state">
+        <span class="material-icons">event_busy</span>
+        <h3>Nenhuma missa agendada</h3>
+        <p>Não há missas programadas para {{ getDiaLabel(diaAtual()) }}</p>
+      </div>
+    } @else {
+      <div class="igrejas-list">
+        @for (entry of getHorariosByIgreja() | keyvalue; track entry.key) {
+          <div class="igreja-card">
+            <div class="igreja-header">
+              <span class="material-icons">church</span>
+              <h2>{{ entry.key }}</h2>
+            </div>
+            <div class="horarios-list">
+              @for (horario of entry.value; track horario.id) {
+                <div class="horario-item">
+                  <div class="horario-time">
+                    <span class="material-icons">schedule</span>
+                    <span class="time">{{ horario.horarioTexto }}</span>
+                  </div>
+                  <div class="horario-details">
+                    @if (horario.celebrante) {
+                      <span class="celebrante">
+                        <span class="material-icons">person</span>
+                        {{ horario.celebrante }}
+                      </span>
+                    }
+                    @if (horario.observacao) {
+                      <span class="observacao">{{ horario.observacao }}</span>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>

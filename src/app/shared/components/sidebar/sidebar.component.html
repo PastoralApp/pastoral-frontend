@@ -1,0 +1,129 @@
+<aside class="sidebar" [class.open]="isOpen">
+  <!-- Overlay para fechar no mobile -->
+  <div class="sidebar-overlay" (click)="onClose()"></div>
+  
+  <div class="sidebar-content">
+    <!-- Header com info do usuário -->
+    <div class="sidebar-header">
+      @if (currentUser) {
+        <div class="user-info">
+          <img 
+            [src]="currentUser.photoUrl || 'assets/images/default-avatar.png'" 
+            [alt]="currentUser.name"
+            class="user-avatar"
+          />
+          <div class="user-details">
+            <span class="user-name">{{ currentUser.name }}</span>
+            <span class="user-role">{{ userRole }}</span>
+          </div>
+        </div>
+      }
+      <button class="btn-close" (click)="onClose()">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+
+    <nav class="sidebar-nav">
+      <!-- Main Section -->
+      <div class="nav-section">
+        <div class="section-title">Principal</div>
+        <ul class="nav-list">
+          @for (item of mainMenuItems; track item.id) {
+            <li class="nav-item">
+              <a 
+                [routerLink]="item.route"
+                routerLinkActive="active"
+                class="nav-link"
+                (click)="onItemClick(item)"
+              >
+                <span class="material-icons nav-icon">{{ item.icon }}</span>
+                <span class="nav-label">{{ item.label }}</span>
+                @if (item.id === 'notificacoes' && getNotificationBadge() > 0) {
+                  <span class="nav-badge">{{ getNotificationBadge() > 99 ? '99+' : getNotificationBadge() }}</span>
+                }
+              </a>
+            </li>
+          }
+        </ul>
+      </div>
+
+      <!-- Profile Section -->
+      <div class="nav-section">
+        <div class="section-title">Minha Conta</div>
+        <ul class="nav-list">
+          @for (item of profileMenuItems; track item.id) {
+            <li class="nav-item">
+              <a 
+                [routerLink]="item.route"
+                routerLinkActive="active"
+                class="nav-link"
+                (click)="onItemClick(item)"
+              >
+                <span class="material-icons nav-icon">{{ item.icon }}</span>
+                <span class="nav-label">{{ item.label }}</span>
+              </a>
+            </li>
+          }
+        </ul>
+      </div>
+
+      <!-- Coordenação Section -->
+      @if (isCoordenador) {
+        <div class="nav-section">
+          <div class="section-title">Coordenação</div>
+          <ul class="nav-list">
+            @for (item of coordMenuItems; track item.id) {
+              @if (hasAccess(item)) {
+                <li class="nav-item">
+                  <a 
+                    [routerLink]="item.route"
+                    routerLinkActive="active"
+                    class="nav-link"
+                    (click)="onItemClick(item)"
+                  >
+                    <span class="material-icons nav-icon">{{ item.icon }}</span>
+                    <span class="nav-label">{{ item.label }}</span>
+                  </a>
+                </li>
+              }
+            }
+          </ul>
+        </div>
+      }
+
+      <!-- Admin Section -->
+      @if (isAdmin) {
+        <div class="nav-section">
+          <div class="section-title">Administração</div>
+          <ul class="nav-list">
+            @for (item of adminMenuItems; track item.id) {
+              <li class="nav-item">
+                <a 
+                  [routerLink]="item.route"
+                  routerLinkActive="active"
+                  class="nav-link"
+                  (click)="onItemClick(item)"
+                >
+                  <span class="material-icons nav-icon">{{ item.icon }}</span>
+                  <span class="nav-label">{{ item.label }}</span>
+                </a>
+              </li>
+            }
+          </ul>
+        </div>
+      }
+
+      <!-- Logout -->
+      <div class="nav-section nav-section-bottom">
+        <ul class="nav-list">
+          <li class="nav-item">
+            <button class="nav-link nav-link-logout" (click)="logout()">
+              <span class="material-icons nav-icon">logout</span>
+              <span class="nav-label">Sair</span>
+            </button>
+          </li>
+        </ul>
+      </div>
+    </nav>
+  </div>
+</aside>

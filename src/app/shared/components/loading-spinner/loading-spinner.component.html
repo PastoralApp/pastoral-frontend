@@ -1,0 +1,18 @@
+<div 
+  class="spinner-container"
+  [class.fullscreen]="fullscreen"
+  [class.overlay]="overlay"
+>
+  <div class="spinner-wrapper">
+    <div 
+      class="spinner"
+      [class.spinner-sm]="size === 'sm'"
+      [class.spinner-md]="size === 'md'"
+      [class.spinner-lg]="size === 'lg'"
+      [style.border-top-color]="color"
+    ></div>
+    @if (message) {
+      <p class="spinner-message">{{ message }}</p>
+    }
+  </div>
+</div>

@@ -1,0 +1,133 @@
+<div class="grupo-detail-container">
+  <header class="detail-header">
+    <button class="back-btn" (click)="goBack()">
+      <span class="material-icons">arrow_back</span>
+      Voltar
+    </button>
+  </header>
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Carregando grupo...</p>
+    </div>
+  } @else if (error()) {
+    <div class="error-state">
+      <span class="material-icons">error_outline</span>
+      <p>{{ error() }}</p>
+      <button class="btn btn-primary" (click)="goBack()">Voltar</button>
+    </div>
+  } @else if (grupo()) {
+    <article class="grupo-content">
+      <div class="grupo-header" [style.background-color]="grupo()!.primaryColor || '#667eea'">
+        <div class="header-content">
+          @if (grupo()!.logoUrl) {
+            <img [src]="grupo()!.logoUrl" [alt]="grupo()!.name" class="grupo-logo">
+          } @else {
+            <div class="grupo-logo placeholder">
+              <span class="material-icons">{{ grupo()!.icon || 'group' }}</span>
+            </div>
+          }
+          <div class="grupo-info">
+            <span class="grupo-sigla">{{ grupo()!.sigla }}</span>
+            <h1>{{ grupo()!.name }}</h1>
+            @if (grupo()!.pastoralName) {
+              <a [routerLink]="['/pastorais', grupo()!.pastoralId]" class="pastoral-link">
+                {{ grupo()!.pastoralName }}
+              </a>
+            }
+          </div>
+          <div class="header-actions">
+            <button 
+              class="btn-icon" 
+              [title]="notificacoesAtivas() ? 'Silenciar notificações' : 'Ativar notificações'"
+              (click)="toggleNotificacoes()"
+            >
+              <span class="material-icons">
+                {{ notificacoesAtivas() ? 'notifications_active' : 'notifications_off' }}
+              </span>
+            </button>
+            @if (canEdit()) {
+              <button class="btn btn-light">
+                <span class="material-icons">edit</span>
+                Editar
+              </button>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="grupo-body">
+        <div class="stats-row">
+          <div class="stat-card">
+            <span class="material-icons">people</span>
+            <div class="stat-info">
+              <span class="stat-value">{{ grupo()!.membersCount || 0 }}</span>
+              <span class="stat-label">Membros</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <span class="material-icons">{{ grupo()!.isActive ? 'check_circle' : 'cancel' }}</span>
+            <div class="stat-info">
+              <span class="stat-value">{{ grupo()!.isActive ? 'Ativo' : 'Inativo' }}</span>
+              <span class="stat-label">Status</span>
+            </div>
+          </div>
+        </div>
+
+        @if (grupo()!.description) {
+          <section class="description-section">
+            <h2>Sobre o grupo</h2>
+            <p>{{ grupo()!.description }}</p>
+          </section>
+        }
+
+        <section class="membros-section">
+          <div class="section-header">
+            <h2>Membros</h2>
+            @if (canEdit()) {
+              <button class="btn btn-outline btn-sm">
+                <span class="material-icons">person_add</span>
+                Adicionar Membro
+              </button>
+            }
+          </div>
+
+          @if (isLoadingMembros()) {
+            <div class="loading-membros">
+              <div class="spinner-small"></div>
+              <span>Carregando membros...</span>
+            </div>
+          } @else if (membros().length > 0) {
+            <div class="membros-list">
+              @for (membro of membros(); track membro.id) {
+                <div class="membro-card">
+                  <div class="membro-avatar">
+                    @if (membro.photoUrl) {
+                      <img [src]="membro.photoUrl" [alt]="membro.name">
+                    } @else {
+                      <span class="avatar-placeholder">{{ getMemberInitial(membro.name) }}</span>
+                    }
+                  </div>
+                  <div class="membro-info">
+                    <span class="membro-name">{{ membro.name }}</span>
+                    <span class="membro-email">{{ membro.email }}</span>
+                  </div>
+                  @if (membro.roleName) {
+                    <span class="membro-role">{{ membro.roleName }}</span>
+                  }
+                </div>
+              }
+            </div>
+          } @else {
+            <div class="empty-state">
+              <span class="material-icons">person_outline</span>
+              <h3>Nenhum membro</h3>
+              <p>Este grupo ainda não possui membros cadastrados</p>
+            </div>
+          }
+        </section>
+      </div>
+    </article>
+  }
+</div>

@@ -1,0 +1,133 @@
+<div class="layout">
+  <header class="navbar">
+    <button class="menu-btn" (click)="toggleSidebar()">
+      <span class="material-icons">menu</span>
+    </button>
+
+    <a routerLink="/feed" class="logo">
+      <span class="material-icons">church</span>
+      <span class="logo-text">Pastoral App</span>
+    </a>
+
+    <div class="navbar-actions">
+      <button class="icon-btn" (click)="toggleTheme()">
+        <span class="material-icons">{{ isDarkMode ? 'light_mode' : 'dark_mode' }}</span>
+      </button>
+      <a routerLink="/notificacoes" class="icon-btn notification-btn">
+        <span class="material-icons">notifications</span>
+        @if (unreadCount() > 0) {
+          <span class="badge">{{ unreadCount() > 9 ? '9+' : unreadCount() }}</span>
+        }
+      </a>
+      <a routerLink="/perfil" class="user-btn">
+        @if (currentUser?.photoUrl) {
+          <img [src]="currentUser?.photoUrl" [alt]="currentUser?.name">
+        } @else {
+          <div class="avatar-placeholder">{{ userInitial }}</div>
+        }
+      </a>
+    </div>
+  </header>
+
+  <aside class="sidebar" [class.open]="sidebarOpen()">
+    <nav class="sidebar-nav">
+      <a routerLink="/feed" routerLinkActive="active" (click)="closeSidebar()">
+        <span class="material-icons">home</span>
+        <span>Feed</span>
+      </a>
+      <a routerLink="/eventos" routerLinkActive="active" (click)="closeSidebar()">
+        <span class="material-icons">event</span>
+        <span>Eventos</span>
+      </a>
+      <a routerLink="/pastorais" routerLinkActive="active" (click)="closeSidebar()">
+        <span class="material-icons">groups</span>
+        <span>Pastorais</span>
+      </a>
+      <a routerLink="/igrejas" routerLinkActive="active" (click)="closeSidebar()">
+        <span class="material-icons">church</span>
+        <span>Igrejas</span>
+      </a>
+      <a routerLink="/horarios-missa" routerLinkActive="active" (click)="closeSidebar()">
+        <span class="material-icons">schedule</span>
+        <span>Horários de Missa</span>
+      </a>
+      <a routerLink="/salvos" routerLinkActive="active" (click)="closeSidebar()">
+        <span class="material-icons">bookmark</span>
+        <span>Salvos</span>
+      </a>
+      <a routerLink="/notificacoes" routerLinkActive="active" (click)="closeSidebar()">
+        <span class="material-icons">notifications</span>
+        <span>Notificações</span>
+      </a>
+      <a routerLink="/meus-posts" routerLinkActive="active" (click)="closeSidebar()">
+        <span class="material-icons">article</span>
+        <span>Meus Posts</span>
+      </a>
+      <a routerLink="/perfil" routerLinkActive="active" (click)="closeSidebar()">
+        <span class="material-icons">person</span>
+        <span>Perfil</span>
+      </a>
+      <a routerLink="/configuracoes" routerLinkActive="active" (click)="closeSidebar()">
+        <span class="material-icons">settings</span>
+        <span>Configurações</span>
+      </a>
+
+      @if (isCoordenador || isAdmin) {
+        <div class="nav-divider"></div>
+        <span class="nav-label">Coordenação</span>
+        <a routerLink="/coordenacao" routerLinkActive="active" (click)="closeSidebar()">
+          <span class="material-icons">manage_accounts</span>
+          <span>Gerenciar Grupos</span>
+        </a>
+      }
+
+      @if (isAdmin) {
+        <div class="nav-divider"></div>
+        <span class="nav-label">Administração</span>
+        <a routerLink="/admin" routerLinkActive="active" (click)="closeSidebar()">
+          <span class="material-icons">admin_panel_settings</span>
+          <span>Painel Admin</span>
+        </a>
+      }
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="logout-btn" (click)="logout()">
+        <span class="material-icons">logout</span>
+        <span>Sair</span>
+      </button>
+    </div>
+  </aside>
+
+  <div class="sidebar-overlay" [class.visible]="sidebarOpen()" (click)="closeSidebar()"></div>
+
+  <main class="main-content">
+    <router-outlet></router-outlet>
+  </main>
+
+  <nav class="bottom-nav">
+    <a routerLink="/feed" routerLinkActive="active">
+      <span class="material-icons">home</span>
+      <span>Feed</span>
+    </a>
+    <a routerLink="/eventos" routerLinkActive="active">
+      <span class="material-icons">event</span>
+      <span>Eventos</span>
+    </a>
+    <a routerLink="/pastorais" routerLinkActive="active">
+      <span class="material-icons">groups</span>
+      <span>Pastorais</span>
+    </a>
+    <a routerLink="/notificacoes" routerLinkActive="active" class="notification-link">
+      <span class="material-icons">notifications</span>
+      @if (unreadCount() > 0) {
+        <span class="badge">{{ unreadCount() }}</span>
+      }
+      <span>Notificações</span>
+    </a>
+    <a routerLink="/perfil" routerLinkActive="active">
+      <span class="material-icons">person</span>
+      <span>Perfil</span>
+    </a>
+  </nav>
+</div>

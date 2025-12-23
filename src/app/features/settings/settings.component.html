@@ -1,0 +1,92 @@
+<div class="settings-container">
+  <header class="settings-header">
+    <h1>Configurações</h1>
+  </header>
+
+  <div class="settings-content">
+    <!-- Account Section -->
+    <section class="settings-section">
+      <h2>Conta</h2>
+      <div class="settings-list">
+        <button class="settings-item" (click)="goToProfile()">
+          <div class="item-icon">
+            <span class="material-icons">person</span>
+          </div>
+          <div class="item-content">
+            <span class="item-title">Editar Perfil</span>
+            <span class="item-subtitle">Nome, foto, data de nascimento</span>
+          </div>
+          <span class="material-icons arrow">chevron_right</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Preferences Section -->
+    <section class="settings-section">
+      <h2>Preferências</h2>
+      <div class="settings-list">
+        <div class="settings-item">
+          <div class="item-icon">
+            <span class="material-icons">{{ isDarkMode ? 'dark_mode' : 'light_mode' }}</span>
+          </div>
+          <div class="item-content">
+            <span class="item-title">Tema Escuro</span>
+            <span class="item-subtitle">Alterna entre tema claro e escuro</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" [checked]="isDarkMode" (change)="toggleTheme()">
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="settings-section">
+      <h2>Sobre</h2>
+      <div class="settings-list">
+        <div class="settings-item static">
+          <div class="item-icon">
+            <span class="material-icons">info</span>
+          </div>
+          <div class="item-content">
+            <span class="item-title">Versão do App</span>
+            <span class="item-subtitle">1.0.0</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Danger Zone -->
+    <section class="settings-section danger">
+      <h2>Zona de Perigo</h2>
+      <div class="settings-list">
+        <button class="settings-item" (click)="openLogoutConfirm()">
+          <div class="item-icon danger">
+            <span class="material-icons">logout</span>
+          </div>
+          <div class="item-content">
+            <span class="item-title danger">Sair da Conta</span>
+            <span class="item-subtitle">Encerra sua sessão no aplicativo</span>
+          </div>
+        </button>
+      </div>
+    </section>
+  </div>
+</div>
+
+@if (showLogoutConfirm()) {
+  <div class="modal-overlay" (click)="closeLogoutConfirm()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-icon">
+        <span class="material-icons">logout</span>
+      </div>
+      <h3>Sair da conta?</h3>
+      <p>Você precisará fazer login novamente para acessar o aplicativo.</p>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" (click)="closeLogoutConfirm()">Cancelar</button>
+        <button class="btn btn-danger" (click)="logout()">Sair</button>
+      </div>
+    </div>
+  </div>
+}

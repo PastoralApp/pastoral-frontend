@@ -1,0 +1,79 @@
+<div class="pastorais-container">
+  <header class="pastorais-header">
+    <h1>Pastorais</h1>
+    <div class="filter-tabs">
+      <button 
+        [class.active]="selectedType() === null"
+        (click)="filterByType(null)"
+      >
+        Todas
+      </button>
+      <button 
+        [class.active]="selectedType() === TipoPastoral.PA"
+        (click)="filterByType(TipoPastoral.PA)"
+      >
+        PA
+      </button>
+      <button 
+        [class.active]="selectedType() === TipoPastoral.PJ"
+        (click)="filterByType(TipoPastoral.PJ)"
+      >
+        PJ
+      </button>
+      <button 
+        [class.active]="selectedType() === TipoPastoral.Geral"
+        (click)="filterByType(TipoPastoral.Geral)"
+      >
+        Geral
+      </button>
+    </div>
+  </header>
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Carregando pastorais...</p>
+    </div>
+  }
+
+  @if (error()) {
+    <div class="error-state">
+      <span class="material-icons">error</span>
+      <p>{{ error() }}</p>
+      <button class="btn btn-primary" (click)="loadPastorais()">Tentar novamente</button>
+    </div>
+  }
+
+  @if (!isLoading() && !error()) {
+    <section class="pastorais-section">
+      <h2><span class="material-icons">explore</span> Pastorais</h2>
+      <div class="pastorais-grid">
+        @for (pastoral of filteredPastorais; track pastoral.id) {
+          <article 
+            class="pastoral-card" 
+            [routerLink]="['/pastorais', pastoral.id]"
+          >
+            <div class="pastoral-type-badge" [attr.data-type]="pastoral.tipoPastoral">
+              {{ pastoral.tipoPastoral }}
+            </div>
+            <h3>{{ pastoral.name }}</h3>
+            @if (pastoral.description) {
+              <p class="pastoral-description">{{ pastoral.description }}</p>
+            }
+            <div class="pastoral-stats">
+              @if (pastoral.grupos && pastoral.grupos.length > 0) {
+                <span><span class="material-icons">groups</span> {{ pastoral.grupos.length }} grupos</span>
+              }
+            </div>
+          </article>
+        } @empty {
+          <div class="empty-state">
+            <span class="material-icons">church</span>
+            <h3>Nenhuma pastoral encontrada</h3>
+            <p>Não há pastorais cadastradas</p>
+          </div>
+        }
+      </div>
+    </section>
+  }
+</div>

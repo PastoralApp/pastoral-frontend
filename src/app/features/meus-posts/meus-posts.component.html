@@ -1,0 +1,51 @@
+<div class="meus-posts-container">
+  <header class="page-header">
+    <div class="header-content">
+      <h1>
+        <span class="material-icons">article</span>
+        Meus Posts
+      </h1>
+      @if (!isLoading()) {
+        <span class="post-count">{{ totalPosts }} post(s)</span>
+      }
+    </div>
+    <a routerLink="/feed" class="btn btn-primary">
+      <span class="material-icons">add</span>
+      Criar Novo Post
+    </a>
+  </header>
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Carregando seus posts...</p>
+    </div>
+  }
+
+  @if (error()) {
+    <div class="error-state">
+      <span class="material-icons">error</span>
+      <p>{{ error() }}</p>
+      <button class="btn btn-primary" (click)="loadMyPosts()">Tentar novamente</button>
+    </div>
+  }
+
+  @if (!isLoading() && !error()) {
+    <div class="posts-grid">
+      @for (post of posts(); track post.id) {
+        <app-post-card 
+          [post]="post"
+          (deleted)="onPostDeleted($event)"
+          (updated)="onPostUpdated($event)"
+        ></app-post-card>
+      } @empty {
+        <div class="empty-state">
+          <span class="material-icons">edit_note</span>
+          <h3>Você ainda não criou nenhum post</h3>
+          <p>Comece a compartilhar suas ideias com a comunidade!</p>
+          <a routerLink="/feed" class="btn btn-primary">Criar Primeiro Post</a>
+        </div>
+      }
+    </div>
+  }
+</div>

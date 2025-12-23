@@ -1,89 +1,112 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, tap } from 'rxjs';
-import { User } from '../models/user.model';
-import { AuthResponse, LoginRequest, GoogleLoginRequest } from '../models/auth.model';
+import { Observable, tap, BehaviorSubject } from 'rxjs';
+import { Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
+import {
+  LoginDto,
+  LoginResponse,
+  GoogleLoginDto,
+  GoogleLoginResponse,
+  GoogleCompleteDto,
+  GoogleCompleteResponse,
+  AuthUser
+} from '../models/auth.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private currentUserSubject: BehaviorSubject<User | null>;
-  public currentUser: Observable<User | null>;
+  private readonly API_URL = `${environment.apiUrl}/auth`;
+  private readonly TOKEN_KEY = 'auth_token';
+  private readonly USER_KEY = 'auth_user';
 
-  constructor(private http: HttpClient) {
-    const storedUser = this.getUserFromToken();
-    this.currentUserSubject = new BehaviorSubject<User | null>(storedUser);
-    this.currentUser = this.currentUserSubject.asObservable();
+  private currentUserSubject = new BehaviorSubject<AuthUser | null>(this.getStoredUser());
+  public currentUser$ = this.currentUserSubject.asObservable();
+  public currentUser = signal<AuthUser | null>(this.getStoredUser());
+
+  private isAuthenticatedSignal = signal<boolean>(this.hasToken());
+  public isAuthenticated = this.isAuthenticatedSignal.asReadonly();
+
+  constructor(
+    private http: HttpClient,
+    private router: Router
+  ) {}
+
+  login(data: LoginDto): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(`${this.API_URL}/login`, data).pipe(
+      tap(response => this.handleAuthSuccess(response.token, response.user))
+    );
   }
 
-  public get currentUserValue(): User | null {
-    return this.currentUserSubject.value;
+  googleLogin(data: GoogleLoginDto): Observable<GoogleLoginResponse> {
+    return this.http.post<GoogleLoginResponse>(`${this.API_URL}/google`, data);
   }
 
-  public getApiUrl(): string {
-    return environment.apiUrl;
+  googleComplete(data: GoogleCompleteDto): Observable<GoogleCompleteResponse> {
+    return this.http.post<GoogleCompleteResponse>(`${this.API_URL}/google/complete`, data).pipe(
+      tap(response => this.handleAuthSuccess(response.token, response.user))
+    );
   }
 
-  login(credentials: LoginRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${environment.apiUrl}/auth/login`, credentials)
-      .pipe(
-        tap(response => {
-          if (response.token) {
-            localStorage.setItem('token', response.token);
-            this.currentUserSubject.next(response.user);
-          }
-        })
-      );
-  }
-
-  loginWithGoogle(request: GoogleLoginRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${environment.apiUrl}/auth/google`, request)
-      .pipe(
-        tap(response => {
-          if (response.token) {
-            localStorage.setItem('token', response.token);
-            this.currentUserSubject.next(response.user);
-          }
-        })
-      );
+  getGoogleLoginUrl(): string {
+    return `${this.API_URL}/google-login`;
   }
 
   logout(): void {
-    localStorage.removeItem('token');
+    localStorage.removeItem(this.TOKEN_KEY);
+    localStorage.removeItem(this.USER_KEY);
     this.currentUserSubject.next(null);
+    this.currentUser.set(null);
+    this.isAuthenticatedSignal.set(false);
+    this.router.navigate(['/auth/login']);
+  }
+
+  getToken(): string | null {
+    return localStorage.getItem(this.TOKEN_KEY);
+  }
+
+  getCurrentUser(): AuthUser | null {
+    return this.currentUserSubject.value;
+  }
+
+  getCurrentUserId(): string {
+    return this.currentUserSubject.value?.id || '';
   }
 
   loadUserFromToken(): void {
-    const user = this.getUserFromToken();
-    this.currentUserSubject.next(user);
-  }
-
-  private getUserFromToken(): User | null {
-    const token = localStorage.getItem('token');
-    if (!token) return null;
-
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      return {
-        id: payload.nameid || payload.sub,
-        name: payload.unique_name || payload.name,
-        email: payload.email,
-        roleId: payload.RoleId,
-        role: {
-          id: payload.RoleId,
-          name: payload.role,
-          type: parseInt(payload.role) || 0,
-          description: ''
-        }
-      } as User;
-    } catch {
-      return null;
+    const user = this.getStoredUser();
+    if (user) {
+      this.currentUserSubject.next(user);
+      this.currentUser.set(user);
+      this.isAuthenticatedSignal.set(true);
     }
   }
 
-  isAuthenticated(): boolean {
-    return this.currentUserValue !== null && !!localStorage.getItem('token');
+  hasRole(roleName: string): boolean {
+    const user = this.getCurrentUser();
+    return user?.role === roleName;
+  }
+
+  hasAnyRole(roleNames: string[]): boolean {
+    const user = this.getCurrentUser();
+    return user ? roleNames.includes(user.role) : false;
+  }
+
+  private handleAuthSuccess(token: string, user: AuthUser): void {
+    localStorage.setItem(this.TOKEN_KEY, token);
+    localStorage.setItem(this.USER_KEY, JSON.stringify(user));
+    this.currentUserSubject.next(user);
+    this.currentUser.set(user);
+    this.isAuthenticatedSignal.set(true);
+  }
+
+  private hasToken(): boolean {
+    return !!localStorage.getItem(this.TOKEN_KEY);
+  }
+
+  private getStoredUser(): AuthUser | null {
+    const userStr = localStorage.getItem(this.USER_KEY);
+    return userStr ? JSON.parse(userStr) : null;
   }
 }

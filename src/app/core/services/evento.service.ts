@@ -1,58 +1,63 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../../../environments/environment.development';
-import { Evento, CreateEventoDto, UpdateEventoDto } from '../models/evento.model';
+import { environment } from '../../../environments/environment';
+import {
+  Evento,
+  CreateEventoDto,
+  UpdateEventoDto,
+  EventoSaveResponse
+} from '../models/evento.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class EventoService {
-  private apiUrl = `${environment.apiUrl}/eventos`;
+  private readonly API_URL = `${environment.apiUrl}/eventos`;
 
   constructor(private http: HttpClient) {}
 
   getAll(): Observable<Evento[]> {
-    return this.http.get<Evento[]>(this.apiUrl);
+    return this.http.get<Evento[]>(this.API_URL);
+  }
+
+  getUpcoming(): Observable<Evento[]> {
+    return this.http.get<Evento[]>(`${this.API_URL}/upcoming`);
+  }
+
+  getPast(): Observable<Evento[]> {
+    return this.http.get<Evento[]>(`${this.API_URL}/past`);
+  }
+
+  getByGrupo(grupoId: string): Observable<Evento[]> {
+    return this.http.get<Evento[]>(`${this.API_URL}/grupo/${grupoId}`);
+  }
+
+  getByPastoral(pastoralId: string): Observable<Evento[]> {
+    return this.http.get<Evento[]>(`${this.API_URL}/pastoral/${pastoralId}`);
   }
 
   getById(id: string): Observable<Evento> {
-    return this.http.get<Evento>(`${this.apiUrl}/${id}`);
+    return this.http.get<Evento>(`${this.API_URL}/${id}`);
   }
 
-  getUpcoming(count: number = 10): Observable<Evento[]> {
-    return this.http.get<Evento[]>(`${this.apiUrl}/upcoming?count=${count}`);
+  create(data: CreateEventoDto): Observable<Evento> {
+    return this.http.post<Evento>(this.API_URL, data);
   }
 
-  getPast(count: number = 10): Observable<Evento[]> {
-    return this.http.get<Evento[]>(`${this.apiUrl}/past?count=${count}`);
-  }
-
-  create(evento: CreateEventoDto): Observable<Evento> {
-    return this.http.post<Evento>(this.apiUrl, evento);
-  }
-
-  update(id: string, evento: UpdateEventoDto): Observable<Evento> {
-    return this.http.put<Evento>(`${this.apiUrl}/${id}`, evento);
+  update(id: string, data: UpdateEventoDto): Observable<void> {
+    return this.http.put<void>(`${this.API_URL}/${id}`, data);
   }
 
   delete(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+    return this.http.delete<void>(`${this.API_URL}/${id}`);
   }
 
-  toggleSave(eventoId: string): Observable<{ saved: boolean }> {
-    return this.http.post<{ saved: boolean }>(`${this.apiUrl}/${eventoId}/save`, {});
+  save(id: string): Observable<EventoSaveResponse> {
+    return this.http.post<EventoSaveResponse>(`${this.API_URL}/${id}/save`, {});
   }
 
-  getSavedEventos(): Observable<Evento[]> {
-    return this.http.get<Evento[]>(`${this.apiUrl}/saved`);
-  }
-
-  activateEvento(eventoId: string): Observable<void> {
-    return this.http.patch<void>(`${this.apiUrl}/${eventoId}/ativar`, {});
-  }
-
-  deactivateEvento(eventoId: string): Observable<void> {
-    return this.http.patch<void>(`${this.apiUrl}/${eventoId}/desativar`, {});
+  getSaved(): Observable<Evento[]> {
+    return this.http.get<Evento[]>(`${this.API_URL}/saved`);
   }
 }

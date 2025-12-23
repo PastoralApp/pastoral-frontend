@@ -1,0 +1,94 @@
+<div class="igreja-detail-container">
+  <header class="detail-header">
+    <button class="back-btn" (click)="goBack()">
+      <span class="material-icons">arrow_back</span>
+      Voltar
+    </button>
+  </header>
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Carregando igreja...</p>
+    </div>
+  } @else if (error()) {
+    <div class="error-state">
+      <span class="material-icons">error_outline</span>
+      <p>{{ error() }}</p>
+      <button class="btn btn-primary" (click)="goBack()">Voltar para Igrejas</button>
+    </div>
+  } @else if (igreja()) {
+    <article class="igreja-content">
+      @if (igreja()!.imagemUrl) {
+        <div class="igreja-image">
+          <img [src]="igreja()!.imagemUrl" [alt]="igreja()!.nome">
+        </div>
+      } @else {
+        <div class="igreja-image placeholder">
+          <span class="material-icons">church</span>
+        </div>
+      }
+
+      <div class="igreja-body">
+        <h1>{{ igreja()!.nome }}</h1>
+        
+        <div class="igreja-info">
+          @if (igreja()!.endereco) {
+            <div class="info-item">
+              <span class="material-icons">location_on</span>
+              <span>{{ igreja()!.endereco }}</span>
+            </div>
+          }
+          @if (igreja()!.telefone) {
+            <div class="info-item">
+              <span class="material-icons">phone</span>
+              <a [href]="'tel:' + igreja()!.telefone">{{ igreja()!.telefone }}</a>
+            </div>
+          }
+        </div>
+
+        <section class="horarios-section">
+          <h2>
+            <span class="material-icons">schedule</span>
+            Horários das Missas
+          </h2>
+
+          @if (hasHorarios()) {
+            <div class="horarios-list">
+              @for (dia of dias; track dia.value) {
+                @if (getHorariosByDia().has(dia.value)) {
+                  <div class="dia-card" [class.hoje]="isHoje(dia.value)">
+                    <div class="dia-header">
+                      <span class="dia-label">{{ dia.label }}</span>
+                      @if (isHoje(dia.value)) {
+                        <span class="badge-hoje">Hoje</span>
+                      }
+                    </div>
+                    <div class="horarios">
+                      @for (horario of getHorariosByDia().get(dia.value); track horario.id) {
+                        <div class="horario-item">
+                          <span class="time">{{ horario.horarioTexto }}</span>
+                          @if (horario.celebrante) {
+                            <span class="celebrante">{{ horario.celebrante }}</span>
+                          }
+                          @if (horario.observacao) {
+                            <span class="observacao">{{ horario.observacao }}</span>
+                          }
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
+              }
+            </div>
+          } @else {
+            <div class="empty-horarios">
+              <span class="material-icons">event_busy</span>
+              <p>Nenhum horário de missa cadastrado</p>
+            </div>
+          }
+        </section>
+      </div>
+    </article>
+  }
+</div>

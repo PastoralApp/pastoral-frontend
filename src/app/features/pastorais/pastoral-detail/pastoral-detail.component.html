@@ -1,0 +1,126 @@
+<div class="pastoral-detail-container">
+  <header class="detail-header">
+    <button class="back-btn" (click)="goBack()">
+      <span class="material-icons">arrow_back</span>
+      Voltar
+    </button>
+  </header>
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Carregando pastoral...</p>
+    </div>
+  } @else if (error()) {
+    <div class="error-state">
+      <span class="material-icons">error_outline</span>
+      <p>{{ error() }}</p>
+      <button class="btn btn-primary" (click)="goBack()">Voltar para Pastorais</button>
+    </div>
+  } @else if (pastoral()) {
+    <article class="pastoral-content">
+      <div class="pastoral-header" [style.background-color]="pastoral()!.primaryColor || '#667eea'">
+        <div class="header-content">
+          @if (pastoral()!.logoUrl) {
+            <img [src]="pastoral()!.logoUrl" [alt]="pastoral()!.name" class="pastoral-logo">
+          } @else {
+            <div class="pastoral-logo placeholder">
+              <span class="material-icons">{{ pastoral()!.icon || 'groups' }}</span>
+            </div>
+          }
+          <div class="pastoral-info">
+            <span class="pastoral-sigla">{{ pastoral()!.sigla }}</span>
+            <h1>{{ pastoral()!.name }}</h1>
+            <span class="pastoral-tipo">{{ getTipoPastoralLabel(pastoral()!.tipoPastoral) }}</span>
+          </div>
+          @if (canEdit()) {
+            <button class="btn btn-light">
+              <span class="material-icons">edit</span>
+              Editar
+            </button>
+          }
+        </div>
+      </div>
+
+      <div class="pastoral-body">
+        <div class="stats-row">
+          <div class="stat-card">
+            <span class="material-icons">groups</span>
+            <div class="stat-info">
+              <span class="stat-value">{{ getActiveGrupos().length }}</span>
+              <span class="stat-label">Grupos</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <span class="material-icons">people</span>
+            <div class="stat-info">
+              <span class="stat-value">{{ getTotalMembros() }}</span>
+              <span class="stat-label">Membros</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <span class="material-icons">{{ pastoral()!.isActive ? 'check_circle' : 'cancel' }}</span>
+            <div class="stat-info">
+              <span class="stat-value">{{ pastoral()!.isActive ? 'Ativa' : 'Inativa' }}</span>
+              <span class="stat-label">Status</span>
+            </div>
+          </div>
+        </div>
+
+        @if (pastoral()!.description) {
+          <section class="description-section">
+            <h2>Sobre</h2>
+            <p>{{ pastoral()!.description }}</p>
+          </section>
+        }
+
+        <section class="grupos-section">
+          <div class="section-header">
+            <h2>Grupos</h2>
+            @if (canEdit()) {
+              <button class="btn btn-outline btn-sm">
+                <span class="material-icons">add</span>
+                Novo Grupo
+              </button>
+            }
+          </div>
+
+          @if (getActiveGrupos().length > 0) {
+            <div class="grupos-grid">
+              @for (grupo of getActiveGrupos(); track grupo.id) {
+                <a [routerLink]="['/grupos', grupo.id]" class="grupo-card">
+                  <div class="grupo-header" [style.background-color]="grupo.primaryColor || '#667eea'">
+                    @if (grupo.logoUrl) {
+                      <img [src]="grupo.logoUrl" [alt]="grupo.name" class="grupo-logo">
+                    } @else {
+                      <div class="grupo-logo placeholder">
+                        <span class="material-icons">{{ grupo.icon || 'group' }}</span>
+                      </div>
+                    }
+                  </div>
+                  <div class="grupo-body">
+                    <h3>{{ grupo.name }}</h3>
+                    <span class="grupo-sigla">{{ grupo.sigla }}</span>
+                    @if (grupo.description) {
+                      <p class="grupo-description">{{ grupo.description }}</p>
+                    }
+                    <div class="grupo-stats">
+                      <span class="material-icons">people</span>
+                      <span>{{ grupo.membersCount || 0 }} membros</span>
+                    </div>
+                  </div>
+                </a>
+              }
+            </div>
+          } @else {
+            <div class="empty-state">
+              <span class="material-icons">groups</span>
+              <h3>Nenhum grupo ativo</h3>
+              <p>Esta pastoral ainda não possui grupos cadastrados</p>
+            </div>
+          }
+        </section>
+      </div>
+    </article>
+  }
+</div>

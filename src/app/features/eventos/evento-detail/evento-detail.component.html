@@ -1,0 +1,103 @@
+<div class="evento-detail-container">
+  <header class="detail-header">
+    <button class="back-btn" (click)="goBack()">
+      <span class="material-icons">arrow_back</span>
+      Voltar
+    </button>
+  </header>
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Carregando evento...</p>
+    </div>
+  } @else if (error()) {
+    <div class="error-state">
+      <span class="material-icons">error_outline</span>
+      <p>{{ error() }}</p>
+      <button class="btn btn-primary" (click)="goBack()">Voltar para Eventos</button>
+    </div>
+  } @else if (evento()) {
+    <article class="evento-content">
+      @if (evento()!.imageUrl) {
+        <div class="evento-image">
+          <img [src]="evento()!.imageUrl" [alt]="evento()!.title">
+        </div>
+      }
+
+      <div class="evento-body">
+        <div class="evento-header">
+          <h1>{{ evento()!.title }}</h1>
+          <div class="evento-actions">
+            <button 
+              class="btn-icon" 
+              [class.saved]="isSaved()"
+              [disabled]="isSaving()"
+              (click)="toggleSave()"
+              title="Salvar evento"
+            >
+              <span class="material-icons">{{ isSaved() ? 'bookmark' : 'bookmark_border' }}</span>
+            </button>
+            @if (canEdit()) {
+              <a [routerLink]="['/eventos', evento()!.id, 'editar']" class="btn btn-outline">
+                <span class="material-icons">edit</span>
+                Editar
+              </a>
+            }
+          </div>
+        </div>
+
+        <div class="evento-meta">
+          <div class="meta-item">
+            <span class="material-icons">calendar_today</span>
+            <div class="meta-text">
+              <span class="label">Data</span>
+              <span class="value">{{ formatDate(evento()!.eventDate) }}</span>
+            </div>
+          </div>
+          <div class="meta-item">
+            <span class="material-icons">schedule</span>
+            <div class="meta-text">
+              <span class="label">Horário</span>
+              <span class="value">{{ formatTime(evento()!.eventDate) }}</span>
+            </div>
+          </div>
+          @if (evento()!.location) {
+            <div class="meta-item">
+              <span class="material-icons">location_on</span>
+              <div class="meta-text">
+                <span class="label">Local</span>
+                <span class="value">{{ evento()!.location }}</span>
+              </div>
+            </div>
+          }
+          @if (evento()!.maxParticipants) {
+            <div class="meta-item">
+              <span class="material-icons">people</span>
+              <div class="meta-text">
+                <span class="label">Vagas</span>
+                <span class="value">{{ evento()!.maxParticipants }} participantes</span>
+              </div>
+            </div>
+          }
+        </div>
+
+        <div class="evento-description">
+          <h2>Sobre o evento</h2>
+          <p>{{ evento()!.description }}</p>
+        </div>
+
+        <div class="evento-footer">
+          <div class="created-by">
+            <span class="material-icons">person</span>
+            <span>Criado por {{ evento()!.createdByName }}</span>
+          </div>
+          <div class="created-at">
+            <span class="material-icons">access_time</span>
+            <span>{{ formatDate(evento()!.createdAt) }}</span>
+          </div>
+        </div>
+      </div>
+    </article>
+  }
+</div>

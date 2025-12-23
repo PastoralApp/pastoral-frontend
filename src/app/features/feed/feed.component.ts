@@ -1,211 +1,119 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { PostService } from '../../core/services/post.service';
-import { Post, CreatePostDto, PostType, CreateCommentDto } from '../../core/models/post.model';
+import { PastoralService } from '../../core/services/pastoral.service';
+import { Post } from '../../core/models/post.model';
+import { Pastoral, TipoPastoral } from '../../core/models/pastoral.model';
+import { PostCardComponent } from './components/post-card/post-card.component';
+import { CreatePostComponent } from './components/create-post/create-post.component';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-feed',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, PostCardComponent, CreatePostComponent],
   templateUrl: './feed.component.html',
-  styleUrls: ['./feed.component.scss']
+  styleUrl: './feed.component.scss'
 })
 export class FeedComponent implements OnInit {
-  posts: Post[] = [];
-  loading = false;
-  showCreateForm = false;
+  private postService = inject(PostService);
+  private pastoralService = inject(PastoralService);
 
-  newPost: CreatePostDto = {
-    content: '',
-    imageUrl: '',
-    type: 'Comum'
-  };
-
-  PostType = PostType;
-
-  commentTexts: { [postId: string]: string } = {};
-  showComments: { [postId: string]: boolean } = {};
-
-  constructor(private postService: PostService) {}
+  posts = signal<Post[]>([]);
+  pinnedPosts = signal<Post[]>([]);
+  pastorais = signal<Pastoral[]>([]);
+  selectedFilter = signal<'all' | 'PA' | 'PJ'>('all');
+  isLoading = signal(true);
+  error = signal('');
 
   ngOnInit(): void {
+    this.loadPastorais();
     this.loadPosts();
   }
 
+  loadPastorais(): void {
+    this.pastoralService.getAll().subscribe({
+      next: (pastorais) => {
+        this.pastorais.set(pastorais);
+      }
+    });
+  }
+
   loadPosts(): void {
-    this.loading = true;
-    this.postService.getAll().subscribe({
-      next: (posts: Post[]) => {
-        this.posts = posts.sort((a, b) => {
-          if (a.isPinned && !b.isPinned) return -1;
-          if (!a.isPinned && b.isPinned) return 1;
-          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-        });
-        this.loading = false;
+    this.isLoading.set(true);
+    this.error.set('');
+
+    this.postService.getPinned().subscribe({
+      next: (pinned) => {
+        this.pinnedPosts.set(pinned);
+      }
+    });
+
+    this.postService.getRecent(50).subscribe({
+      next: (posts) => {
+        this.posts.set(posts);
+        this.isLoading.set(false);
       },
-      error: (err: any) => {
-        console.error('Erro ao carregar posts:', err);
-        this.loading = false;
+      error: (err) => {
+        this.error.set('Erro ao carregar posts');
+        this.isLoading.set(false);
       }
     });
   }
 
-  toggleCreateForm(): void {
-    this.showCreateForm = !this.showCreateForm;
-    if (!this.showCreateForm) {
-      this.resetForm();
-    }
-  }
+  loadPostsByFilter(filter: 'PA' | 'PJ'): void {
+    this.isLoading.set(true);
+    this.error.set('');
+    
+    const pastoralIds = this.pastorais()
+      .filter(p => p.tipoPastoral === filter)
+      .map(p => p.id);
 
-  createPost(): void {
-    if (!this.newPost.content) {
+    if (pastoralIds.length === 0) {
+      this.posts.set([]);
+      this.pinnedPosts.set([]);
+      this.isLoading.set(false);
       return;
     }
 
-    this.loading = true;
-    this.postService.create(this.newPost).subscribe({
-      next: (post: Post) => {
-        this.posts.unshift(post);
-        this.toggleCreateForm();
-        this.loading = false;
+    // Carregar posts de todas as pastorais do tipo selecionado
+    const requests = pastoralIds.map(id => this.postService.getByPastoral(id));
+    
+    forkJoin(requests).subscribe({
+      next: (results) => {
+        const allPosts = results.flat();
+        this.posts.set(allPosts);
+        this.pinnedPosts.set(allPosts.filter(p => p.isPinned));
+        this.isLoading.set(false);
       },
-      error: (err: any) => {
-        console.error('Erro ao criar post:', err);
-        this.loading = false;
+      error: () => {
+        this.error.set('Erro ao carregar posts');
+        this.isLoading.set(false);
       }
     });
   }
 
-  resetForm(): void {
-    this.newPost = {
-      content: '',
-      imageUrl: '',
-      type: 'Comum'
-    };
-  }
-
-  toggleReaction(post: Post): void {
-    this.postService.toggleReaction(post.id).subscribe({
-      next: (result: { likesCount: number; userHasReacted: boolean }) => {
-        post.likesCount = result.likesCount;
-        post.userHasReacted = result.userHasReacted;
-      },
-      error: (err: any) => console.error('Erro ao reagir:', err)
-    });
-  }
-
-  toggleComments(postId: string): void {
-    this.showComments[postId] = !this.showComments[postId];
-
-    if (this.showComments[postId]) {
-      this.loadComments(postId);
+  setFilter(filter: 'all' | 'PA' | 'PJ'): void {
+    this.selectedFilter.set(filter);
+    
+    if (filter === 'all') {
+      this.loadPosts();
+    } else {
+      this.loadPostsByFilter(filter);
     }
   }
 
-  loadComments(postId: string): void {
-    this.postService.getComments(postId).subscribe({
-      next: (comments: any[]) => {
-        const post = this.posts.find(p => p.id === postId);
-        if (post) {
-          post.comments = comments;
-        }
-      },
-      error: (err: any) => console.error('Erro ao carregar comentários:', err)
-    });
+  onPostCreated(post: Post): void {
+    this.posts.update(posts => [post, ...posts]);
   }
 
-  addComment(post: Post): void {
-    const commentText = this.commentTexts[post.id];
-    if (!commentText?.trim()) {
-      return;
-    }
-
-    const comment: CreateCommentDto = { conteudo: commentText };
-
-    this.postService.addComment(post.id, comment).subscribe({
-      next: (newComment: any) => {
-        if (!post.comments) {
-          post.comments = [];
-        }
-        post.comments.push(newComment);
-        this.commentTexts[post.id] = '';
-      },
-      error: (err: any) => console.error('Erro ao adicionar comentário:', err)
-    });
+  onPostDeleted(postId: string): void {
+    this.posts.update(posts => posts.filter(p => p.id !== postId));
+    this.pinnedPosts.update(posts => posts.filter(p => p.id !== postId));
   }
 
-  deleteComment(post: Post, commentId: string): void {
-    if (!confirm('Deseja realmente excluir este comentário?')) {
-      return;
-    }
-
-    this.postService.deleteComment(commentId).subscribe({
-      next: () => {
-        if (post.comments) {
-          post.comments = post.comments.filter(c => c.id !== commentId);
-        }
-      },
-      error: (err: any) => console.error('Erro ao excluir comentário:', err)
-    });
-  }
-
-  sharePost(post: Post): void {
-    this.postService.sharePost(post.id).subscribe({
-      next: () => {
-        alert('Post compartilhado!');
-      },
-      error: (err: any) => console.error('Erro ao compartilhar:', err)
-    });
-  }
-
-  toggleSave(post: Post): void {
-    this.postService.toggleSave(post.id).subscribe({
-      next: (result: { saved: boolean }) => {
-        post.userHasSaved = result.saved;
-      },
-      error: (err: any) => console.error('Erro ao salvar:', err)
-    });
-  }
-
-  formatDate(date: Date): string {
-    const now = new Date();
-    const postDate = new Date(date);
-    const diffMs = now.getTime() - postDate.getTime();
-    const diffMins = Math.floor(diffMs / 60000);
-    const diffHours = Math.floor(diffMs / 3600000);
-    const diffDays = Math.floor(diffMs / 86400000);
-
-    if (diffMins < 1) return 'Agora';
-    if (diffMins < 60) return `${diffMins}min atrás`;
-    if (diffHours < 24) return `${diffHours}h atrás`;
-    if (diffDays === 1) return 'Ontem';
-    if (diffDays < 7) return `${diffDays} dias atrás`;
-
-    return postDate.toLocaleDateString('pt-BR', { 
-      day: '2-digit', 
-      month: '2-digit', 
-      year: 'numeric' 
-    });
-  }
-
-  getPostTypeLabel(type: string): string {
-    switch (type) {
-      case 'Comum': return 'Comum';
-      case 'Aviso': return 'Aviso';
-      case 'Evento': return 'Evento';
-      case 'Reflexao': return 'Reflexão';
-      default: return 'Post';
-    }
-  }
-
-  getPostTypeBadgeClass(type: string): string {
-    switch (type) {
-      case 'Comum': return 'bg-secondary';
-      case 'Aviso': return 'bg-warning text-dark';
-      case 'Evento': return 'bg-success';
-      case 'Reflexao': return 'bg-primary';
-      default: return 'bg-secondary';
-    }
+  onPostUpdated(updatedPost: Post): void {
+    this.posts.update(posts => posts.map(p => p.id === updatedPost.id ? updatedPost : p));
   }
 }

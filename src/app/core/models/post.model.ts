@@ -1,35 +1,46 @@
 export enum PostType {
   Comum = 'Comum',
-  Aviso = 'Aviso',
-  Evento = 'Evento',
-  Reflexao = 'Reflexao'
+  Oficial = 'Oficial',
+  Fixada = 'Fixada',
+  Anuncio = 'Anuncio'
 }
 
 export interface Post {
   id: string;
   content: string;
   imageUrl?: string;
-  type: string;
+  type: PostType;
   isPinned: boolean;
   likesCount: number;
   authorId: string;
-  authorName?: string;
+  authorName: string;
   authorPhotoUrl?: string;
-  createdAt: Date;
-  updatedAt?: Date;
-  reactions?: PostReaction[];
-  comments?: PostComment[];
-  shares?: PostShare[];
-  userHasReacted?: boolean;
-  userHasSaved?: boolean;
+  createdAt: string;
+  updatedAt?: string;
 }
 
-export interface PostReaction {
-  id: string;
-  postId: string;
-  userId: string;
-  userName?: string;
-  dataReacao: Date;
+export interface CreatePostDto {
+  content: string;
+  imageUrl?: string;
+  type?: PostType;
+}
+
+export interface UpdatePostDto {
+  content: string;
+  imageUrl?: string;
+}
+
+export interface ReactResponse {
+  reacted: boolean;
+  likesCount: number;
+}
+
+export interface ShareResponse {
+  sharesCount: number;
+}
+
+export interface SaveResponse {
+  saved: boolean;
 }
 
 export interface PostComment {
@@ -37,29 +48,12 @@ export interface PostComment {
   postId: string;
   userId: string;
   userName?: string;
+  userPhotoUrl?: string;
   conteudo: string;
+  dataComentario: string;
   isAtivo: boolean;
-  dataComentario: Date;
-}
-
-export interface PostShare {
-  id: string;
-  postId: string;
-  userId: string;
-  dataCompartilhamento: Date;
-}
-
-export interface CreatePostDto {
-  content: string;
-  imageUrl?: string;
-  type: string;
 }
 
 export interface CreateCommentDto {
   conteudo: string;
-}
-
-export interface UpdatePostDto {
-  content: string;
-  imageUrl?: string;
 }

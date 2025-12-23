@@ -1,0 +1,48 @@
+<header class="app-header">
+  <div class="header-content">
+    <!-- Menu Toggle -->
+    <button class="btn-menu" (click)="onToggleSidebar()">
+      <span class="material-icons">menu</span>
+    </button>
+
+    <!-- Logo -->
+    <a routerLink="/feed" class="header-logo">
+      <span class="material-icons">church</span>
+      <span class="logo-text">Pastoral App</span>
+    </a>
+
+    <!-- Pastoral Badge -->
+    @if (selectedPastoral) {
+      <div class="pastoral-badge" [attr.data-tipo]="selectedPastoral">
+        {{ selectedPastoral }}
+      </div>
+    }
+
+    <!-- Spacer -->
+    <div class="header-spacer"></div>
+
+    <!-- Actions -->
+    <div class="header-actions">
+      <!-- Theme Toggle -->
+      <button class="btn-icon" (click)="onToggleTheme()" title="Alternar tema">
+        <span class="material-icons">{{ isDarkMode ? 'light_mode' : 'dark_mode' }}</span>
+      </button>
+
+      <!-- Notifications -->
+      <a routerLink="/notificacoes" class="btn-icon">
+        <span class="material-icons">notifications</span>
+      </a>
+
+      <!-- User Avatar -->
+      @if (currentUser) {
+        <a routerLink="/perfil" class="user-avatar">
+          @if (currentUser.photoUrl) {
+            <img [src]="currentUser.photoUrl" [alt]="currentUser.name">
+          } @else {
+            <span class="avatar-placeholder">{{ userInitial }}</span>
+          }
+        </a>
+      }
+    </div>
+  </div>
+</header>

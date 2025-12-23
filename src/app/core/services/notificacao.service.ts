@@ -1,52 +1,60 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../../../environments/environment.development';
-import { Notificacao, CreateNotificacaoDto, UpdateNotificacaoDto } from '../models/notificacao.model';
+import { environment } from '../../../environments/environment';
+import {
+  Notificacao,
+  NotificacaoNaoLida,
+  CreateNotificacaoDto,
+  UpdateNotificacaoDto
+} from '../models/notificacao.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class NotificacaoService {
-  private apiUrl = `${environment.apiUrl}/notificacoes`;
+  private readonly API_URL = `${environment.apiUrl}/notificacoes`;
 
   constructor(private http: HttpClient) {}
 
-  getMinhasNotificacoes(): Observable<Notificacao[]> {
-    return this.http.get<Notificacao[]>(`${this.apiUrl}/minhas`);
+  getMinhas(): Observable<Notificacao[]> {
+    return this.http.get<Notificacao[]>(`${this.API_URL}/minhas`);
   }
 
-  getNaoLidas(): Observable<Notificacao[]> {
-    return this.http.get<Notificacao[]>(`${this.apiUrl}/nao-lidas`);
+  getNaoLidas(): Observable<NotificacaoNaoLida[]> {
+    return this.http.get<NotificacaoNaoLida[]>(`${this.API_URL}/nao-lidas`);
   }
 
-  marcarComoLida(id: string): Observable<void> {
-    return this.http.post<void>(`${this.apiUrl}/${id}/marcar-lida`, {});
+  marcarLida(id: string): Observable<void> {
+    return this.http.post<void>(`${this.API_URL}/${id}/marcar-lida`, {});
   }
 
-  getByGrupo(grupoId: string, incluirInativas = false): Observable<Notificacao[]> {
-    return this.http.get<Notificacao[]>(`${this.apiUrl}/grupo/${grupoId}`, {
-      params: { incluirInativas: incluirInativas.toString() }
-    });
+  getByGrupo(grupoId: string, incluirInativas: boolean = false): Observable<Notificacao[]> {
+    const params = new HttpParams().set('incluirInativas', incluirInativas.toString());
+    return this.http.get<Notificacao[]>(`${this.API_URL}/grupo/${grupoId}`, { params });
   }
 
-  create(dto: CreateNotificacaoDto): Observable<Notificacao> {
-    return this.http.post<Notificacao>(this.apiUrl, dto);
+  getById(id: string): Observable<Notificacao> {
+    return this.http.get<Notificacao>(`${this.API_URL}/${id}`);
   }
 
-  update(id: string, dto: UpdateNotificacaoDto): Observable<void> {
-    return this.http.put<void>(`${this.apiUrl}/${id}`, dto);
+  create(data: CreateNotificacaoDto): Observable<Notificacao> {
+    return this.http.post<Notificacao>(this.API_URL, data);
+  }
+
+  update(id: string, data: UpdateNotificacaoDto): Observable<void> {
+    return this.http.put<void>(`${this.API_URL}/${id}`, data);
   }
 
   delete(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+    return this.http.delete<void>(`${this.API_URL}/${id}`);
   }
 
   ativar(id: string): Observable<void> {
-    return this.http.patch<void>(`${this.apiUrl}/${id}/ativar`, {});
+    return this.http.patch<void>(`${this.API_URL}/${id}/ativar`, {});
   }
 
   desativar(id: string): Observable<void> {
-    return this.http.patch<void>(`${this.apiUrl}/${id}/desativar`, {});
+    return this.http.patch<void>(`${this.API_URL}/${id}/desativar`, {});
   }
 }

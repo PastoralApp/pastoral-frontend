@@ -1,0 +1,97 @@
+<div class="user-profile-container">
+  <header class="detail-header">
+    <button class="back-btn" (click)="goBack()">
+      <span class="material-icons">arrow_back</span>
+      Voltar
+    </button>
+  </header>
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Carregando perfil...</p>
+    </div>
+  } @else if (error()) {
+    <div class="error-state">
+      <span class="material-icons">error_outline</span>
+      <p>{{ error() }}</p>
+      <button class="btn btn-primary" (click)="goBack()">Voltar</button>
+    </div>
+  } @else if (user()) {
+    <article class="profile-content">
+      <div class="profile-header">
+        <div class="avatar-section">
+          @if (user()!.photoUrl) {
+            <img [src]="user()!.photoUrl" [alt]="user()!.name" class="avatar">
+          } @else {
+            <div class="avatar placeholder">{{ getUserInitial() }}</div>
+          }
+          <span class="status-badge" [class.active]="user()!.isActive">
+            {{ user()!.isActive ? 'Ativo' : 'Inativo' }}
+          </span>
+        </div>
+        
+        <div class="info-section">
+          <h1>{{ user()!.name }}</h1>
+          <span class="role-badge">{{ user()!.roleName }}</span>
+          <p class="member-since">Membro desde {{ getMemberSince() }}</p>
+        </div>
+
+        @if (isCurrentUser()) {
+          <a routerLink="/perfil" class="btn btn-outline">
+            <span class="material-icons">edit</span>
+            Editar meu perfil
+          </a>
+        }
+      </div>
+
+      <div class="profile-body">
+        <section class="info-card">
+          <h2>Informações</h2>
+          <div class="info-list">
+            <div class="info-item">
+              <span class="label">Email</span>
+              <span class="value">{{ user()!.email }}</span>
+            </div>
+            @if (user()!.birthDate) {
+              <div class="info-item">
+                <span class="label">Data de Nascimento</span>
+                <span class="value">{{ formatDate(user()!.birthDate) }}</span>
+              </div>
+            }
+            @if (user()!.telefone) {
+              <div class="info-item">
+                <span class="label">Telefone</span>
+                <span class="value">{{ user()!.telefone }}</span>
+              </div>
+            }
+          </div>
+        </section>
+
+        @if (user()!.grupoName) {
+          <section class="info-card">
+            <h2>Grupo</h2>
+            <a [routerLink]="['/grupos', user()!.grupoId]" class="grupo-link">
+              <span class="material-icons">group</span>
+              <span>{{ user()!.grupoName }}</span>
+              <span class="material-icons arrow">chevron_right</span>
+            </a>
+          </section>
+        }
+
+        @if (user()!.tags && user()!.tags.length > 0) {
+          <section class="info-card">
+            <h2>Tags</h2>
+            <div class="tags-list">
+              @for (tag of user()!.tags; track tag.id) {
+                <span class="tag" [style.background-color]="tag.color">
+                  {{ tag.name }}
+                </span>
+              }
+            </div>
+          </section>
+        }
+      </div>
+    </article>
+  }
+</div>

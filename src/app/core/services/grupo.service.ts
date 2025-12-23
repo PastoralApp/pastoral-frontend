@@ -1,66 +1,73 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../../../environments/environment.development';
-import { Grupo, CreateGrupoDto } from '../models/pastoral.model';
+import { environment } from '../../../environments/environment';
+import {
+  Grupo,
+  CreateGrupoDto,
+  UpdateGrupoDto
+} from '../models/pastoral.model';
+import { UserSimple } from '../models/user.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class GrupoService {
-  private apiUrl = `${environment.apiUrl}/grupos`;
+  private readonly API_URL = `${environment.apiUrl}/grupos`;
 
   constructor(private http: HttpClient) {}
 
-  getAll(): Observable<Grupo[]> {
-    return this.http.get<Grupo[]>(this.apiUrl);
+  getAll(incluirInativos: boolean = false): Observable<Grupo[]> {
+    const params = new HttpParams().set('incluirInativos', incluirInativos.toString());
+    return this.http.get<Grupo[]>(this.API_URL, { params });
   }
 
   getById(id: string): Observable<Grupo> {
-    return this.http.get<Grupo>(`${this.apiUrl}/${id}`);
+    return this.http.get<Grupo>(`${this.API_URL}/${id}`);
   }
 
-  getByPastoral(pastoralId: string): Observable<Grupo[]> {
-    return this.http.get<Grupo[]>(`${this.apiUrl}/pastoral/${pastoralId}`);
+  getByPastoral(pastoralId: string, incluirInativos: boolean = false): Observable<Grupo[]> {
+    const params = new HttpParams().set('incluirInativos', incluirInativos.toString());
+    return this.http.get<Grupo[]>(`${this.API_URL}/pastoral/${pastoralId}`, { params });
   }
 
-  create(dto: CreateGrupoDto): Observable<Grupo> {
-    return this.http.post<Grupo>(this.apiUrl, dto);
+  create(data: CreateGrupoDto): Observable<Grupo> {
+    return this.http.post<Grupo>(this.API_URL, data);
   }
 
-  update(id: string, dto: CreateGrupoDto): Observable<void> {
-    return this.http.put<void>(`${this.apiUrl}/${id}`, dto);
+  update(id: string, data: UpdateGrupoDto): Observable<void> {
+    return this.http.put<void>(`${this.API_URL}/${id}`, data);
   }
 
-  delete(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
-  }
-
-  getMembros(id: string): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/${id}/membros`);
+  getMembros(id: string): Observable<UserSimple[]> {
+    return this.http.get<UserSimple[]>(`${this.API_URL}/${id}/membros`);
   }
 
   addMembro(grupoId: string, userId: string): Observable<void> {
-    return this.http.post<void>(`${this.apiUrl}/${grupoId}/membros/${userId}`, {});
+    return this.http.post<void>(`${this.API_URL}/${grupoId}/membros/${userId}`, {});
   }
 
   removeMembro(grupoId: string, userId: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${grupoId}/membros/${userId}`);
+    return this.http.delete<void>(`${this.API_URL}/${grupoId}/membros/${userId}`);
   }
 
   silenciarNotificacoes(grupoId: string): Observable<void> {
-    return this.http.post<void>(`${this.apiUrl}/${grupoId}/silenciar-notificacoes`, {});
+    return this.http.post<void>(`${this.API_URL}/${grupoId}/silenciar-notificacoes`, {});
   }
 
   ativarNotificacoes(grupoId: string): Observable<void> {
-    return this.http.post<void>(`${this.apiUrl}/${grupoId}/ativar-notificacoes`, {});
+    return this.http.post<void>(`${this.API_URL}/${grupoId}/ativar-notificacoes`, {});
   }
 
   ativar(id: string): Observable<void> {
-    return this.http.patch<void>(`${this.apiUrl}/${id}/ativar`, {});
+    return this.http.patch<void>(`${this.API_URL}/${id}/ativar`, {});
   }
 
   desativar(id: string): Observable<void> {
-    return this.http.patch<void>(`${this.apiUrl}/${id}/desativar`, {});
+    return this.http.patch<void>(`${this.API_URL}/${id}/desativar`, {});
+  }
+
+  delete(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.API_URL}/${id}`);
   }
 }

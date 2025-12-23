@@ -1,89 +1,100 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../../../environments/environment.development';
-import { Post, CreatePostDto, UpdatePostDto, PostComment, CreateCommentDto } from '../models/post.model';
+import { environment } from '../../../environments/environment';
+import {
+  Post,
+  CreatePostDto,
+  UpdatePostDto,
+  ReactResponse,
+  ShareResponse,
+  SaveResponse,
+  PostComment,
+  CreateCommentDto
+} from '../models/post.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PostService {
-  private apiUrl = `${environment.apiUrl}/posts`;
+  private readonly API_URL = `${environment.apiUrl}/posts`;
 
   constructor(private http: HttpClient) {}
 
   getAll(): Observable<Post[]> {
-    return this.http.get<Post[]>(this.apiUrl);
+    return this.http.get<Post[]>(this.API_URL);
   }
 
-  getById(id: string): Observable<Post> {
-    return this.http.get<Post>(`${this.apiUrl}/${id}`);
-  }
-
-  getRecent(count: number = 10): Observable<Post[]> {
-    return this.http.get<Post[]>(`${this.apiUrl}/recent?count=${count}`);
+  getRecent(count: number = 50): Observable<Post[]> {
+    const params = new HttpParams().set('count', count.toString());
+    return this.http.get<Post[]>(`${this.API_URL}/recent`, { params });
   }
 
   getPinned(): Observable<Post[]> {
-    return this.http.get<Post[]>(`${this.apiUrl}/pinned`);
+    return this.http.get<Post[]>(`${this.API_URL}/pinned`);
   }
 
-  create(post: CreatePostDto): Observable<Post> {
-    return this.http.post<Post>(this.apiUrl, post);
+  getByPastoral(pastoralId: string): Observable<Post[]> {
+    return this.http.get<Post[]>(`${this.API_URL}/pastoral/${pastoralId}`);
   }
 
-  update(id: string, post: UpdatePostDto): Observable<Post> {
-    return this.http.put<Post>(`${this.apiUrl}/${id}`, post);
+  getByGrupo(grupoId: string): Observable<Post[]> {
+    return this.http.get<Post[]>(`${this.API_URL}/grupo/${grupoId}`);
+  }
+
+  getByUser(userId: string): Observable<Post[]> {
+    return this.http.get<Post[]>(`${this.API_URL}/user/${userId}`);
+  }
+
+  getById(id: string): Observable<Post> {
+    return this.http.get<Post>(`${this.API_URL}/${id}`);
+  }
+
+  create(data: CreatePostDto): Observable<Post> {
+    return this.http.post<Post>(this.API_URL, data);
+  }
+
+  update(id: string, data: UpdatePostDto): Observable<void> {
+    return this.http.put<void>(`${this.API_URL}/${id}`, data);
   }
 
   delete(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+    return this.http.delete<void>(`${this.API_URL}/${id}`);
   }
 
-  toggleReaction(postId: string): Observable<{ likesCount: number; userHasReacted: boolean }> {
-    return this.http.post<{ likesCount: number; userHasReacted: boolean }>(
-      `${this.apiUrl}/${postId}/react`,
-      {}
-    );
+  pin(id: string): Observable<void> {
+    return this.http.post<void>(`${this.API_URL}/${id}/pin`, {});
   }
 
-  addComment(postId: string, comment: CreateCommentDto): Observable<PostComment> {
-    return this.http.post<PostComment>(`${this.apiUrl}/${postId}/comments`, comment);
+  unpin(id: string): Observable<void> {
+    return this.http.post<void>(`${this.API_URL}/${id}/unpin`, {});
   }
 
-  getComments(postId: string): Observable<PostComment[]> {
-    return this.http.get<PostComment[]>(`${this.apiUrl}/${postId}/comments`);
+  react(id: string): Observable<ReactResponse> {
+    return this.http.post<ReactResponse>(`${this.API_URL}/${id}/react`, {});
+  }
+
+  getComments(id: string): Observable<PostComment[]> {
+    return this.http.get<PostComment[]>(`${this.API_URL}/${id}/comments`);
+  }
+
+  addComment(id: string, data: CreateCommentDto): Observable<PostComment> {
+    return this.http.post<PostComment>(`${this.API_URL}/${id}/comments`, data);
   }
 
   deleteComment(commentId: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/comments/${commentId}`);
+    return this.http.delete<void>(`${this.API_URL}/comments/${commentId}`);
   }
 
-  sharePost(postId: string): Observable<{ sharesCount: number }> {
-    return this.http.post<{ sharesCount: number }>(`${this.apiUrl}/${postId}/share`, {});
+  share(id: string): Observable<ShareResponse> {
+    return this.http.post<ShareResponse>(`${this.API_URL}/${id}/share`, {});
   }
 
-  toggleSave(postId: string): Observable<{ saved: boolean }> {
-    return this.http.post<{ saved: boolean }>(`${this.apiUrl}/${postId}/save`, {});
+  save(id: string): Observable<SaveResponse> {
+    return this.http.post<SaveResponse>(`${this.API_URL}/${id}/save`, {});
   }
 
-  getSavedPosts(): Observable<Post[]> {
-    return this.http.get<Post[]>(`${this.apiUrl}/saved`);
-  }
-
-  fixPost(postId: string): Observable<void> {
-    return this.http.patch<void>(`${this.apiUrl}/${postId}/fixar`, {});
-  }
-
-  unfixPost(postId: string): Observable<void> {
-    return this.http.patch<void>(`${this.apiUrl}/${postId}/desfixar`, {});
-  }
-
-  activatePost(postId: string): Observable<void> {
-    return this.http.patch<void>(`${this.apiUrl}/${postId}/ativar`, {});
-  }
-
-  deactivatePost(postId: string): Observable<void> {
-    return this.http.patch<void>(`${this.apiUrl}/${postId}/desativar`, {});
+  getSaved(): Observable<Post[]> {
+    return this.http.get<Post[]>(`${this.API_URL}/saved`);
   }
 }

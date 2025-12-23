@@ -1,0 +1,98 @@
+<div class="coordenacao-container">
+  <header class="coordenacao-header">
+    <h1>Coordenação de Grupos</h1>
+    <button class="btn btn-primary" (click)="openCreateModal()">
+      <span class="material-icons">add</span>
+      Novo Grupo
+    </button>
+  </header>
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Carregando grupos...</p>
+    </div>
+  } @else {
+    <div class="grupos-grid">
+      @for (grupo of grupos(); track grupo.id) {
+        <article class="grupo-card" [class.inactive]="!grupo.isActive">
+          <div class="grupo-header">
+            <h3>{{ grupo.name }}</h3>
+            <span class="status-badge" [class.active]="grupo.isActive">
+              {{ grupo.isActive ? 'Ativo' : 'Inativo' }}
+            </span>
+          </div>
+          @if (grupo.description) {
+            <p class="grupo-description">{{ grupo.description }}</p>
+          }
+          @if (grupo.pastoralName) {
+            <span class="pastoral-tag">{{ grupo.pastoralName }}</span>
+          }
+          <div class="grupo-stats">
+            <span><span class="material-icons">people</span> {{ grupo.membersCount || 0 }} membros</span>
+          </div>
+          <div class="grupo-actions">
+            <button class="btn btn-outline" (click)="toggleGrupoStatus(grupo)">
+              <span class="material-icons">{{ grupo.isActive ? 'block' : 'check_circle' }}</span>
+              {{ grupo.isActive ? 'Desativar' : 'Ativar' }}
+            </button>
+          </div>
+        </article>
+      } @empty {
+        <div class="empty-state">
+          <span class="material-icons">groups</span>
+          <h3>Nenhum grupo encontrado</h3>
+          <p>Crie um novo grupo para começar</p>
+        </div>
+      }
+    </div>
+  }
+</div>
+
+@if (showCreateModal()) {
+  <div class="modal-overlay" (click)="closeCreateModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Novo Grupo</h2>
+        <button class="close-btn" (click)="closeCreateModal()">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="nome">Nome</label>
+          <input
+            type="text"
+            id="nome"
+            [(ngModel)]="newGrupo.name"
+            placeholder="Nome do grupo"
+          >
+        </div>
+        <div class="form-group">
+          <label for="descricao">Descrição</label>
+          <textarea
+            id="descricao"
+            [(ngModel)]="newGrupo.description"
+            placeholder="Descrição do grupo"
+            rows="3"
+          ></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeCreateModal()">Cancelar</button>
+        <button 
+          class="btn btn-primary" 
+          [disabled]="!newGrupo.name || isCreating()"
+          (click)="createGrupo()"
+        >
+          @if (isCreating()) {
+            <span class="spinner"></span>
+            Criando...
+          } @else {
+            Criar Grupo
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+}

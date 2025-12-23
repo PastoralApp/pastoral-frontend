@@ -1,0 +1,35 @@
+<article class="evento-card" [class.past]="!isUpcoming">
+  <div class="evento-date">
+    <span class="day">{{ dayNumber }}</span>
+    <span class="month">{{ monthShort }}</span>
+  </div>
+  
+  <div class="evento-content">
+    <header class="evento-header">
+      <h3 [routerLink]="['/eventos', evento.id]">{{ evento.title }}</h3>
+    </header>
+
+    <div class="evento-info">
+      <div class="info-item">
+        <span class="material-icons">schedule</span>
+        <span>{{ formatTime(evento.eventDate) }}</span>
+      </div>
+      @if (evento.location) {
+        <div class="info-item">
+          <span class="material-icons">location_on</span>
+          <span>{{ evento.location }}</span>
+        </div>
+      }
+      @if (evento.maxParticipants > 0) {
+        <div class="info-item">
+          <span class="material-icons">people</span>
+          <span>Máx {{ evento.maxParticipants }} participantes</span>
+        </div>
+      }
+    </div>
+
+    @if (evento.description) {
+      <p class="evento-description">{{ evento.description }}</p>
+    }
+  </div>
+</article>

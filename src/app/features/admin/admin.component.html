@@ -1,0 +1,148 @@
+<div class="admin-container">
+  <header class="admin-header">
+    <h1>Painel Administrativo</h1>
+  </header>
+
+  <div class="admin-tabs">
+    <button [class.active]="activeTab() === 'users'" (click)="setTab('users')">
+      <span class="material-icons">people</span>
+      Usuários
+    </button>
+    <button [class.active]="activeTab() === 'pastorais'" (click)="setTab('pastorais')">
+      <span class="material-icons">groups</span>
+      Pastorais
+    </button>
+    <button [class.active]="activeTab() === 'roles'" (click)="setTab('roles')">
+      <span class="material-icons">security</span>
+      Roles
+    </button>
+  </div>
+
+  <div class="search-bar">
+    <span class="material-icons">search</span>
+    <input
+      type="text"
+      placeholder="Buscar..."
+      [ngModel]="searchTerm()"
+      (ngModelChange)="searchTerm.set($event)"
+    >
+  </div>
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Carregando...</p>
+    </div>
+  } @else {
+    @if (activeTab() === 'users') {
+      <div class="admin-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Status</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (user of filteredUsers; track user.id) {
+              <tr [class.inactive]="!user.isActive">
+                <td>
+                  <div class="user-cell">
+                    @if (user.photoUrl) {
+                      <img [src]="user.photoUrl" [alt]="user.name">
+                    } @else {
+                      <div class="avatar-placeholder">{{ user.name.charAt(0) }}</div>
+                    }
+                    {{ user.name }}
+                  </div>
+                </td>
+                <td>{{ user.email }}</td>
+                <td>
+                  <select [ngModel]="user.roleId" (ngModelChange)="changeUserRole(user.id, $event)">
+                    @for (role of roles(); track role.id) {
+                      <option [value]="role.id">{{ role.name }}</option>
+                    }
+                  </select>
+                </td>
+                <td>
+                  <span class="status-badge" [class.active]="user.isActive">
+                    {{ user.isActive ? 'Ativo' : 'Inativo' }}
+                  </span>
+                </td>
+                <td>
+                  <button class="action-btn" (click)="toggleUserStatus(user)">
+                    <span class="material-icons">{{ user.isActive ? 'block' : 'check_circle' }}</span>
+                  </button>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="5" class="empty-cell">Nenhum usuário encontrado</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+
+    @if (activeTab() === 'pastorais') {
+      <div class="admin-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Tipo</th>
+              <th>Membros</th>
+              <th>Status</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (pastoral of filteredPastorais; track pastoral.id) {
+              <tr [class.inactive]="!pastoral.isActive">
+                <td>{{ pastoral.name }}</td>
+                <td>
+                  <span class="type-badge" [attr.data-type]="pastoral.tipoPastoral">
+                    {{ pastoral.tipoPastoral }}
+                  </span>
+                </td>
+                <td>{{ pastoral.grupos || 0 }}</td>
+                <td>
+                  <span class="status-badge" [class.active]="pastoral.isActive">
+                    {{ pastoral.isActive ? 'Ativo' : 'Inativo' }}
+                  </span>
+                </td>
+                <td>
+                  <button class="action-btn" (click)="togglePastoralStatus(pastoral)">
+                    <span class="material-icons">{{ pastoral.isActive ? 'block' : 'check_circle' }}</span>
+                  </button>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="5" class="empty-cell">Nenhuma pastoral encontrada</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+
+    @if (activeTab() === 'roles') {
+      <div class="roles-grid">
+        @for (role of roles(); track role.id) {
+          <div class="role-card">
+            <span class="material-icons">security</span>
+            <h3>{{ role.name }}</h3>
+            @if (role.description) {
+              <p>{{ role.description }}</p>
+            }
+          </div>
+        }
+      </div>
+    }
+  }
+</div>

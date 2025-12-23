@@ -1,31 +1,34 @@
+export interface Tag {
+  id: string;
+  name: string;
+  color: string;
+  description?: string;
+}
+
 export interface User {
   id: string;
   name: string;
   email: string;
   photoUrl?: string;
-  birthDate?: Date;
-  isActive?: boolean;
+  birthDate?: string;
+  telefone?: string;
+  isActive: boolean;
   roleId: string;
-  roleName?: string;
+  roleName: string;
   grupoId?: string;
   grupoName?: string;
-  role?: Role;
-  tags?: Tag[];
-  createdAt?: Date;
-  updatedAt?: Date;
+  tags: Tag[];
+  createdAt: string;
+  updatedAt?: string;
 }
 
-export interface Role {
+export interface UserSimple {
   id: string;
   name: string;
-  type: number;
-  description: string;
-}
-
-export interface Tag {
-  id: string;
-  name: string;
-  color: string;
+  email: string;
+  photoUrl?: string;
+  isActive: boolean;
+  roleName?: string;
 }
 
 export interface CreateUserDto {
@@ -38,7 +41,19 @@ export interface CreateUserDto {
 
 export interface UpdateUserDto {
   name: string;
-  email: string;
+  email?: string;
+  birthDate?: string;
   photoUrl?: string;
-  birthDate?: Date;
+  roleId?: string;
+  isActive?: boolean;
+}
+
+export interface UpdateProfileDto {
+  name: string;
+  birthDate?: string;
+  photoUrl?: string;
+}
+
+export interface UpdateRoleDto {
+  roleId: string;
 }

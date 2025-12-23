@@ -1,0 +1,91 @@
+<div class="callback-container">
+  <div class="callback-card">
+    @if (isLoading && !requiresCompletion) {
+      <div class="loading-state">
+        <div class="spinner-large"></div>
+        <p>Processando login...</p>
+      </div>
+    }
+
+    @if (errorMessage && !requiresCompletion) {
+      <div class="error-state">
+        <span class="material-icons error-icon">error</span>
+        <h2>Erro no login</h2>
+        <p>{{ errorMessage }}</p>
+        <a routerLink="/auth/login" class="btn btn-primary">Voltar para login</a>
+      </div>
+    }
+
+    @if (requiresCompletion) {
+      <div class="complete-state">
+        <div class="complete-header">
+          @if (prefillData?.photoUrl) {
+            <img [src]="prefillData?.photoUrl" alt="Foto" class="user-photo">
+          } @else {
+            <div class="user-photo-placeholder">
+              <span class="material-icons">person</span>
+            </div>
+          }
+          <h2>Complete seu cadastro</h2>
+          <p>Olá {{ prefillData?.name }}! Complete seu cadastro para continuar.</p>
+          <span class="email-badge">{{ prefillData?.email }}</span>
+        </div>
+
+        @if (errorMessage) {
+          <div class="alert alert-danger">
+            <span class="material-icons">error</span>
+            {{ errorMessage }}
+          </div>
+        }
+
+        <form [formGroup]="completeForm" (ngSubmit)="onCompleteSubmit()">
+          <div class="form-group">
+            <label for="name">Nome</label>
+            <div class="input-wrapper">
+              <span class="material-icons">person</span>
+              <input
+                type="text"
+                id="name"
+                formControlName="name"
+                placeholder="Seu nome"
+                [class.is-invalid]="completeForm.get('name')?.invalid && completeForm.get('name')?.touched"
+              >
+            </div>
+            @if (completeForm.get('name')?.invalid && completeForm.get('name')?.touched) {
+              <span class="error-text">Nome deve ter no mínimo 3 caracteres</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="password">Crie uma senha</label>
+            <div class="input-wrapper">
+              <span class="material-icons">lock</span>
+              <input
+                [type]="showPassword ? 'text' : 'password'"
+                id="password"
+                formControlName="password"
+                placeholder="Sua senha"
+                [class.is-invalid]="completeForm.get('password')?.invalid && completeForm.get('password')?.touched"
+              >
+              <button type="button" class="toggle-password" (click)="togglePassword()">
+                <span class="material-icons">{{ showPassword ? 'visibility_off' : 'visibility' }}</span>
+              </button>
+            </div>
+            @if (completeForm.get('password')?.invalid && completeForm.get('password')?.touched) {
+              <span class="error-text">Senha deve ter no mínimo 6 caracteres</span>
+            }
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block" [disabled]="completeForm.invalid || isLoading">
+            @if (isLoading) {
+              <span class="spinner"></span>
+              Finalizando...
+            } @else {
+              Finalizar cadastro
+            }
+          </button>
+        </form>
+      </div>
+    }
+  </div>
+</div>

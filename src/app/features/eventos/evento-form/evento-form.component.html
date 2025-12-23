@@ -1,0 +1,138 @@
+<div class="evento-form-container">
+  <header class="form-header">
+    <button class="back-btn" (click)="goBack()">
+      <span class="material-icons">arrow_back</span>
+      Voltar
+    </button>
+    <h1>{{ pageTitle }}</h1>
+  </header>
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Carregando...</p>
+    </div>
+  } @else {
+    <form class="evento-form" (ngSubmit)="onSubmit()">
+      @if (error()) {
+        <div class="error-alert">
+          <span class="material-icons">error</span>
+          <span>{{ error() }}</span>
+        </div>
+      }
+
+      <div class="form-group">
+        <label for="title">Título *</label>
+        <input
+          type="text"
+          id="title"
+          [ngModel]="form().title"
+          (ngModelChange)="updateField('title', $event)"
+          name="title"
+          placeholder="Digite o título do evento"
+          required
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="description">Descrição *</label>
+        <textarea
+          id="description"
+          [ngModel]="form().description"
+          (ngModelChange)="updateField('description', $event)"
+          name="description"
+          placeholder="Descreva o evento"
+          rows="4"
+          required
+        ></textarea>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="eventDate">Data e Hora *</label>
+          <input
+            type="datetime-local"
+            id="eventDate"
+            [ngModel]="form().eventDate"
+            (ngModelChange)="updateField('eventDate', $event)"
+            name="eventDate"
+            required
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="location">Local</label>
+          <input
+            type="text"
+            id="location"
+            [ngModel]="form().location"
+            (ngModelChange)="updateField('location', $event)"
+            name="location"
+            placeholder="Onde será o evento"
+          >
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="imageUrl">URL da Imagem</label>
+        <input
+          type="url"
+          id="imageUrl"
+          [ngModel]="form().imageUrl"
+          (ngModelChange)="updateField('imageUrl', $event)"
+          name="imageUrl"
+          placeholder="https://exemplo.com/imagem.jpg"
+        >
+        @if (form().imageUrl) {
+          <div class="image-preview">
+            <img [src]="form().imageUrl" alt="Preview">
+          </div>
+        }
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="maxParticipants">Máximo de Participantes</label>
+          <input
+            type="number"
+            id="maxParticipants"
+            [ngModel]="form().maxParticipants"
+            (ngModelChange)="updateField('maxParticipants', $event)"
+            name="maxParticipants"
+            placeholder="Sem limite"
+            min="1"
+          >
+        </div>
+
+        <div class="form-group checkbox-group">
+          <label class="checkbox-label">
+            <input
+              type="checkbox"
+              [ngModel]="form().requireInscription"
+              (ngModelChange)="updateField('requireInscription', $event)"
+              name="requireInscription"
+            >
+            <span class="checkmark"></span>
+            <span>Requer inscrição prévia</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" (click)="goBack()">
+          Cancelar
+        </button>
+        <button 
+          type="submit" 
+          class="btn btn-primary"
+          [disabled]="isSaving()"
+        >
+          @if (isSaving()) {
+            <span class="spinner-small"></span>
+          }
+          {{ submitButtonText }}
+        </button>
+      </div>
+    </form>
+  }
+</div>

@@ -1,37 +1,57 @@
-import { Component, inject } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ThemeService } from '../../../core/services/theme.service';
+import { RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+import { ThemeService } from '../../../core/services/theme.service';
+import { TipoPastoral } from '../../../core/models/pastoral.model';
+import { AuthUser } from '../../../core/models/auth.model';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule],
-  template: `
-    <header class="header">
-      <div class="header-content">
-        <h1 class="logo">Pastoral App</h1>
-        <div class="header-actions">
-          <button class="theme-toggle" (click)="toggleTheme()">
-            {{ themeService.theme() === 'pa' ? 'PA' : 'PJ' }}
-          </button>
-          @if (authService.user(); as user) {
-            <div class="user-info">
-              <span class="user-name">{{ user.name }}</span>
-            </div>
-          }
-        </div>
-      </div>
-    </header>
-  `,
-  styleUrls: ['./header.component.scss']
+  imports: [CommonModule, RouterLink],
+  templateUrl: './header.component.html',
+  styleUrl: './header.component.scss'
 })
 export class HeaderComponent {
-  themeService = inject(ThemeService);
-  authService = inject(AuthService);
+  private authService = inject(AuthService);
+  private themeService = inject(ThemeService);
 
-  toggleTheme(): void {
-    const newTheme = this.themeService.theme() === 'pa' ? 'pj' : 'pa';
-    this.themeService.setTheme(newTheme);
+  @Input() selectedPastoral: TipoPastoral | null = null;
+  @Input() showMobileMenu = false;
+  @Output() toggleMobileMenu = new EventEmitter<void>();
+  @Output() toggleSidebar = new EventEmitter<void>();
+
+  get currentUser(): AuthUser | null {
+    return this.authService.currentUser();
+  }
+
+  get isDarkMode(): boolean {
+    return this.themeService.isDarkMode();
+  }
+
+  get userInitial(): string {
+    return this.currentUser?.name?.charAt(0).toUpperCase() || '?';
+  }
+
+  onToggleTheme(): void {
+    this.themeService.toggleTheme();
+  }
+
+  onToggleMobileMenu(): void {
+    this.toggleMobileMenu.emit();
+  }
+
+  onToggleSidebar(): void {
+    this.toggleSidebar.emit();
+  }
+
+  getUserInitials(name: string): string {
+    if (!name) return 'U';
+    const parts = name.split(' ');
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    }
+    return name[0].toUpperCase();
   }
 }
