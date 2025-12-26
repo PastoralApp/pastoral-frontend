@@ -1,0 +1,28 @@
+@use '../../admin-shared.styles' as *;
+
+.role-name {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  .role-icon {
+    font-size: 22px;
+  }
+}
+
+.tipo-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.action-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+
+  &:hover {
+    background: transparent;
+  }
+}

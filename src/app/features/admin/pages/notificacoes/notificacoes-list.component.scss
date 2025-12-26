@@ -1,0 +1,39 @@
+@use '../../admin-shared.styles' as *;
+
+.notif-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  .material-icons {
+    color: var(--text-secondary, #666);
+    font-size: 20px;
+
+    &.global {
+      color: var(--primary, #4CAF50);
+    }
+  }
+}
+
+.tipo-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  background: #e3f2fd;
+  color: #1565c0;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+
+  &.geral {
+    background: var(--primary-light, #e8f5e9);
+    color: var(--primary-dark, #2e7d32);
+  }
+}
+
+.action-btn.success {
+  color: var(--primary, #4CAF50);
+
+  &:hover {
+    background: var(--primary-light, #e8f5e9);
+  }
+}

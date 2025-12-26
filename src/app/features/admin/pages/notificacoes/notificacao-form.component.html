@@ -1,0 +1,126 @@
+<div class="admin-page">
+  <header class="page-header">
+    <div class="header-left">
+      <a routerLink="/admin/notificacoes" class="btn-back">
+        <span class="material-icons">arrow_back</span>
+      </a>
+      <div>
+        <h1>
+          <span class="material-icons">notifications</span>
+          {{ isEditMode() ? 'Editar Notificação' : 'Nova Notificação' }}
+        </h1>
+        <p class="subtitle">{{ isEditMode() ? 'Atualize os dados da notificação' : 'Crie uma nova notificação' }}</p>
+      </div>
+    </div>
+  </header>
+
+  @if (errorMessage()) {
+    <div class="error-message">
+      <span class="material-icons">error</span>
+      {{ errorMessage() }}
+    </div>
+  }
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Carregando dados...</p>
+    </div>
+  } @else {
+    <div class="form-container">
+      <form class="form-card" (ngSubmit)="save()">
+        <div class="form-group">
+          <label for="titulo">Título *</label>
+          <input type="text" id="titulo" name="titulo" [(ngModel)]="notificacao.titulo" required placeholder="Ex: Missa de Natal">
+        </div>
+
+        <div class="form-group">
+          <label for="mensagem">Mensagem *</label>
+          <textarea id="mensagem" name="mensagem" [(ngModel)]="notificacao.mensagem" rows="4" required placeholder="Digite a mensagem da notificação"></textarea>
+        </div>
+
+        @if (!isEditMode()) {
+          <div class="form-group tipo-selector">
+            <label>Tipo de Notificação *</label>
+            <div class="radio-group">
+              <label class="radio-option" [class.selected]="tipoNotificacao === 'geral'">
+                <input type="radio" name="tipoNotificacao" value="geral" [(ngModel)]="tipoNotificacao" (change)="onTipoChange()">
+                <span class="radio-content">
+                  <span class="material-icons">public</span>
+                  <span>Geral</span>
+                  <small>Enviar para todos os usuários</small>
+                </span>
+              </label>
+              <label class="radio-option" [class.selected]="tipoNotificacao === 'grupo'">
+                <input type="radio" name="tipoNotificacao" value="grupo" [(ngModel)]="tipoNotificacao" (change)="onTipoChange()">
+                <span class="radio-content">
+                  <span class="material-icons">group</span>
+                  <span>Grupo Específico</span>
+                  <small>Enviar para um grupo selecionado</small>
+                </span>
+              </label>
+              <label class="radio-option" [class.selected]="tipoNotificacao === 'individual'">
+                <input type="radio" name="tipoNotificacao" value="individual" [(ngModel)]="tipoNotificacao" (change)="onTipoChange()">
+                <span class="radio-content">
+                  <span class="material-icons">person</span>
+                  <span>Individual</span>
+                  <small>Enviar para um usuário específico</small>
+                </span>
+              </label>
+            </div>
+          </div>
+
+          @if (tipoNotificacao === 'grupo') {
+            <div class="form-group">
+              <label for="grupoId">Grupo *</label>
+              <select id="grupoId" name="grupoId" [(ngModel)]="notificacao.grupoId" required>
+                <option value="">Selecione o grupo</option>
+                @for (grupo of grupos(); track grupo.id) {
+                  <option [value]="grupo.id">{{ grupo.name }}</option>
+                }
+              </select>
+            </div>
+          }
+
+          @if (tipoNotificacao === 'individual') {
+            <div class="form-group">
+              <label for="destinatarioId">Usuário *</label>
+              <select id="destinatarioId" name="destinatarioId" [(ngModel)]="notificacao.destinatarioId" required>
+                <option value="">Selecione o usuário</option>
+                @for (usuario of usuarios(); track usuario.id) {
+                  <option [value]="usuario.id">{{ usuario.name }} ({{ usuario.email }})</option>
+                }
+              </select>
+            </div>
+          }
+
+          <div class="form-group checkbox-group">
+            <label class="checkbox-label">
+              <input type="checkbox" name="sendEmail" [(ngModel)]="notificacao.sendEmail">
+              <span class="checkbox-content">
+                <span class="material-icons">email</span>
+                <span>
+                  <strong>Enviar também por email</strong>
+                  <small>Os destinatários receberão um email com a notificação (apenas usuários com email verificado)</small>
+                </span>
+              </span>
+            </label>
+          </div>
+        }
+
+        <div class="form-actions">
+          <a routerLink="/admin/notificacoes" class="btn btn-secondary">Cancelar</a>
+          <button type="submit" class="btn btn-primary" [disabled]="isSaving()">
+            @if (isSaving()) {
+              <div class="spinner-small"></div>
+              Salvando...
+            } @else {
+              <span class="material-icons">save</span>
+              {{ isEditMode() ? 'Atualizar' : 'Salvar' }}
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+</div>

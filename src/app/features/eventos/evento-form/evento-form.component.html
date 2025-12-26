@@ -14,13 +14,6 @@
     </div>
   } @else {
     <form class="evento-form" (ngSubmit)="onSubmit()">
-      @if (error()) {
-        <div class="error-alert">
-          <span class="material-icons">error</span>
-          <span>{{ error() }}</span>
-        </div>
-      }
-
       <div class="form-group">
         <label for="title">Título *</label>
         <input
@@ -116,6 +109,81 @@
             <span>Requer inscrição prévia</span>
           </label>
         </div>
+      </div>
+
+      <div class="section-divider">
+        <span class="section-title">Organização do Evento</span>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="grupoId">
+            Grupo Responsável
+            @if (isCoordGrupo()) {
+              <span class="required">*</span>
+            }
+          </label>
+          @if (canSelectGrupo()) {
+            <select
+              id="grupoId"
+              [ngModel]="form().grupoId"
+              (ngModelChange)="updateField('grupoId', $event)"
+              name="grupoId"
+            >
+              <option [value]="undefined">Nenhum grupo</option>
+              @for (grupo of grupos(); track grupo.id) {
+                <option [value]="grupo.id">{{ grupo.name }}</option>
+              }
+            </select>
+          } @else {
+            <input type="text" [value]="grupoSelecionadoNome" disabled>
+            <small class="helper-text">Vinculado automaticamente ao seu grupo</small>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="responsavelUserId">Responsável</label>
+          @if (canSelectResponsavel()) {
+            <select
+              id="responsavelUserId"
+              [ngModel]="form().responsavelUserId"
+              (ngModelChange)="updateField('responsavelUserId', $event)"
+              name="responsavelUserId"
+            >
+              <option [value]="undefined">Nenhum responsável específico</option>
+              @for (coord of coordenadores(); track coord.id) {
+                <option [value]="coord.id">{{ coord.name }} ({{ coord.roleName }})</option>
+              }
+            </select>
+          } @else {
+            <input type="text" value="Você é o responsável" disabled>
+          }
+        </div>
+      </div>
+
+      <div class="section-divider">
+        <span class="section-title">Personalização</span>
+      </div>
+
+      <div class="form-group">
+        <label>Cor do Evento</label>
+        <div class="color-picker">
+          @for (cor of coresDisponiveis; track cor.valor) {
+            <button
+              type="button"
+              class="color-option"
+              [class.selected]="form().cor === cor.valor"
+              [style.background-color]="cor.valor || 'var(--primary-color)'"
+              (click)="updateField('cor', cor.valor)"
+              [title]="cor.nome"
+            >
+              @if (form().cor === cor.valor) {
+                <span class="material-icons">check</span>
+              }
+            </button>
+          }
+        </div>
+        <small class="helper-text">Escolha uma cor para identificar este evento no calendário</small>
       </div>
 
       <div class="form-actions">

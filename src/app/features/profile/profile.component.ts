@@ -1,29 +1,32 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { UserService } from '../../core/services/user.service';
 import { AuthService } from '../../core/services/auth.service';
-import { UpdateUserDto, User } from '../../core/models/user.model';
+import { UpdateProfileDto, User } from '../../core/models/user.model';
+import { ToastService } from '../../shared/services/toast.service';
+import { ConfirmationService } from '../../shared/components/confirmation-modal';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss'
 })
 export class ProfileComponent implements OnInit {
   private userService = inject(UserService);
   private authService = inject(AuthService);
+  private toastService = inject(ToastService);
+  private confirmationService = inject(ConfirmationService);
 
   user = signal<User | null>(null);
   isLoading = signal(true);
   isEditing = signal(false);
   isSaving = signal(false);
-  error = signal('');
-  successMessage = signal('');
 
-  editForm = signal<UpdateUserDto>({
+  editForm = signal<UpdateProfileDto>({
     name: ''
   });
 
@@ -33,7 +36,6 @@ export class ProfileComponent implements OnInit {
 
   loadProfile(): void {
     this.isLoading.set(true);
-    this.error.set('');
 
     this.userService.getMe().subscribe({
       next: (user) => {
@@ -46,7 +48,7 @@ export class ProfileComponent implements OnInit {
         this.isLoading.set(false);
       },
       error: (err) => {
-        this.error.set('Erro ao carregar perfil');
+        this.toastService.error('Erro ao carregar perfil');
         this.isLoading.set(false);
       }
     });
@@ -54,7 +56,6 @@ export class ProfileComponent implements OnInit {
 
   startEditing(): void {
     this.isEditing.set(true);
-    this.successMessage.set('');
   }
 
   cancelEditing(): void {
@@ -73,32 +74,39 @@ export class ProfileComponent implements OnInit {
     if (this.isSaving()) return;
 
     this.isSaving.set(true);
-    this.error.set('');
-    this.successMessage.set('');
 
     this.userService.updateMyProfile(this.editForm()).subscribe({
       next: () => {
         this.loadProfile();
         this.isEditing.set(false);
         this.isSaving.set(false);
-        this.successMessage.set('Perfil atualizado com sucesso!');
+        this.toastService.success('Perfil atualizado com sucesso!');
       },
       error: (err) => {
-        this.error.set(err.error?.message || 'Erro ao atualizar perfil');
+        this.toastService.error(err.error?.message || 'Erro ao atualizar perfil');
         this.isSaving.set(false);
       }
     });
   }
 
-  updateFormField(field: keyof UpdateUserDto, value: string | undefined): void {
+  updateFormField(field: keyof UpdateProfileDto, value: string | undefined): void {
     this.editForm.update(form => ({
       ...form,
       [field]: value || undefined
     }));
   }
 
-  logout(): void {
-    this.authService.logout();
+  async logout(): Promise<void> {
+    const confirmed = await this.confirmationService.confirm({
+      title: 'Sair da conta',
+      message: 'Tem certeza que deseja sair da sua conta?',
+      confirmText: 'Sim, sair',
+      cancelText: 'Cancelar',
+      type: 'warning'
+    });
+    if (confirmed) {
+      this.authService.logout();
+    }
   }
 
   get userInitial(): string {

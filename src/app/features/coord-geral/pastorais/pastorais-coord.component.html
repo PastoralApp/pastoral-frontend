@@ -1,0 +1,107 @@
+<div class="pastorais-container">
+  <header class="page-header">
+    <div class="header-left">
+      <a routerLink="/coord-geral" class="btn-back">
+        <span class="material-icons">arrow_back</span>
+      </a>
+      <div>
+        <h1>Cores das Pastorais</h1>
+        <p>Edite as cores de identificação de cada pastoral</p>
+      </div>
+    </div>
+  </header>
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Carregando pastorais...</p>
+    </div>
+  }
+
+  @if (!isLoading()) {
+    <div class="pastorais-grid">
+      @for (pastoral of pastorais(); track pastoral.id) {
+        <div class="pastoral-card" [style.border-left-color]="pastoral.primaryColor">
+          <div class="pastoral-header">
+            <div class="pastoral-info">
+              <h3>{{ pastoral.name }}</h3>
+              @if (pastoral.description) {
+                <p class="description">{{ pastoral.description }}</p>
+              }
+            </div>
+
+            <div class="color-preview" [style.background-color]="pastoral.primaryColor">
+              <span class="color-code" [style.color]="getContrastColor(pastoral.primaryColor)">
+                {{ pastoral.primaryColor.toUpperCase() }}
+              </span>
+            </div>
+          </div>
+
+          <div class="pastoral-stats">
+            <div class="stat">
+              <span class="material-icons">group</span>
+              <span>{{ pastoral.membrosCount || 0 }} membros</span>
+            </div>
+            <div class="stat">
+              <span class="material-icons">group_work</span>
+              <span>{{ pastoral.gruposCount || 0 }} grupos</span>
+            </div>
+          </div>
+
+          @if (!isEditing(pastoral.id)) {
+            <button class="btn-edit" (click)="startEdit(pastoral)">
+              <span class="material-icons">palette</span>
+              Alterar Cor
+            </button>
+          }
+
+          @if (isEditing(pastoral.id)) {
+            <div class="edit-panel">
+              <div class="color-input-group">
+                <label>Nova Cor</label>
+                <div class="input-with-picker">
+                  <input
+                    type="text"
+                    [(ngModel)]="tempColor"
+                    placeholder="#000000"
+                    maxlength="7"
+                    class="color-text-input"
+                  />
+                  <input
+                    type="color"
+                    [(ngModel)]="tempColor"
+                    class="color-picker"
+                  />
+                </div>
+                <small>Formato: #RRGGBB (ex: #2196F3)</small>
+              </div>
+
+              <div class="color-preview-large" [style.background-color]="tempColor()">
+                <span [style.color]="getContrastColor(tempColor())">
+                  Preview: {{ pastoral.name }}
+                </span>
+              </div>
+
+              <div class="edit-actions">
+                <button class="btn-cancel" (click)="cancelEdit()">
+                  <span class="material-icons">close</span>
+                  Cancelar
+                </button>
+                <button class="btn-save" (click)="saveColor(pastoral)">
+                  <span class="material-icons">check</span>
+                  Salvar
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      } @empty {
+        <div class="empty-state">
+          <span class="material-icons">palette</span>
+          <h3>Nenhuma pastoral encontrada</h3>
+          <p>Não há pastorais cadastradas no sistema</p>
+        </div>
+      }
+    </div>
+  }
+</div>

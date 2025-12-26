@@ -1,6 +1,25 @@
 <div class="notificacoes-container">
   <header class="notificacoes-header">
-    <h1>Notificações</h1>
+    <div class="header-top">
+      <h1>Notificações</h1>
+      @if (isConnected()) {
+        <span class="connection-status connected" title="Conectado a notificações em tempo real">
+          <span class="status-dot"></span>
+          Conectado
+        </span>
+      } @else {
+        <span class="connection-status disconnected" title="Desconectado de notificações em tempo real">
+          <span class="status-dot"></span>
+          Desconectado
+        </span>
+      }
+    </div>
+    @if (canSendNotification()) {
+      <a routerLink="/enviar-notificacao" class="btn btn-primary">
+        <span class="material-icons">mail</span>
+        Enviar Notificação
+      </a>
+    }
   </header>
 
   @if (isLoading()) {
@@ -10,15 +29,7 @@
     </div>
   }
 
-  @if (error()) {
-    <div class="error-state">
-      <span class="material-icons">error</span>
-      <p>{{ error() }}</p>
-      <button class="btn btn-primary" (click)="loadNotificacoes()">Tentar novamente</button>
-    </div>
-  }
-
-  @if (!isLoading() && !error()) {
+  @if (!isLoading()) {
     <div class="notificacoes-list">
       @for (notificacao of notificacoes(); track notificacao.id) {
         <article 

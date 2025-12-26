@@ -10,15 +10,7 @@
     </div>
   }
 
-  @if (error()) {
-    <div class="error-state">
-      <span class="material-icons">error</span>
-      <p>{{ error() }}</p>
-      <button class="btn btn-primary" (click)="loadIgrejas()">Tentar novamente</button>
-    </div>
-  }
-
-  @if (!isLoading() && !error()) {
+  @if (!isLoading()) {
     <div class="igrejas-grid">
       @for (igreja of igrejas(); track igreja.id) {
         <article class="igreja-card" [routerLink]="['/igrejas', igreja.id]">

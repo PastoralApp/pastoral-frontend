@@ -1,0 +1,72 @@
+<div class="admin-page">
+  <header class="page-header">
+    <div class="header-left">
+      <a routerLink="/admin/igrejas" class="btn-back">
+        <span class="material-icons">arrow_back</span>
+      </a>
+      <div>
+        <h1>
+          <span class="material-icons">church</span>
+          {{ isEditMode() ? 'Editar Igreja' : 'Nova Igreja' }}
+        </h1>
+        <p class="subtitle">{{ isEditMode() ? 'Atualize os dados da igreja' : 'Cadastre uma nova igreja' }}</p>
+      </div>
+    </div>
+  </header>
+
+  @if (errorMessage()) {
+    <div class="error-message">
+      <span class="material-icons">error</span>
+      {{ errorMessage() }}
+    </div>
+  }
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Carregando dados...</p>
+    </div>
+  } @else {
+    <div class="form-container">
+      <form class="form-card" (ngSubmit)="save()">
+        <div class="form-group">
+          <label for="nome">Nome da Igreja *</label>
+          <input type="text" id="nome" name="nome" [(ngModel)]="igreja.nome" required placeholder="Ex: Igreja Matriz São José">
+        </div>
+
+        <div class="form-group">
+          <label for="endereco">Endereço</label>
+          <input type="text" id="endereco" name="endereco" [(ngModel)]="igreja.endereco" placeholder="Ex: Rua Principal, 100 - Centro">
+        </div>
+
+        <div class="form-group">
+          <label for="telefone">Telefone</label>
+          <input type="tel" id="telefone" name="telefone" [(ngModel)]="igreja.telefone" placeholder="(00) 0000-0000">
+        </div>
+
+        <div class="form-group">
+          <label for="imagemUrl">URL da Imagem</label>
+          <input type="url" id="imagemUrl" name="imagemUrl" [(ngModel)]="igreja.imagemUrl" placeholder="https://...">
+          @if (igreja.imagemUrl) {
+            <div class="image-preview">
+              <img [src]="igreja.imagemUrl" alt="Preview">
+            </div>
+          }
+        </div>
+
+        <div class="form-actions">
+          <a routerLink="/admin/igrejas" class="btn btn-secondary">Cancelar</a>
+          <button type="submit" class="btn btn-primary" [disabled]="isSaving()">
+            @if (isSaving()) {
+              <div class="spinner-small"></div>
+              Salvando...
+            } @else {
+              <span class="material-icons">save</span>
+              {{ isEditMode() ? 'Atualizar' : 'Cadastrar' }}
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+</div>

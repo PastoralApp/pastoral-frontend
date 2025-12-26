@@ -1,8 +1,16 @@
-export interface Tag {
+import type { Tag } from './tag.model';
+export { Tag, CreateTagDto } from './tag.model';
+
+export interface UserGrupoInfo {
   id: string;
-  name: string;
-  color: string;
-  description?: string;
+  grupoId: string;
+  grupoName: string;
+  grupoSigla: string;
+  grupoLogoUrl?: string;
+  primaryColor: string;
+  pastoralName?: string;
+  dataEntrada: string;
+  silenciarNotificacoes: boolean;
 }
 
 export interface User {
@@ -18,6 +26,7 @@ export interface User {
   grupoId?: string;
   grupoName?: string;
   tags: Tag[];
+  grupos: UserGrupoInfo[];
   createdAt: string;
   updatedAt?: string;
 }
@@ -37,15 +46,36 @@ export interface CreateUserDto {
   password: string;
   roleId: string;
   grupoId?: string;
+  telefone?: string;
+  birthDate?: string;
 }
 
 export interface UpdateUserDto {
   name: string;
-  email?: string;
+  email: string;
   birthDate?: string;
   photoUrl?: string;
-  roleId?: string;
-  isActive?: boolean;
+  telefone?: string;
+  roleId: string;
+  isActive: boolean;
+}
+
+export interface UpdateUserProfileDto {
+  name: string;
+  birthDate?: string;
+  photoUrl?: string;
+  telefone?: string;
+}
+
+export interface UpdateUserRoleDto {
+  roleId: string;
+}
+
+export interface UpdateUserAdminDto {
+  name: string;
+  telefone?: string;
+  birthDate?: string;
+  roleId: string;
 }
 
 export interface UpdateProfileDto {
@@ -56,4 +86,12 @@ export interface UpdateProfileDto {
 
 export interface UpdateRoleDto {
   roleId: string;
+}
+
+export interface AddTagToUserDto {
+  tagId: string;
+}
+
+export interface RemoveTagFromUserDto {
+  tagId: string;
 }

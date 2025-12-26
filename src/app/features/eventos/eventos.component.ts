@@ -1,24 +1,25 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
 import { EventoService } from '../../core/services/evento.service';
 import { Evento } from '../../core/models/evento.model';
 import { EventoCardComponent } from './components/evento-card/evento-card.component';
+import { EventoCalendarComponent } from './components/evento-calendar/evento-calendar.component';
+import { ToastService } from '../../shared/services/toast.service';
 
 @Component({
   selector: 'app-eventos',
   standalone: true,
-  imports: [CommonModule, RouterLink, EventoCardComponent],
+  imports: [CommonModule, EventoCardComponent, EventoCalendarComponent],
   templateUrl: './eventos.component.html',
   styleUrl: './eventos.component.scss'
 })
 export class EventosComponent implements OnInit {
   private eventoService = inject(EventoService);
+  private toastService = inject(ToastService);
 
   eventos = signal<Evento[]>([]);
   proximosEventos = signal<Evento[]>([]);
   isLoading = signal(true);
-  error = signal('');
   view = signal<'list' | 'calendar'>('list');
 
   ngOnInit(): void {
@@ -27,7 +28,6 @@ export class EventosComponent implements OnInit {
 
   loadEventos(): void {
     this.isLoading.set(true);
-    this.error.set('');
 
     this.eventoService.getUpcoming().subscribe({
       next: (eventos) => {
@@ -41,7 +41,7 @@ export class EventosComponent implements OnInit {
         this.isLoading.set(false);
       },
       error: (err) => {
-        this.error.set('Erro ao carregar eventos');
+        this.toastService.error('Erro ao carregar eventos');
         this.isLoading.set(false);
       }
     });

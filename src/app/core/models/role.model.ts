@@ -12,6 +12,12 @@ export interface Role {
   description: string;
 }
 
+export interface CreateRoleDto {
+  name: string;
+  type?: number;
+  description: string;
+}
+
 export const ROLE_IDS = {
   USUARIO: '00000000-0000-0000-0000-000000000001',
   COORDENADOR_GRUPO: '00000000-0000-0000-0000-000000000002',

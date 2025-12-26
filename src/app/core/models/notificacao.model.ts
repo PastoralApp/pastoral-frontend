@@ -3,6 +3,7 @@ export interface Notificacao {
   titulo: string;
   mensagem: string;
   grupoId?: string;
+  destinatarioId?: string;
   grupoNome?: string;
   grupoSigla?: string;
   remetenteId: string;
@@ -10,6 +11,7 @@ export interface Notificacao {
   dataEnvio: string;
   isAtiva: boolean;
   isGeral: boolean;
+  sendEmail: boolean;
   lida: boolean;
   dataLeitura?: string;
 }
@@ -27,7 +29,9 @@ export interface CreateNotificacaoDto {
   mensagem: string;
   remetenteId: string;
   grupoId?: string;
+  destinatarioId?: string;
   isGeral: boolean;
+  sendEmail: boolean;
 }
 
 export interface UpdateNotificacaoDto {

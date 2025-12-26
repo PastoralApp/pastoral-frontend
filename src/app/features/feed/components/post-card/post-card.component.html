@@ -1,4 +1,11 @@
 <article class="post-card" [class.pinned]="isPinned" [class.oficial]="post.type === 'Oficial'" [class.anuncio]="post.type === 'Anuncio'">
+  @if (post.isPinned && pinTypeLabel) {
+    <div class="pin-badge" [ngClass]="pinTypeBadgeClass">
+      <span class="material-icons">push_pin</span>
+      {{ pinTypeLabel }}
+    </div>
+  }
+  
   <header class="post-header">
     <div class="author-info">
       @if (post.authorPhotoUrl) {
@@ -15,6 +22,7 @@
           @if (post.type !== 'Comum') {
             <span class="post-type">{{ postTypeLabel }}</span>
           }
+          <span class="post-pastoral" [class]="'pastoral-' + post.tipoPastoral.toLowerCase()">{{ pastoralLabel }}</span>
         </div>
       </div>
     </div>
@@ -24,6 +32,12 @@
       </button>
       @if (showOptions()) {
         <div class="options-menu">
+          @if (canPin) {
+            <button [disabled]="isPinning()" (click)="togglePin()">
+              <span class="material-icons">{{ post.isPinned ? 'push_pin' : 'push_pin' }}</span>
+              {{ post.isPinned ? 'Desafixar' : 'Fixar' }}
+            </button>
+          }
           @if (isAuthor) {
             <button (click)="deletePost()">
               <span class="material-icons">delete</span>
@@ -56,11 +70,12 @@
     <div class="post-actions">
       <button 
         class="action-btn" 
+        [class.liked]="post.isLiked"
         [disabled]="isReacting()"
         (click)="react()"
       >
-        <span class="material-icons">favorite_border</span>
-        <span>Curtir</span>
+        <span class="material-icons">{{ post.isLiked ? 'favorite' : 'favorite_border' }}</span>
+        <span>{{ post.isLiked ? 'Descurtir' : 'Curtir' }}</span>
       </button>
       <button class="action-btn" (click)="toggleComments()">
         <span class="material-icons">chat_bubble_outline</span>

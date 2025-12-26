@@ -1,0 +1,85 @@
+<div class="admin-page">
+  <header class="page-header">
+    <div class="header-left">
+      <a routerLink="/admin" class="btn-back">
+        <span class="material-icons">arrow_back</span>
+      </a>
+      <div>
+        <h1>
+          <span class="material-icons">group</span>
+          Gerenciar Grupos
+        </h1>
+        <p class="subtitle">{{ grupos().length }} grupo(s) cadastrado(s)</p>
+      </div>
+    </div>
+    <a routerLink="/admin/grupos/create" class="btn btn-primary">
+      <span class="material-icons">add</span>
+      Novo Grupo
+    </a>
+  </header>
+
+  <div class="search-bar">
+    <span class="material-icons">search</span>
+    <input type="text" placeholder="Buscar grupos..." [ngModel]="searchTerm" (ngModelChange)="onSearch($event)">
+  </div>
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Carregando grupos...</p>
+    </div>
+  } @else {
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Sigla</th>
+            <th>Pastoral</th>
+            <th>Membros</th>
+            <th>Status</th>
+            <th class="actions-column">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (grupo of filteredGrupos(); track grupo.id) {
+            <tr [class.inactive]="!grupo.isActive">
+              <td>
+                <div class="item-info">
+                  <span class="color-dot" [style.background]="grupo.primaryColor"></span>
+                  {{ grupo.name }}
+                </div>
+              </td>
+              <td>{{ grupo.sigla }}</td>
+              <td>{{ grupo.pastoralName || '-' }}</td>
+              <td>{{ grupo.membersCount || 0 }}</td>
+              <td>
+                <span class="status-badge" [class.active]="grupo.isActive">
+                  {{ grupo.isActive ? 'Ativo' : 'Inativo' }}
+                </span>
+              </td>
+              <td class="actions-column">
+                <a [routerLink]="['/admin/grupos/edit', grupo.id]" class="action-btn" title="Editar">
+                  <span class="material-icons">edit</span>
+                </a>
+                <button class="action-btn" (click)="toggleStatus(grupo)" [title]="grupo.isActive ? 'Desativar' : 'Ativar'">
+                  <span class="material-icons">{{ grupo.isActive ? 'block' : 'check_circle' }}</span>
+                </button>
+                <button class="action-btn danger" (click)="delete(grupo)" title="Excluir">
+                  <span class="material-icons">delete</span>
+                </button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="6" class="empty-state">
+                <span class="material-icons">group</span>
+                <p>Nenhum grupo encontrado</p>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

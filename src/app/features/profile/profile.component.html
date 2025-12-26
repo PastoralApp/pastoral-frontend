@@ -6,13 +6,7 @@
     </div>
   }
 
-  @if (error() && !isLoading()) {
-    <div class="error-state">
-      <span class="material-icons">error</span>
-      <p>{{ error() }}</p>
-      <button class="btn btn-primary" (click)="loadProfile()">Tentar novamente</button>
-    </div>
-  }
+
 
   @if (!isLoading() && user()) {
     <div class="profile-card">
@@ -39,12 +33,7 @@
         }
       </div>
 
-      @if (successMessage()) {
-        <div class="success-message">
-          <span class="material-icons">check_circle</span>
-          {{ successMessage() }}
-        </div>
-      }
+
 
       @if (isEditing()) {
         <form class="edit-form" (ngSubmit)="saveProfile()">
@@ -98,33 +87,110 @@
           </div>
         </form>
       } @else {
+        <div class="profile-stats">
+          <div class="stat-card">
+            <span class="material-icons">groups</span>
+            <div class="stat-info">
+              <span class="stat-value">{{ user()?.grupos?.length || 0 }}</span>
+              <span class="stat-label">Grupos</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <span class="material-icons">label</span>
+            <div class="stat-info">
+              <span class="stat-value">{{ user()?.tags?.length || 0 }}</span>
+              <span class="stat-label">Tags</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <span class="material-icons">verified_user</span>
+            <div class="stat-info">
+              <span class="stat-value">{{ user()?.roleName || 'Usuário' }}</span>
+              <span class="stat-label">Cargo</span>
+            </div>
+          </div>
+        </div>
+
         <div class="profile-details">
-          <div class="detail-item">
-            <span class="label">Telefone</span>
-            <span class="value">{{ user()?.telefone || '-' }}</span>
-          </div>
-          <div class="detail-item">
-            <span class="label">Data de Nascimento</span>
-            <span class="value">{{ formatDate(user()?.birthDate || null) }}</span>
-          </div>
-          <div class="detail-item">
-            <span class="label">Membro desde</span>
-            <span class="value">{{ formatDate(user()?.createdAt || null) }}</span>
-          </div>
-          <div class="detail-item">
-            <span class="label">Status</span>
-            <span class="value status" [class.active]="user()?.isActive">
-              {{ user()?.isActive ? 'Ativo' : 'Inativo' }}
-            </span>
+          <h3 class="section-title">Informações Pessoais</h3>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <span class="material-icons">email</span>
+              <div class="detail-content">
+                <span class="label">E-mail</span>
+                <span class="value">{{ user()?.email }}</span>
+              </div>
+            </div>
+            <div class="detail-item">
+              <span class="material-icons">phone</span>
+              <div class="detail-content">
+                <span class="label">Telefone</span>
+                <span class="value">{{ user()?.telefone || 'Não informado' }}</span>
+              </div>
+            </div>
+            <div class="detail-item">
+              <span class="material-icons">cake</span>
+              <div class="detail-content">
+                <span class="label">Data de Nascimento</span>
+                <span class="value">{{ formatDate(user()?.birthDate || null) }}</span>
+              </div>
+            </div>
+            <div class="detail-item">
+              <span class="material-icons">calendar_today</span>
+              <div class="detail-content">
+                <span class="label">Membro desde</span>
+                <span class="value">{{ formatDate(user()?.createdAt || null) }}</span>
+              </div>
+            </div>
+            <div class="detail-item">
+              <span class="material-icons">verified_user</span>
+              <div class="detail-content">
+                <span class="label">Cargo</span>
+                <span class="value role-value">{{ user()?.roleName || 'Usuário' }}</span>
+              </div>
+            </div>
+            <div class="detail-item">
+              <span class="material-icons">check_circle</span>
+              <div class="detail-content">
+                <span class="label">Status da Conta</span>
+                <span class="value status" [class.active]="user()?.isActive">
+                  {{ user()?.isActive ? 'Ativa' : 'Inativa' }}
+                </span>
+              </div>
+            </div>
           </div>
         </div>
 
         @if (user()?.tags && user()!.tags!.length > 0) {
           <div class="section">
-            <h3>Tags</h3>
+            <h3>Minhas Tags</h3>
             <div class="tags">
               @for (tag of user()?.tags; track tag.id) {
-                <span class="tag">{{ tag.name }}</span>
+                <span class="tag" [style.background-color]="tag.color + '20'" [style.color]="tag.color">{{ tag.name }}</span>
+              }
+            </div>
+          </div>
+        }
+
+        @if (user()?.grupos && user()!.grupos!.length > 0) {
+          <div class="section">
+            <h3>Meus Grupos</h3>
+            <div class="grupos-list">
+              @for (grupo of user()?.grupos; track grupo.grupoId) {
+                <a [routerLink]="['/grupos', grupo.grupoId]" class="grupo-item" [style.border-left-color]="grupo.primaryColor">
+                  <div class="grupo-avatar" [style.background-color]="grupo.primaryColor">
+                    @if (grupo.grupoLogoUrl) {
+                      <img [src]="grupo.grupoLogoUrl" [alt]="grupo.grupoName">
+                    } @else {
+                      <span>{{ grupo.grupoSigla.charAt(0) || 'G' }}</span>
+                    }
+                  </div>
+                  <div class="grupo-info">
+                    <span class="grupo-name">{{ grupo.grupoName }}</span>
+                    <span class="grupo-pastoral">{{ grupo.pastoralName }}</span>
+                  </div>
+                  <span class="material-icons">chevron_right</span>
+                </a>
               }
             </div>
           </div>

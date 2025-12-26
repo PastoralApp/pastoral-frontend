@@ -1,0 +1,255 @@
+<div class="coordenacao-tags-container">
+  <header class="page-header">
+    <div class="header-left">
+      <a routerLink="/coord-grupo" class="btn-back">
+        <span class="material-icons">arrow_back</span>
+      </a>
+      <h1>Gerenciar Tags do Grupo</h1>
+    </div>
+    <button class="btn btn-primary" (click)="openCreateModal()">
+      <span class="material-icons">add</span>
+      Nova Tag
+    </button>
+  </header>
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Carregando...</p>
+    </div>
+  } @else {
+    <div class="content-grid">
+      <section class="tags-section">
+        <h2>Tags Disponíveis</h2>
+        <div class="tags-list">
+          @for (tag of tags(); track tag.id) {
+            <div class="tag-card">
+              <div class="tag-header">
+                <div class="tag-color" [style.background-color]="tag.color"></div>
+                <div class="tag-info">
+                  <h3>{{ tag.name }}</h3>
+                  <p>{{ tag.description }}</p>
+                  <small>{{ getUsersWithTag(tag).length }} usuário(s)</small>
+                </div>
+              </div>
+              <div class="tag-actions">
+                <button class="btn-icon" (click)="openAssignModal(tag)" title="Atribuir">
+                  <span class="material-icons">person_add</span>
+                </button>
+                <button class="btn-icon" (click)="openEditModal(tag)" title="Editar">
+                  <span class="material-icons">edit</span>
+                </button>
+                <button class="btn-icon danger" (click)="deleteTag(tag)" title="Excluir">
+                  <span class="material-icons">delete</span>
+                </button>
+              </div>
+            </div>
+          } @empty {
+            <div class="empty-state">
+              <span class="material-icons">label_off</span>
+              <p>Nenhuma tag criada ainda</p>
+            </div>
+          }
+        </div>
+      </section>
+
+      <section class="users-section">
+        <h2>Usuários do Grupo</h2>
+        <div class="users-list">
+          @for (user of users(); track user.id) {
+            <div class="user-card">
+              <div class="user-header">
+                @if (user.photoUrl) {
+                  <img [src]="user.photoUrl" [alt]="user.name" class="user-avatar">
+                } @else {
+                  <div class="user-avatar placeholder">
+                    {{ user.name.charAt(0).toUpperCase() }}
+                  </div>
+                }
+                <div class="user-info">
+                  <h4>{{ user.name }}</h4>
+                  <p>{{ user.email }}</p>
+                </div>
+              </div>
+              <div class="user-tags">
+                @for (tag of tags(); track tag.id) {
+                  <button
+                    class="tag-toggle"
+                    [class.active]="hasTag(user, tag)"
+                    [style.border-color]="tag.color"
+                    [style.background-color]="hasTag(user, tag) ? tag.color : 'transparent'"
+                    [style.color]="hasTag(user, tag) ? 'white' : tag.color"
+                    (click)="toggleUserTag(user, tag)"
+                  >
+                    {{ tag.name }}
+                  </button>
+                }
+              </div>
+            </div>
+          } @empty {
+            <div class="empty-state">
+              <span class="material-icons">people_off</span>
+              <p>Nenhum usuário no grupo</p>
+            </div>
+          }
+        </div>
+      </section>
+    </div>
+  }
+
+  @if (showCreateModal()) {
+    <div class="modal-overlay" (click)="closeModals()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <header class="modal-header">
+          <h2>Nova Tag</h2>
+          <button class="close-btn" (click)="closeModals()">
+            <span class="material-icons">close</span>
+          </button>
+        </header>
+        <form (ngSubmit)="createTag()" class="modal-form">
+          <div class="form-group">
+            <label for="name">Nome*</label>
+            <input
+              type="text"
+              id="name"
+              [ngModel]="tagForm().name"
+              (ngModelChange)="updateFormField('name', $event)"
+              name="name"
+              required
+            >
+          </div>
+          <div class="form-group">
+            <label for="color">Cor*</label>
+            <input
+              type="color"
+              id="color"
+              [ngModel]="tagForm().color"
+              (ngModelChange)="updateFormField('color', $event)"
+              name="color"
+            >
+          </div>
+          <div class="form-group">
+            <label for="description">Descrição</label>
+            <textarea
+              id="description"
+              [ngModel]="tagForm().description"
+              (ngModelChange)="updateFormField('description', $event)"
+              name="description"
+              rows="3"
+            ></textarea>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" (click)="closeModals()">
+              Cancelar
+            </button>
+            <button type="submit" class="btn btn-primary">
+              Criar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  @if (showEditModal() && selectedTag()) {
+    <div class="modal-overlay" (click)="closeModals()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <header class="modal-header">
+          <h2>Editar Tag</h2>
+          <button class="close-btn" (click)="closeModals()">
+            <span class="material-icons">close</span>
+          </button>
+        </header>
+        <form (ngSubmit)="updateTag()" class="modal-form">
+          <div class="form-group">
+            <label for="edit-name">Nome*</label>
+            <input
+              type="text"
+              id="edit-name"
+              [ngModel]="tagForm().name"
+              (ngModelChange)="updateFormField('name', $event)"
+              name="name"
+              required
+            >
+          </div>
+          <div class="form-group">
+            <label for="edit-color">Cor*</label>
+            <input
+              type="color"
+              id="edit-color"
+              [ngModel]="tagForm().color"
+              (ngModelChange)="updateFormField('color', $event)"
+              name="color"
+            >
+          </div>
+          <div class="form-group">
+            <label for="edit-description">Descrição</label>
+            <textarea
+              id="edit-description"
+              [ngModel]="tagForm().description"
+              (ngModelChange)="updateFormField('description', $event)"
+              name="description"
+              rows="3"
+            ></textarea>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" (click)="closeModals()">
+              Cancelar
+            </button>
+            <button type="submit" class="btn btn-primary">
+              Salvar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  @if (showAssignModal() && selectedTag()) {
+    <div class="modal-overlay" (click)="closeModals()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <header class="modal-header">
+          <h2>Atribuir Tag: {{ selectedTag()!.name }}</h2>
+          <button class="close-btn" (click)="closeModals()">
+            <span class="material-icons">close</span>
+          </button>
+        </header>
+        <div class="modal-body">
+          <div class="assign-users-list">
+            @for (user of users(); track user.id) {
+              <div class="assign-user-item">
+                <div class="user-info-inline">
+                  @if (user.photoUrl) {
+                    <img [src]="user.photoUrl" [alt]="user.name">
+                  } @else {
+                    <div class="avatar-placeholder">
+                      {{ user.name.charAt(0).toUpperCase() }}
+                    </div>
+                  }
+                  <span>{{ user.name }}</span>
+                </div>
+                <button
+                  class="btn"
+                  [class.btn-primary]="!hasTag(user, selectedTag()!)"
+                  [class.btn-danger]="hasTag(user, selectedTag()!)"
+                  (click)="toggleUserTag(user, selectedTag()!)"
+                >
+                  @if (hasTag(user, selectedTag()!)) {
+                    Remover
+                  } @else {
+                    Adicionar
+                  }
+                </button>
+              </div>
+            }
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" (click)="closeModals()">
+            Fechar
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

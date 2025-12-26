@@ -1,0 +1,254 @@
+<div class="admin-tags-container">
+  <header class="page-header">
+    <a routerLink="/admin" class="btn-back">
+      <span class="material-icons">arrow_back</span>
+    </a>
+    <div class="header-title">
+      <h1>
+        <span class="material-icons">label</span>
+        Gerenciar Tags
+      </h1>
+      <button class="btn btn-primary" (click)="openCreateModal()">
+        <span class="material-icons">add</span>
+        Nova Tag
+      </button>
+    </div>
+  </header>
+
+  <div class="toolbar">
+    <div class="search-bar">
+      <span class="material-icons">search</span>
+      <input
+        type="text"
+        placeholder="Buscar tags..."
+        [ngModel]="searchTerm()"
+        (ngModelChange)="searchTerm.set($event)"
+      >
+    </div>
+  </div>
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Carregando tags...</p>
+    </div>
+  } @else {
+    <div class="tags-grid">
+      @for (tag of filteredTags; track tag.id) {
+        <div class="tag-card">
+          <div class="tag-header">
+            <div class="tag-info">
+              <div class="tag-title">
+                <div class="tag-color" [style.background-color]="tag.color"></div>
+                <h3>{{ tag.name }}</h3>
+              </div>
+              @if (tag.description) {
+                <p>{{ tag.description }}</p>
+              }
+            </div>
+            <div class="tag-actions">
+              <button 
+                class="btn-icon btn-edit" 
+                (click)="openEditModal(tag)"
+                title="Editar"
+              >
+                <span class="material-icons">edit</span>
+              </button>
+              <button 
+                class="btn-icon btn-delete" 
+                (click)="deleteTag(tag)"
+                title="Excluir"
+              >
+                <span class="material-icons">delete</span>
+              </button>
+            </div>
+          </div>
+          
+          @if (tag.users && tag.users.length > 0) {
+            <div class="tag-users">
+              <span class="users-label">{{ tag.users.length }} usuário(s)</span>
+              <div class="users-preview">
+                @for (user of tag.users.slice(0, 3); track user.id) {
+                  @if (user.photoUrl) {
+                    <img [src]="user.photoUrl" [alt]="user.name" class="user-avatar">
+                  } @else {
+                    <div class="avatar-placeholder">{{ user.name.charAt(0) }}</div>
+                  }
+                }
+                @if (tag.users.length > 3) {
+                  <div class="more-users">+{{ tag.users.length - 3 }}</div>
+                }
+              </div>
+              <button class="btn-link" (click)="openUserModal(tag)">
+                Gerenciar usuários
+              </button>
+            </div>
+          }
+        </div>
+      } @empty {
+        <div class="empty-state">
+          <span class="material-icons">label_off</span>
+          <p>Nenhuma tag encontrada</p>
+          <button class="btn btn-primary" (click)="openCreateModal()">
+            Criar primeira tag
+          </button>
+        </div>
+      }
+    </div>
+  }
+</div>
+
+@if (isModalOpen()) {
+  <div class="modal-overlay" (click)="closeModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>{{ isEditing() ? 'Editar Tag' : 'Nova Tag' }}</h2>
+        <button class="btn-close" (click)="closeModal()">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Nome da Tag *</label>
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Ex: Coordenador, Músico, Liturgia..."
+            [ngModel]="formData().name"
+            (ngModelChange)="updateFormName($event)"
+          >
+        </div>
+
+        <div class="form-group">
+          <label>Cor</label>
+          <div class="color-input-group">
+            <input
+              type="color"
+              class="color-picker"
+              [ngModel]="formData().color"
+              (ngModelChange)="updateFormColor($event)"
+            >
+            <input
+              type="text"
+              class="form-control"
+              placeholder="#6366f1"
+              [ngModel]="formData().color"
+              (ngModelChange)="updateFormColor($event)"
+            >
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Descrição</label>
+          <textarea
+            class="form-control"
+            rows="3"
+            placeholder="Descrição opcional da tag..."
+            [ngModel]="formData().description"
+            (ngModelChange)="updateFormDescription($event)"
+          ></textarea>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeModal()">
+          Cancelar
+        </button>
+        <button class="btn btn-primary" (click)="saveTag()">
+          {{ isEditing() ? 'Salvar' : 'Criar' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+@if (isUserModalOpen()) {
+  <div class="modal-overlay" (click)="closeUserModal()">
+    <div class="modal modal-large" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>
+          <span class="material-icons">people</span>
+          Usuários - {{ selectedTagForUsers()?.name }}
+        </h2>
+        <button class="btn-close" (click)="closeUserModal()">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="users-section">
+          <h3>Usuários com esta tag ({{ tagUsers().length }})</h3>
+          <div class="users-list">
+            @for (user of tagUsers(); track user.id) {
+              <div class="user-item">
+                <div class="user-info">
+                  @if (user.photoUrl) {
+                    <img [src]="user.photoUrl" [alt]="user.name" class="avatar">
+                  } @else {
+                    <div class="avatar-placeholder">{{ user.name.charAt(0) }}</div>
+                  }
+                  <div>
+                    <div class="user-name">{{ user.name }}</div>
+                    <div class="user-email">{{ user.email }}</div>
+                  </div>
+                </div>
+                <button 
+                  class="btn-icon btn-remove" 
+                  (click)="removeUserFromTag(user.id)"
+                  title="Remover tag"
+                >
+                  <span class="material-icons">remove_circle</span>
+                </button>
+              </div>
+            } @empty {
+              <div class="empty-users">
+                <span class="material-icons">person_off</span>
+                <p>Nenhum usuário com esta tag</p>
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="users-section">
+          <h3>Adicionar usuários ({{ availableUsers().length }})</h3>
+          <div class="users-list">
+            @for (user of availableUsers(); track user.id) {
+              <div class="user-item">
+                <div class="user-info">
+                  @if (user.photoUrl) {
+                    <img [src]="user.photoUrl" [alt]="user.name" class="avatar">
+                  } @else {
+                    <div class="avatar-placeholder">{{ user.name.charAt(0) }}</div>
+                  }
+                  <div>
+                    <div class="user-name">{{ user.name }}</div>
+                    <div class="user-email">{{ user.email }}</div>
+                  </div>
+                </div>
+                <button 
+                  class="btn-icon btn-add" 
+                  (click)="addUserToTag(user.id)"
+                  title="Adicionar tag"
+                >
+                  <span class="material-icons">add_circle</span>
+                </button>
+              </div>
+            } @empty {
+              <div class="empty-users">
+                <span class="material-icons">check_circle</span>
+                <p>Todos os usuários já possuem esta tag</p>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-primary" (click)="closeUserModal()">
+          Fechar
+        </button>
+      </div>
+    </div>
+  </div>
+}

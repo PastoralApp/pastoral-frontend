@@ -1,0 +1,263 @@
+<div class="admin-page">
+  <header class="page-header">
+    <div class="header-left">
+      <a routerLink="/admin/users" class="btn-back">
+        <span class="material-icons">arrow_back</span>
+      </a>
+      <h1>
+        <span class="material-icons">{{ isEditMode() ? 'edit' : 'person_add' }}</span>
+        {{ isEditMode() ? 'Editar Usuário' : 'Novo Usuário' }}
+      </h1>
+    </div>
+  </header>
+
+  <div class="form-container">
+    <form (ngSubmit)="save()" #userForm="ngForm">
+      <div class="form-card">
+        <h3><span class="material-icons">person</span> Informações Básicas</h3>
+        
+        <div class="form-group">
+          <label for="name">Nome Completo *</label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            [(ngModel)]="formData.name"
+            required
+            placeholder="Digite o nome completo"
+            autocomplete="name"
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email *</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            [(ngModel)]="formData.email"
+            required
+            [readonly]="isEditMode()"
+            placeholder="email@exemplo.com"
+            autocomplete="email"
+          >
+          @if (isEditMode()) {
+            <small class="form-hint">O email não pode ser alterado</small>
+          }
+        </div>
+
+        @if (!isEditMode()) {
+          <div class="form-group">
+            <label for="password">Senha *</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              [(ngModel)]="formData.password"
+              required
+              placeholder="Senha inicial do usuário"
+              autocomplete="new-password"
+              minlength="6"
+            >
+            <small class="form-hint">Mínimo de 6 caracteres</small>
+          </div>
+        }
+
+        <div class="form-group">
+          <label for="roleId">Permissão (Role) *</label>
+          <select id="roleId" name="roleId" [(ngModel)]="formData.roleId" required>
+            <option value="">Selecione uma role</option>
+            @for (role of roles(); track role.id) {
+              <option [value]="role.id">{{ role.name }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <h3><span class="material-icons">info</span> Informações Adicionais</h3>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="telefone">Telefone</label>
+            <input
+              type="tel"
+              id="telefone"
+              name="telefone"
+              [(ngModel)]="formData.telefone"
+              placeholder="(00) 00000-0000"
+              autocomplete="tel"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="birthDate">Data de Nascimento</label>
+            <input
+              type="date"
+              id="birthDate"
+              name="birthDate"
+              [(ngModel)]="formData.birthDate"
+              autocomplete="bday"
+            >
+          </div>
+        </div>
+      </div>
+
+      @if (isEditMode() && currentUser()) {
+        <div class="form-card">
+          <h3><span class="material-icons">sell</span> Tags do Usuário</h3>
+          
+          <div class="tags-section">
+            <div class="current-tags">
+              <label>Tags Atuais:</label>
+              <div class="tags-list">
+                @if (currentUser()!.tags && currentUser()!.tags.length > 0) {
+                  @for (tag of currentUser()!.tags; track tag.id) {
+                    <span class="tag-item" [style.background-color]="tag.color">
+                      {{ tag.name }}
+                      <button 
+                        type="button" 
+                        class="tag-remove"
+                        (click)="removeTagFromUser(tag.id, tag.name)"
+                        title="Remover tag">
+                        <span class="material-icons">close</span>
+                      </button>
+                    </span>
+                  }
+                } @else {
+                  <span class="no-tags">Nenhuma tag atribuída</span>
+                }
+              </div>
+            </div>
+
+            <div class="add-tag">
+              <label>Adicionar Tag:</label>
+              <div class="add-tag-controls">
+                @if (availableTags().length > 0) {
+                  <select #tagSelect class="tag-select">
+                    <option value="">Selecione uma tag</option>
+                    @for (tag of availableTags(); track tag.id) {
+                      <option [value]="tag.id">{{ tag.name }}</option>
+                    }
+                  </select>
+                  <button 
+                    type="button" 
+                    class="btn btn-sm btn-primary"
+                    (click)="addTagToUser(tagSelect.value); tagSelect.value = ''">
+                    <span class="material-icons">add</span>
+                    Adicionar
+                  </button>
+                } @else {
+                  <span class="no-available-tags">Todas as tags disponíveis já foram atribuídas</span>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-card">
+          <h3><span class="material-icons">groups</span> Grupos do Usuário</h3>
+          
+          <div class="grupos-section">
+            <div class="current-grupos">
+              <label>Grupos Atuais ({{ currentUser()!.grupos.length || 0 }}/4):</label>
+              <div class="grupos-list">
+                @if (currentUser()!.grupos && currentUser()!.grupos.length > 0) {
+                  @for (grupo of currentUser()!.grupos; track grupo.grupoId) {
+                    <div class="grupo-item">
+                      <div class="grupo-info">
+                        <div class="grupo-color" [style.background-color]="grupo.primaryColor"></div>
+                        <div class="grupo-details">
+                          <strong>{{ grupo.grupoName }}</strong>
+                          <span class="grupo-sigla">{{ grupo.grupoSigla }}</span>
+                          @if (grupo.pastoralName) {
+                            <span class="pastoral-badge">{{ grupo.pastoralName }}</span>
+                          }
+                        </div>
+                      </div>
+                      <button 
+                        type="button" 
+                        class="btn-remove-grupo"
+                        (click)="removeGrupoFromUser(grupo.grupoId, grupo.grupoName)"
+                        title="Remover do grupo">
+                        <span class="material-icons">remove_circle</span>
+                      </button>
+                    </div>
+                  }
+                } @else {
+                  <span class="no-grupos">Usuário não está em nenhum grupo</span>
+                }
+              </div>
+            </div>
+
+            <div class="add-grupo">
+              <label>Adicionar a Grupo:</label>
+              <div class="add-grupo-controls">
+                @if (availableGrupos().length > 0 && (currentUser()!.grupos.length || 0) < 4) {
+                  <select #grupoSelect class="grupo-select">
+                    <option value="">Selecione um grupo</option>
+                    @for (grupo of availableGrupos(); track grupo.id) {
+                      <option [value]="grupo.id">{{ grupo.name }} ({{ grupo.sigla }})</option>
+                    }
+                  </select>
+                  <button 
+                    type="button" 
+                    class="btn btn-sm btn-primary"
+                    [disabled]="isAddingGrupo()"
+                    (click)="addGrupoToUser(grupoSelect.value); grupoSelect.value = ''">
+                    @if (isAddingGrupo()) {
+                      <span class="spinner-sm"></span>
+                    } @else {
+                      <span class="material-icons">add</span>
+                    }
+                    Adicionar
+                  </button>
+                } @else if ((currentUser()!.grupos.length || 0) >= 4) {
+                  <span class="limit-warning">
+                    <span class="material-icons">warning</span>
+                    Limite de 4 grupos atingido
+                  </span>
+                } @else {
+                  <span class="no-available-grupos">Todos os grupos disponíveis já foram atribuídos</span>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+
+      <div class="form-actions">
+        <a routerLink="/admin/users" class="btn btn-secondary">
+          <span class="material-icons">close</span>
+          Cancelar
+        </a>
+        
+        @if (isEditMode()) {
+          <button 
+            type="button" 
+            class="btn btn-danger"
+            (click)="deleteUser()"
+            [disabled]="isDeleting()">
+            @if (isDeleting()) {
+              <span class="spinner-sm"></span>
+              Excluindo...
+            } @else {
+              <span class="material-icons">delete</span>
+              Excluir Usuário
+            }
+          </button>
+        }
+        
+        <button type="submit" class="btn btn-primary" [disabled]="!userForm.valid || isSubmitting()">
+          @if (isSubmitting()) {
+            <span class="spinner-sm"></span>
+            Salvando...
+          } @else {
+            <span class="material-icons">{{ isEditMode() ? 'save' : 'add' }}</span>
+            {{ isEditMode() ? 'Salvar Alterações' : 'Criar Usuário' }}
+          }
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

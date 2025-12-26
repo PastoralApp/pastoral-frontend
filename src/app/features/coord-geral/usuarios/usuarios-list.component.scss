@@ -1,0 +1,67 @@
+@use '../coord-geral-shared.styles' as *;
+
+.usuarios-container {
+  @extend .coord-page;
+}
+
+.usuarios-grid {
+  @extend .cards-grid;
+}
+
+.usuario-card {
+  @extend .card;
+  text-align: center;
+
+  .usuario-avatar {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1rem;
+    border-radius: 50%;
+    overflow: hidden;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .avatar-placeholder {
+      width: 100%;
+      height: 100%;
+      background: var(--primary-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      .material-icons {
+        font-size: 40px;
+        color: white;
+      }
+    }
+  }
+
+  .usuario-info {
+    h3 {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .tags-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      justify-content: center;
+      margin-bottom: 1rem;
+
+      .tag {
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        color: white;
+        font-weight: 500;
+      }
+    }
+  }
+}

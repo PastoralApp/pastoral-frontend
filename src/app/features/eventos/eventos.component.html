@@ -2,10 +2,6 @@
   <header class="eventos-header">
     <h1>Eventos</h1>
     <div class="header-actions">
-      <a routerLink="/eventos/novo" class="btn btn-primary">
-        <span class="material-icons">add</span>
-        Novo Evento
-      </a>
       <div class="view-toggle">
         <button 
           [class.active]="view() === 'list'"
@@ -30,15 +26,7 @@
     </div>
   }
 
-  @if (error()) {
-    <div class="error-state">
-      <span class="material-icons">error</span>
-      <p>{{ error() }}</p>
-      <button class="btn btn-primary" (click)="loadEventos()">Tentar novamente</button>
-    </div>
-  }
-
-  @if (!isLoading() && !error()) {
+  @if (!isLoading()) {
     @if (view() === 'list') {
       @if (proximosEventos().length > 0) {
         <section class="eventos-section">
@@ -74,9 +62,7 @@
     }
 
     @if (view() === 'calendar') {
-      <div class="calendar-view">
-        <p class="coming-soon">Visualização de calendário em breve</p>
-      </div>
+      <app-evento-calendar [eventos]="eventos()"></app-evento-calendar>
     }
   }
 </div>

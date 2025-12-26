@@ -1,0 +1,101 @@
+<div class="admin-page">
+  <header class="page-header">
+    <div class="header-left">
+      <a routerLink="/admin/grupos" class="btn-back">
+        <span class="material-icons">arrow_back</span>
+      </a>
+      <div>
+        <h1>
+          <span class="material-icons">group</span>
+          {{ isEditMode() ? 'Editar Grupo' : 'Novo Grupo' }}
+        </h1>
+        <p class="subtitle">{{ isEditMode() ? 'Atualize os dados do grupo' : 'Cadastre um novo grupo' }}</p>
+      </div>
+    </div>
+  </header>
+
+  @if (errorMessage()) {
+    <div class="error-message">
+      <span class="material-icons">error</span>
+      {{ errorMessage() }}
+    </div>
+  }
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Carregando dados...</p>
+    </div>
+  } @else {
+    <div class="form-container">
+      <form class="form-card" (ngSubmit)="save()">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="name">Nome do Grupo *</label>
+            <input type="text" id="name" name="name" [(ngModel)]="grupo.name" required placeholder="Ex: Grupo Jovem">
+          </div>
+          <div class="form-group">
+            <label for="sigla">Sigla</label>
+            <input type="text" id="sigla" name="sigla" [(ngModel)]="grupo.sigla" placeholder="Ex: GJ" maxlength="10">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="pastoralId">Pastoral *</label>
+          <select id="pastoralId" name="pastoralId" [(ngModel)]="grupo.pastoralId" required>
+            <option value="">Selecione a pastoral</option>
+            @for (pastoral of pastorais(); track pastoral.id) {
+              <option [value]="pastoral.id">{{ pastoral.name }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="description">Descrição</label>
+          <textarea id="description" name="description" [(ngModel)]="grupo.description" rows="3" placeholder="Breve descrição do grupo"></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="primaryColor">Cor Principal</label>
+            <div class="color-input">
+              <input type="color" id="primaryColor" name="primaryColor" [(ngModel)]="grupo.primaryColor">
+              <span>{{ grupo.primaryColor }}</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="secondaryColor">Cor Secundária</label>
+            <div class="color-input">
+              <input type="color" id="secondaryColor" name="secondaryColor" [(ngModel)]="grupo.secondaryColor">
+              <span>{{ grupo.secondaryColor }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="logoUrl">URL do Logo</label>
+            <input type="url" id="logoUrl" name="logoUrl" [(ngModel)]="grupo.logoUrl" placeholder="https://...">
+          </div>
+          <div class="form-group">
+            <label for="icon">Ícone (Material Icons)</label>
+            <input type="text" id="icon" name="icon" [(ngModel)]="grupo.icon" placeholder="Ex: group">
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <a routerLink="/admin/grupos" class="btn btn-secondary">Cancelar</a>
+          <button type="submit" class="btn btn-primary" [disabled]="isSaving()">
+            @if (isSaving()) {
+              <div class="spinner-small"></div>
+              Salvando...
+            } @else {
+              <span class="material-icons">save</span>
+              {{ isEditMode() ? 'Atualizar' : 'Cadastrar' }}
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+</div>

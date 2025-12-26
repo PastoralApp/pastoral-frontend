@@ -1,5 +1,9 @@
-<article class="evento-card" [class.past]="!isUpcoming">
-  <div class="evento-date">
+<article 
+  class="evento-card" 
+  [class.past]="!isUpcoming"
+  [style.border-left-color]="evento.cor || 'var(--primary)'"
+>
+  <div class="evento-date" [style.background-color]="evento.cor || 'var(--primary)'">
     <span class="day">{{ dayNumber }}</span>
     <span class="month">{{ monthShort }}</span>
   </div>
@@ -7,6 +11,9 @@
   <div class="evento-content">
     <header class="evento-header">
       <h3 [routerLink]="['/eventos', evento.id]">{{ evento.title }}</h3>
+      @if (evento.grupoNome) {
+        <span class="grupo-badge">{{ evento.grupoNome }}</span>
+      }
     </header>
 
     <div class="evento-info">

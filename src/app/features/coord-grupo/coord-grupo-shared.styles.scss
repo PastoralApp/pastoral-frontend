@@ -1,0 +1,28 @@
+// Estilos compartilhados para componentes do Coordenador de Grupo
+
+.role-badge {
+  padding: 0.375rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+
+  &.role-admin {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+
+  &.role-coord-geral {
+    background: #dbeafe;
+    color: #1e40af;
+  }
+
+  &.role-coord-grupo {
+    background: #d1fae5;
+    color: #065f46;
+  }
+
+  &.role-usuario {
+    background: #f3f4f6;
+    color: #374151;
+  }
+}

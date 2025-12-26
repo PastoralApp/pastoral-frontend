@@ -1,0 +1,101 @@
+<div class="form-container">
+  <header class="form-header">
+    <button class="btn-back" (click)="voltar()">
+      <span class="material-icons">arrow_back</span>
+    </button>
+    <div>
+      <h1>{{ isEditing() ? 'Editar Grupo' : 'Novo Grupo' }}</h1>
+      <p>{{ isEditing() ? 'Atualize as informações do grupo' : 'Preencha os dados para criar um novo grupo' }}</p>
+    </div>
+  </header>
+
+  <form (ngSubmit)="salvar()" class="grupo-form">
+    <div class="form-group">
+      <label>
+        <span class="material-icons">label</span>
+        Nome do Grupo *
+      </label>
+      <input
+        type="text"
+        [(ngModel)]="name"
+        name="name"
+        placeholder="Digite o nome do grupo..."
+        maxlength="100"
+        required
+      />
+      <small>{{ name().length }}/100 caracteres</small>
+    </div>
+
+    <div class="form-group">
+      <label>
+        <span class="material-icons">description</span>
+        Descrição
+      </label>
+      <textarea
+        [(ngModel)]="description"
+        name="description"
+        placeholder="Descreva o grupo..."
+        rows="4"
+        maxlength="500"
+      ></textarea>
+      <small>{{ description().length }}/500 caracteres</small>
+    </div>
+
+    <div class="form-group">
+      <label>
+        <span class="material-icons">groups</span>
+        Pastoral *
+      </label>
+      <select [(ngModel)]="pastoralId" name="pastoralId" required>
+        <option [value]="null">Selecione uma pastoral...</option>
+        @for (pastoral of pastorais(); track pastoral.id) {
+          <option [value]="pastoral.id">{{ pastoral.name }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>
+        <span class="material-icons">church</span>
+        Igreja
+      </label>
+      <select [(ngModel)]="igrejaId" name="igrejaId">
+        <option [value]="null">Nenhuma igreja vinculada...</option>
+        @for (igreja of igrejas(); track igreja.id) {
+          <option [value]="igreja.id">{{ igreja.nome }}</option>
+        }
+      </select>
+      <small>Opcional: vincule o grupo a uma igreja específica</small>
+    </div>
+
+    <div class="form-group">
+      <label>
+        <span class="material-icons">person</span>
+        Coordenador
+      </label>
+      <select [(ngModel)]="coordenadorId" name="coordenadorId">
+        <option [value]="null">Nenhum coordenador...</option>
+        @for (coord of coordenadores(); track coord.id) {
+          <option [value]="coord.id">{{ coord.name }} ({{ coord.roleName }})</option>
+        }
+      </select>
+      <small>Opcional: selecione um coordenador para o grupo</small>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="btn-cancel" (click)="voltar()" [disabled]="isLoading()">
+        <span class="material-icons">close</span>
+        Cancelar
+      </button>
+      <button type="submit" class="btn-submit" [disabled]="isLoading()">
+        @if (isLoading()) {
+          <div class="spinner-small"></div>
+          Salvando...
+        } @else {
+          <span class="material-icons">{{ isEditing() ? 'save' : 'add' }}</span>
+          {{ isEditing() ? 'Salvar' : 'Criar Grupo' }}
+        }
+      </button>
+    </div>
+  </form>
+</div>

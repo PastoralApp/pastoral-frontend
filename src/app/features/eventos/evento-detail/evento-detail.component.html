@@ -87,6 +87,32 @@
           <p>{{ evento()!.description }}</p>
         </div>
 
+        @if (evento()!.grupoNome || evento()!.responsavelUserName) {
+          <div class="evento-organization">
+            <h2>Organização</h2>
+            <div class="org-info">
+              @if (evento()!.grupoNome) {
+                <div class="org-item">
+                  <span class="material-icons">groups</span>
+                  <div class="org-text">
+                    <span class="label">Grupo</span>
+                    <span class="value">{{ evento()!.grupoNome }}</span>
+                  </div>
+                </div>
+              }
+              @if (evento()!.responsavelUserName) {
+                <div class="org-item">
+                  <span class="material-icons">badge</span>
+                  <div class="org-text">
+                    <span class="label">Responsável</span>
+                    <span class="value">{{ evento()!.responsavelUserName }}</span>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
         <div class="evento-footer">
           <div class="created-by">
             <span class="material-icons">person</span>

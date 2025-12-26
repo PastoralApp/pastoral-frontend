@@ -2,9 +2,11 @@ import { Component, inject, Input, Output, EventEmitter, signal } from '@angular
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { Post, PostComment, PostType, CreateCommentDto } from '../../../../core/models/post.model';
+import { Post, PostComment, PostType, CreateCommentDto, TipoPastoral } from '../../../../core/models/post.model';
 import { PostService } from '../../../../core/services/post.service';
 import { AuthService } from '../../../../core/services/auth.service';
+import { ConfirmationService } from '../../../../shared/components/confirmation-modal';
+import { ToastService } from '../../../../shared/services/toast.service';
 
 @Component({
   selector: 'app-post-card',
@@ -16,6 +18,8 @@ import { AuthService } from '../../../../core/services/auth.service';
 export class PostCardComponent {
   private postService = inject(PostService);
   private authService = inject(AuthService);
+  private confirmationService = inject(ConfirmationService);
+  private toastService = inject(ToastService);
 
   @Input({ required: true }) post!: Post;
   @Input() isPinned = false;
@@ -30,6 +34,7 @@ export class PostCardComponent {
   showOptions = signal(false);
   isReacting = signal(false);
   isSaving = signal(false);
+  isPinning = signal(false);
 
   get currentUserId(): string {
     return this.authService.getCurrentUserId();
@@ -37,6 +42,32 @@ export class PostCardComponent {
 
   get isAuthor(): boolean {
     return this.post.authorId === this.currentUserId;
+  }
+
+  get canPin(): boolean {
+    const user = this.authService.currentUser();
+    const role = user?.role || '';
+    return role === 'Administrador' || role === 'Coordenador Geral' || role === 'Coordenador de Grupo';
+  }
+
+  get pinTypeLabel(): string {
+    if (!this.post.isPinned || !this.post.pinType) return '';
+    const labels: Record<string, string> = {
+      'Admin': 'FIXADO ADMIN',
+      'Coordenador Geral': 'FIXADO COORD. GERAL',
+      'Coordenador de Grupo': 'FIXADO COORD. GRUPO'
+    };
+    return labels[this.post.pinType] || 'FIXADO';
+  }
+
+  get pinTypeBadgeClass(): string {
+    if (!this.post.isPinned || !this.post.pinType) return '';
+    const classes: Record<string, string> = {
+      'Admin': 'pin-badge-admin',
+      'Coordenador Geral': 'pin-badge-coord-geral',
+      'Coordenador de Grupo': 'pin-badge-coord-grupo'
+    };
+    return classes[this.post.pinType] || 'pin-badge-default';
   }
 
   get postTypeLabel(): string {
@@ -47,6 +78,24 @@ export class PostCardComponent {
       [PostType.Anuncio]: 'Anúncio'
     };
     return labels[this.post.type] || '';
+  }
+
+  get pastoralLabel(): string {
+    const labels: Record<TipoPastoral, string> = {
+      [TipoPastoral.PA]: 'PA',
+      [TipoPastoral.PJ]: 'PJ',
+      [TipoPastoral.Geral]: 'GERAL'
+    };
+    return labels[this.post.tipoPastoral] || '';
+  }
+
+  get pastoralFullName(): string {
+    const labels: Record<TipoPastoral, string> = {
+      [TipoPastoral.PA]: 'Pastoral Adolescentes',
+      [TipoPastoral.PJ]: 'Pastoral Jovens',
+      [TipoPastoral.Geral]: 'Geral'
+    };
+    return labels[this.post.tipoPastoral] || '';
   }
 
   toggleComments(): void {
@@ -64,6 +113,7 @@ export class PostCardComponent {
         this.loadingComments.set(false);
       },
       error: () => {
+        this.toastService.error('Erro ao carregar comentários');
         this.loadingComments.set(false);
       }
     });
@@ -77,12 +127,14 @@ export class PostCardComponent {
       next: (response) => {
         this.post = {
           ...this.post,
-          likesCount: response.likesCount
+          likesCount: response.likesCount,
+          isLiked: response.reacted
         };
         this.updated.emit(this.post);
         this.isReacting.set(false);
       },
       error: () => {
+        this.toastService.error('Erro ao reagir ao post');
         this.isReacting.set(false);
       }
     });
@@ -94,21 +146,48 @@ export class PostCardComponent {
 
     this.postService.save(this.post.id).subscribe({
       next: () => {
+        this.toastService.success('Post salvo!');
         this.updated.emit(this.post);
         this.isSaving.set(false);
       },
       error: () => {
+        this.toastService.error('Erro ao salvar post');
         this.isSaving.set(false);
       }
     });
   }
 
   share(): void {
-    this.postService.share(this.post.id).subscribe({
-      next: () => {
-        this.updated.emit(this.post);
-      }
-    });
+    const url = `${window.location.origin}/post/${this.post.id}`;
+    
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(url).then(() => {
+        this.toastService.success('Link copiado para a área de transferência!');
+        
+        // Registra o compartilhamento no backend
+        this.postService.share(this.post.id).subscribe({
+          next: () => {
+            this.updated.emit(this.post);
+          },
+          error: () => {
+            console.error('Erro ao registrar compartilhamento');
+          }
+        });
+      }).catch(() => {
+        this.toastService.error('Erro ao copiar link');
+      });
+    } else {
+      // Fallback para navegadores que não suportam clipboard API
+      this.toastService.info(`Link: ${url}`);
+      this.postService.share(this.post.id).subscribe({
+        next: () => {
+          this.updated.emit(this.post);
+        },
+        error: () => {
+          this.toastService.error('Erro ao compartilhar post');
+        }
+      });
+    }
   }
 
   submitComment(): void {
@@ -125,32 +204,78 @@ export class PostCardComponent {
         this.submittingComment.set(false);
       },
       error: () => {
+        this.toastService.error('Erro ao adicionar comentário');
         this.submittingComment.set(false);
       }
     });
   }
 
-  deleteComment(commentId: string): void {
+  async deleteComment(commentId: string): Promise<void> {
+    const confirmed = await this.confirmationService.confirmDelete('este comentário');
+    if (!confirmed) return;
+
     this.postService.deleteComment(commentId).subscribe({
       next: () => {
         this.comments.update(c => c.filter(comment => comment.id !== commentId));
         this.updated.emit(this.post);
+        this.toastService.success('Comentário excluído');
+      },
+      error: () => {
+        this.toastService.error('Erro ao excluir comentário');
       }
     });
   }
 
-  deletePost(): void {
-    if (!confirm('Tem certeza que deseja excluir este post?')) return;
+  async deletePost(): Promise<void> {
+    const confirmed = await this.confirmationService.confirmDelete('este post');
+    if (!confirmed) return;
 
     this.postService.delete(this.post.id).subscribe({
       next: () => {
+        this.toastService.success('Post excluído');
         this.deleted.emit(this.post.id);
+      },
+      error: () => {
+        this.toastService.error('Erro ao excluir post');
       }
     });
   }
 
   toggleOptions(): void {
     this.showOptions.update(v => !v);
+  }
+
+  togglePin(): void {
+    if (this.isPinning()) return;
+    this.isPinning.set(true);
+
+    if (this.post.isPinned) {
+      this.postService.unpin(this.post.id).subscribe({
+        next: () => {
+          this.post = { ...this.post, isPinned: false, pinType: undefined };
+          this.updated.emit(this.post);
+          this.toastService.success('Post desafixado');
+          this.isPinning.set(false);
+        },
+        error: (err) => {
+          this.toastService.error(err.error?.message || 'Erro ao desafixar post');
+          this.isPinning.set(false);
+        }
+      });
+    } else {
+      this.postService.pin(this.post.id).subscribe({
+        next: () => {
+          this.toastService.success('Post fixado');
+          this.isPinning.set(false);
+          // Recarrega a página ou atualiza o feed para refletir o novo estado
+          window.location.reload();
+        },
+        error: (err) => {
+          this.toastService.error(err.error?.message || 'Erro ao fixar post');
+          this.isPinning.set(false);
+        }
+      });
+    }
   }
 
   formatDate(date: string): string {

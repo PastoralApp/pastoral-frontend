@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { ThemeService } from '../../core/services/theme.service';
+import { ConfirmationService } from '../../shared/components/confirmation-modal';
 
 @Component({
   selector: 'app-settings',
@@ -15,8 +16,7 @@ export class SettingsComponent {
   private router = inject(Router);
   private authService = inject(AuthService);
   private themeService = inject(ThemeService);
-
-  showLogoutConfirm = signal(false);
+  private confirmationService = inject(ConfirmationService);
 
   get isDarkMode(): boolean {
     return this.themeService.isDarkMode();
@@ -30,16 +30,19 @@ export class SettingsComponent {
     this.themeService.toggleTheme();
   }
 
-  openLogoutConfirm(): void {
-    this.showLogoutConfirm.set(true);
-  }
+  async logout(): Promise<void> {
+    const confirmed = await this.confirmationService.confirm({
+      title: 'Sair da conta?',
+      message: 'Você precisará fazer login novamente para acessar o aplicativo.',
+      confirmText: 'Sair',
+      cancelText: 'Cancelar',
+      type: 'danger',
+      icon: 'material-icons logout'
+    });
 
-  closeLogoutConfirm(): void {
-    this.showLogoutConfirm.set(false);
-  }
-
-  logout(): void {
-    this.authService.logout();
+    if (confirmed) {
+      this.authService.logout();
+    }
   }
 
   goToProfile(): void {

@@ -1,0 +1,88 @@
+<div class="admin-page">
+  <header class="page-header">
+    <div class="header-left">
+      <a routerLink="/admin" class="btn-back">
+        <span class="material-icons">arrow_back</span>
+      </a>
+      <div>
+        <h1>
+          <span class="material-icons">admin_panel_settings</span>
+          Gerenciar Cargos/Roles
+        </h1>
+        <p class="subtitle">{{ roles().length }} cargo(s) cadastrado(s)</p>
+      </div>
+    </div>
+    <a routerLink="/admin/roles/create" class="btn btn-primary">
+      <span class="material-icons">add</span>
+      Novo Cargo
+    </a>
+  </header>
+
+  @if (errorMessage()) {
+    <div class="error-message">
+      <span class="material-icons">error</span>
+      {{ errorMessage() }}
+      <button (click)="loadRoles()">Tentar novamente</button>
+    </div>
+  }
+
+  <div class="search-bar">
+    <span class="material-icons">search</span>
+    <input type="text" placeholder="Buscar cargos..." [ngModel]="searchTerm" (ngModelChange)="onSearch($event)">
+  </div>
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Carregando cargos...</p>
+    </div>
+  } @else {
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Descrição</th>
+            <th>Tipo</th>
+            <th class="actions-column">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (role of filteredRoles(); track role.id) {
+            <tr>
+              <td>
+                <div class="role-name">
+                  <span class="material-icons role-icon" [style.color]="getRoleColor(role.type)">
+                    {{ getRoleIcon(role.type) }}
+                  </span>
+                  {{ role.name }}
+                </div>
+              </td>
+              <td>{{ role.description || '-' }}</td>
+              <td>
+                <span class="tipo-badge" [style.background]="getRoleColor(role.type) + '20'" [style.color]="getRoleColor(role.type)">
+                  {{ getRoleTypeLabel(role.type) }}
+                </span>
+              </td>
+              <td class="actions-column">
+                <a [routerLink]="['/admin/roles/edit', role.id]" class="action-btn" title="Editar">
+                  <span class="material-icons">edit</span>
+                </a>
+                <button class="action-btn danger" (click)="delete(role)" title="Excluir" [disabled]="isSystemRole(role)">
+                  <span class="material-icons">delete</span>
+                </button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="4" class="empty-state">
+                <span class="material-icons">admin_panel_settings</span>
+                <p>Nenhum cargo encontrado</p>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

@@ -1,0 +1,92 @@
+<div class="admin-page">
+  <header class="page-header">
+    <div class="header-left">
+      <a routerLink="/admin" class="btn-back">
+        <span class="material-icons">arrow_back</span>
+      </a>
+      <div>
+        <h1>
+          <span class="material-icons">groups</span>
+          Gerenciar Pastorais
+        </h1>
+        <p class="subtitle">{{ pastorais().length }} pastoral(is) cadastrada(s)</p>
+      </div>
+    </div>
+    <a routerLink="/admin/pastorais/create" class="btn btn-primary">
+      <span class="material-icons">add</span>
+      Nova Pastoral
+    </a>
+  </header>
+
+  <div class="search-bar">
+    <span class="material-icons">search</span>
+    <input
+      type="text"
+      placeholder="Buscar pastorais..."
+      [ngModel]="searchTerm"
+      (ngModelChange)="onSearch($event)"
+    >
+  </div>
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Carregando pastorais...</p>
+    </div>
+  } @else {
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Sigla</th>
+            <th>Tipo</th>
+            <th>Grupos</th>
+            <th>Status</th>
+            <th class="actions-column">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (pastoral of filteredPastorais(); track pastoral.id) {
+            <tr [class.inactive]="!pastoral.isActive">
+              <td>
+                <div class="item-info">
+                  <span class="color-dot" [style.background]="pastoral.primaryColor"></span>
+                  {{ pastoral.name }}
+                </div>
+              </td>
+              <td>{{ pastoral.sigla }}</td>
+              <td>
+                <span class="badge" [attr.data-type]="pastoral.tipoPastoral">{{ pastoral.tipoPastoral }}</span>
+              </td>
+              <td>{{ pastoral.grupos.length || 0 }}</td>
+              <td>
+                <span class="status-badge" [class.active]="pastoral.isActive">
+                  {{ pastoral.isActive ? 'Ativo' : 'Inativo' }}
+                </span>
+              </td>
+              <td class="actions-column">
+                <a [routerLink]="['/admin/pastorais/edit', pastoral.id]" class="action-btn" title="Editar">
+                  <span class="material-icons">edit</span>
+                </a>
+                <button class="action-btn" (click)="toggleStatus(pastoral)" [title]="pastoral.isActive ? 'Desativar' : 'Ativar'">
+                  <span class="material-icons">{{ pastoral.isActive ? 'block' : 'check_circle' }}</span>
+                </button>
+                <button class="action-btn danger" (click)="delete(pastoral)" title="Excluir">
+                  <span class="material-icons">delete</span>
+                </button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="6" class="empty-state">
+                <span class="material-icons">groups</span>
+                <p>Nenhuma pastoral encontrada</p>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

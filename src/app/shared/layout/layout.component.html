@@ -5,7 +5,7 @@
     </button>
 
     <a routerLink="/feed" class="logo">
-      <span class="material-icons">church</span>
+      <img src="assets/logosemfundo.png" alt="Pastoral App" class="logo-img" />
       <span class="logo-text">Pastoral App</span>
     </a>
 
@@ -43,6 +43,10 @@
         <span class="material-icons">groups</span>
         <span>Pastorais</span>
       </a>
+      <a routerLink="/grupos" routerLinkActive="active" (click)="closeSidebar()">
+        <span class="material-icons">group_work</span>
+        <span>Grupos</span>
+      </a>
       <a routerLink="/igrejas" routerLinkActive="active" (click)="closeSidebar()">
         <span class="material-icons">church</span>
         <span>Igrejas</span>
@@ -72,12 +76,21 @@
         <span>Configurações</span>
       </a>
 
-      @if (isCoordenador || isAdmin) {
+      @if (isCoordenador) {
         <div class="nav-divider"></div>
         <span class="nav-label">Coordenação</span>
-        <a routerLink="/coordenacao" routerLinkActive="active" (click)="closeSidebar()">
+        <a routerLink="/coord-grupo" routerLinkActive="active" (click)="closeSidebar()">
           <span class="material-icons">manage_accounts</span>
           <span>Gerenciar Grupos</span>
+        </a>
+      }
+
+      @if (isCoordenadorGeral) {
+        <div class="nav-divider"></div>
+        <span class="nav-label">Coordenação Geral</span>
+        <a routerLink="/coord-geral" routerLinkActive="active" (click)="closeSidebar()">
+          <span class="material-icons">supervisor_account</span>
+          <span>Painel Geral</span>
         </a>
       }
 

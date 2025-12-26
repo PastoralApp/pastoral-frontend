@@ -57,4 +57,12 @@ export class NotificacaoService {
   desativar(id: string): Observable<void> {
     return this.http.patch<void>(`${this.API_URL}/${id}/desativar`, {});
   }
+
+  getAllAdmin(): Observable<Notificacao[]> {
+    return this.http.get<Notificacao[]>(`${this.API_URL}/admin/all`);
+  }
+
+  enviar(data: any): Observable<void> {
+    return this.http.post<void>(`${this.API_URL}/enviar`, data);
+  }
 }

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { PastoralService } from '../../core/services/pastoral.service';
 import { Pastoral, TipoPastoral } from '../../core/models/pastoral.model';
+import { ToastService } from '../../shared/services/toast.service';
 
 @Component({
   selector: 'app-pastorais',
@@ -13,10 +14,10 @@ import { Pastoral, TipoPastoral } from '../../core/models/pastoral.model';
 })
 export class PastoraisComponent implements OnInit {
   private pastoralService = inject(PastoralService);
+  private toastService = inject(ToastService);
 
   pastorais = signal<Pastoral[]>([]);
   isLoading = signal(true);
-  error = signal('');
   selectedType = signal<TipoPastoral | null>(null);
 
   TipoPastoral = TipoPastoral;
@@ -27,7 +28,6 @@ export class PastoraisComponent implements OnInit {
 
   loadPastorais(): void {
     this.isLoading.set(true);
-    this.error.set('');
 
     this.pastoralService.getAll().subscribe({
       next: (pastorais) => {
@@ -35,7 +35,7 @@ export class PastoraisComponent implements OnInit {
         this.isLoading.set(false);
       },
       error: (err) => {
-        this.error.set('Erro ao carregar pastorais');
+        this.toastService.error('Erro ao carregar pastorais');
         this.isLoading.set(false);
       }
     });

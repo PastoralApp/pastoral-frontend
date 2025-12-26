@@ -1,0 +1,126 @@
+<div class="admin-page">
+  <header class="page-header">
+    <div class="header-left">
+      <a routerLink="/admin" class="btn-back">
+        <span class="material-icons">arrow_back</span>
+      </a>
+      <div>
+        <h1>
+          <span class="material-icons">supervisor_account</span>
+          Gerenciar Coordenação
+        </h1>
+        <p class="subtitle">{{ filteredCoordenadores().length }} coordenador(es) encontrado(s)</p>
+      </div>
+    </div>
+    <a routerLink="/admin/coord-grupo/create" class="btn btn-primary">
+      <span class="material-icons">person_add</span>
+      Novo Coordenador
+    </a>
+  </header>
+
+  @if (errorMessage()) {
+    <div class="error-message">
+      <span class="material-icons">error</span>
+      {{ errorMessage() }}
+      <button (click)="loadCoordenadores()">Tentar novamente</button>
+    </div>
+  }
+
+  <div class="toolbar">
+    <div class="search-bar">
+      <span class="material-icons">search</span>
+      <input 
+        type="text" 
+        placeholder="Buscar por nome, email ou grupo..." 
+        [ngModel]="searchTerm()"
+        (ngModelChange)="searchTerm.set($event)"
+      >
+    </div>
+
+    <div class="filter-group">
+      <label>Filtrar por role:</label>
+      <select [ngModel]="selectedRole()" (ngModelChange)="selectedRole.set($event)">
+        <option value="all">Todas</option>
+        <option value="Administrador">Administrador</option>
+        <option value="Coordenador Geral">Coordenador Geral</option>
+        <option value="Coordenador de Grupo">Coordenador de Grupo</option>
+      </select>
+    </div>
+  </div>
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Carregando coordenadores...</p>
+    </div>
+  } @else {
+    <div class="coordenadores-grid">
+      @for (coord of filteredCoordenadores(); track coord.id) {
+        <div class="coordenador-card">
+          <div class="card-header">
+            <div class="user-info">
+              @if (coord.photoUrl) {
+                <img [src]="coord.photoUrl" [alt]="coord.name" class="avatar">
+              } @else {
+                <div class="avatar-placeholder">{{ coord.name.charAt(0) }}</div>
+              }
+              <div class="info">
+                <h3>{{ coord.name }}</h3>
+                <p class="email">{{ coord.email }}</p>
+                <span class="role-badge" [ngClass]="getRoleBadgeClass(coord.roleName)">
+                  {{ coord.roleName }}
+                </span>
+              </div>
+            </div>
+            <span class="status-badge" [ngClass]="getStatusBadgeClass(coord.isActive)">
+              {{ coord.isActive ? 'Ativo' : 'Inativo' }}
+            </span>
+          </div>
+
+          <div class="card-body">
+            <div class="section">
+              <h4>
+                <span class="material-icons">groups</span>
+                Grupos ({{ coord.grupos.length }})
+              </h4>
+              @if (coord.grupos.length > 0) {
+                <div class="grupos-list">
+                  @for (grupo of coord.grupos; track grupo.grupoId) {
+                    <div class="grupo-item">
+                      <span class="grupo-dot" [style.background]="grupo.primaryColor"></span>
+                      <div class="grupo-info">
+                        <strong>{{ grupo.grupoSigla }}</strong>
+                        <span class="grupo-name">{{ grupo.grupoName }}</span>
+                      </div>
+                    </div>
+                  }
+                </div>
+              } @else {
+                <p class="empty-text">Sem grupos</p>
+              }
+            </div>
+          </div>
+
+          <div class="card-actions">
+            <a [routerLink]="['/admin/coord-grupo/edit', coord.id]" class="btn btn-secondary">
+              <span class="material-icons">edit</span>
+              Editar
+            </a>
+            <a [routerLink]="['/admin/users', coord.id]" class="btn btn-outline">
+              <span class="material-icons">visibility</span>
+              Ver Detalhes
+            </a>
+          </div>
+        </div>
+      } @empty {
+        <div class="empty-state">
+          <span class="material-icons">supervisor_account</span>
+          <p>Nenhum coordenador encontrado</p>
+          <a routerLink="/admin/coord-grupo/create" class="btn btn-primary">
+            Adicionar primeiro coordenador
+          </a>
+        </div>
+      }
+    </div>
+  }
+</div>

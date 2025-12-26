@@ -1,0 +1,142 @@
+<div class="admin-eventos-container">
+  <header class="page-header">
+    <a routerLink="/admin" class="btn-back">
+      <span class="material-icons">arrow_back</span>
+    </a>
+    <h1>
+      <span class="material-icons">event</span>
+      Gerenciar Eventos
+    </h1>
+    <a routerLink="/admin/eventos/create" class="btn btn-primary">
+      <span class="material-icons">add</span>
+      Novo Evento
+    </a>
+  </header>
+
+  <div class="toolbar">
+    <div class="search-bar">
+      <span class="material-icons">search</span>
+      <input
+        type="text"
+        placeholder="Buscar eventos..."
+        [ngModel]="searchTerm()"
+        (ngModelChange)="searchTerm.set($event)"
+      >
+    </div>
+
+    <div class="filters">
+      <select 
+        [ngModel]="filterStatus()"
+        (ngModelChange)="filterStatus.set($event)"
+        class="filter-select"
+      >
+        <option value="all">Todos os eventos</option>
+        <option value="upcoming">Próximos</option>
+        <option value="past">Passados</option>
+      </select>
+    </div>
+  </div>
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Carregando eventos...</p>
+    </div>
+  } @else {
+    <div class="eventos-table">
+      <table>
+        <thead>
+          <tr>
+            <th>Evento</th>
+            <th>Data</th>
+            <th>Local</th>
+            <th>Participantes</th>
+            <th>Status</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (evento of filteredEventos; track evento.id) {
+            <tr [class.past]="isEventPast(evento.eventDate)">
+              <td>
+                <div class="evento-cell">
+                  @if (evento.imageUrl) {
+                    <img [src]="evento.imageUrl" [alt]="evento.title" class="evento-image">
+                  } @else {
+                    <div class="evento-image-placeholder">
+                      <span class="material-icons">event</span>
+                    </div>
+                  }
+                  <div class="evento-info">
+                    <span class="evento-title">{{ evento.title }}</span>
+                    @if (evento.description) {
+                      <span class="evento-desc">{{ evento.description.length > 60 ? evento.description.substring(0, 60) + '...' : evento.description }}</span>
+                    }
+                  </div>
+                </div>
+              </td>
+              <td class="date-cell">
+                {{ formatDate(evento.eventDate) }}
+              </td>
+              <td>
+                @if (evento.location) {
+                  <span class="location">
+                    <span class="material-icons">location_on</span>
+                    {{ evento.location }}
+                  </span>
+                } @else {
+                  <span class="no-location">-</span>
+                }
+              </td>
+              <td class="participants-cell">
+                <span class="participants">
+                  <span class="material-icons">people</span>
+                  {{ getParticipantsInfo(evento) }}
+                </span>
+              </td>
+              <td>
+                @if (isEventPast(evento.eventDate)) {
+                  <span class="badge badge-past">Encerrado</span>
+                } @else {
+                  <span class="badge badge-upcoming">Ativo</span>
+                }
+              </td>
+              <td>
+                <div class="action-buttons">
+                  <a 
+                    [routerLink]="['/eventos', evento.id]"
+                    class="btn-icon btn-view" 
+                    title="Visualizar"
+                  >
+                    <span class="material-icons">visibility</span>
+                  </a>
+                  <a 
+                    [routerLink]="['/admin/eventos/edit', evento.id]"
+                    class="btn-icon btn-edit" 
+                    title="Editar"
+                  >
+                    <span class="material-icons">edit</span>
+                  </a>
+                  <button 
+                    class="btn-icon btn-delete" 
+                    (click)="deleteEvento(evento)"
+                    title="Excluir"
+                  >
+                    <span class="material-icons">delete</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="6" class="empty-state">
+                <span class="material-icons">event_busy</span>
+                <p>Nenhum evento encontrado</p>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

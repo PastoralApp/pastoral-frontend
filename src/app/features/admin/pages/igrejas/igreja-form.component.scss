@@ -1,0 +1,13 @@
+@use '../../admin-shared.styles' as *;
+
+.image-preview {
+  margin-top: 12px;
+  
+  img {
+    max-width: 300px;
+    max-height: 200px;
+    border-radius: 8px;
+    object-fit: cover;
+    border: 2px solid var(--border, #e0e0e0);
+  }
+}

@@ -1,0 +1,83 @@
+<div class="admin-page">
+  <header class="page-header">
+    <div class="header-left">
+      <a routerLink="/admin/horarios" class="btn-back">
+        <span class="material-icons">arrow_back</span>
+      </a>
+      <div>
+        <h1>
+          <span class="material-icons">schedule</span>
+          {{ isEditMode() ? 'Editar Horário' : 'Novo Horário' }}
+        </h1>
+        <p class="subtitle">{{ isEditMode() ? 'Atualize os dados do horário' : 'Cadastre um novo horário de missa' }}</p>
+      </div>
+    </div>
+  </header>
+
+  @if (errorMessage()) {
+    <div class="error-message">
+      <span class="material-icons">error</span>
+      {{ errorMessage() }}
+    </div>
+  }
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Carregando dados...</p>
+    </div>
+  } @else {
+    <div class="form-container">
+      <form class="form-card" (ngSubmit)="save()">
+        <div class="form-group">
+          <label for="igrejaId">Igreja *</label>
+          <select id="igrejaId" name="igrejaId" [(ngModel)]="horario.igrejaId" required>
+            <option value="">Selecione a igreja</option>
+            @for (igreja of igrejas(); track igreja.id) {
+              <option [value]="igreja.id">{{ igreja.nome }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="diaSemana">Dia da Semana *</label>
+            <select id="diaSemana" name="diaSemana" [(ngModel)]="horario.diaSemana" required>
+              <option value="">Selecione o dia</option>
+              @for (dia of diasSemana; track dia.value) {
+                <option [value]="dia.value">{{ dia.label }}</option>
+              }
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="horario">Horário *</label>
+            <input type="time" id="horario" name="horario" [(ngModel)]="horario.horario" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="celebrante">Celebrante</label>
+          <input type="text" id="celebrante" name="celebrante" [(ngModel)]="horario.celebrante" placeholder="Ex: Pe. João">
+        </div>
+
+        <div class="form-group">
+          <label for="observacao">Observação</label>
+          <textarea id="observacao" name="observacao" [(ngModel)]="horario.observacao" rows="3" placeholder="Ex: Missa das famílias"></textarea>
+        </div>
+
+        <div class="form-actions">
+          <a routerLink="/admin/horarios" class="btn btn-secondary">Cancelar</a>
+          <button type="submit" class="btn btn-primary" [disabled]="isSaving()">
+            @if (isSaving()) {
+              <div class="spinner-small"></div>
+              Salvando...
+            } @else {
+              <span class="material-icons">save</span>
+              {{ isEditMode() ? 'Atualizar' : 'Cadastrar' }}
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+</div>

@@ -18,6 +18,11 @@ export const noAuthGuard: CanActivateFn = (route, state) => {
   const authService = inject(AuthService);
   const router = inject(Router);
 
+  const allowedPaths = ['/auth/google-callback', '/auth/google-complete', '/auth/google-success'];
+  if (allowedPaths.some(path => state.url.startsWith(path))) {
+    return true;
+  }
+
   if (!authService.getToken()) {
     return true;
   }

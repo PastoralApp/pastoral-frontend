@@ -10,15 +10,7 @@
     </div>
   }
 
-  @if (error()) {
-    <div class="error-state">
-      <span class="material-icons">error</span>
-      <p>{{ error() }}</p>
-      <button class="btn btn-primary" (click)="loadSalvos()">Tentar novamente</button>
-    </div>
-  }
-
-  @if (!isLoading() && !error()) {
+  @if (!isLoading()) {
     <div class="posts-list">
       @for (post of posts(); track post.id) {
         <app-post-card 

@@ -102,7 +102,7 @@
     color: var(--error-color);
 
     &:hover {
-      background-color: rgba(239, 68, 68, 0.1);
+      background-color: var(--error-light);
     }
   }
 }
@@ -111,6 +111,13 @@
   font-size: 22px;
   color: inherit;
   flex-shrink: 0;
+}
+
+.img-icon {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  display: inline-block;
 }
 
 .nav-label {
@@ -134,7 +141,6 @@
   border-radius: var(--radius-full);
 }
 
-// Scrollbar styling
 .sidebar::-webkit-scrollbar {
   width: 4px;
 }

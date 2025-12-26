@@ -1,148 +1,111 @@
 <div class="admin-container">
+  <router-outlet></router-outlet>
+
+  @if (!isChildRoute()) {
   <header class="admin-header">
     <h1>Painel Administrativo</h1>
+    <p class="subtitle">Gerencie todos os recursos do sistema</p>
   </header>
 
-  <div class="admin-tabs">
-    <button [class.active]="activeTab() === 'users'" (click)="setTab('users')">
-      <span class="material-icons">people</span>
-      Usuários
-    </button>
-    <button [class.active]="activeTab() === 'pastorais'" (click)="setTab('pastorais')">
-      <span class="material-icons">groups</span>
-      Pastorais
-    </button>
-    <button [class.active]="activeTab() === 'roles'" (click)="setTab('roles')">
-      <span class="material-icons">security</span>
-      Roles
-    </button>
+  <div class="admin-grid">
+    <a routerLink="/admin/users" class="admin-card">
+      <div class="card-icon users">
+        <span class="material-icons">people</span>
+      </div>
+      <div class="card-content">
+        <h3>Usuários</h3>
+        <p>Gerenciar usuários do sistema</p>
+      </div>
+      <span class="material-icons card-arrow">arrow_forward</span>
+    </a>
+
+    <a routerLink="/admin/pastorais" class="admin-card">
+      <div class="card-icon pastorais">
+        <span class="material-icons">groups</span>
+      </div>
+      <div class="card-content">
+        <h3>Pastorais</h3>
+        <p>Gerenciar pastorais e categorias</p>
+      </div>
+      <span class="material-icons card-arrow">arrow_forward</span>
+    </a>
+
+    <a routerLink="/admin/grupos" class="admin-card">
+      <div class="card-icon grupos">
+        <span class="material-icons">group</span>
+      </div>
+      <div class="card-content">
+        <h3>Grupos</h3>
+        <p>Gerenciar grupos das pastorais</p>
+      </div>
+      <span class="material-icons card-arrow">arrow_forward</span>
+    </a>
+
+    <a routerLink="/admin/igrejas" class="admin-card">
+      <div class="card-icon igrejas">
+        <span class="material-icons">church</span>
+      </div>
+      <div class="card-content">
+        <h3>Igrejas</h3>
+        <p>Gerenciar igrejas e locais</p>
+      </div>
+      <span class="material-icons card-arrow">arrow_forward</span>
+    </a>
+
+    <a routerLink="/admin/horarios" class="admin-card">
+      <div class="card-icon horarios">
+        <span class="material-icons">schedule</span>
+      </div>
+      <div class="card-content">
+        <h3>Horários</h3>
+        <p>Gerenciar horários de missas</p>
+      </div>
+      <span class="material-icons card-arrow">arrow_forward</span>
+    </a>
+
+    <a routerLink="/admin/notificacoes" class="admin-card">
+      <div class="card-icon notificacoes">
+        <span class="material-icons">notifications</span>
+      </div>
+      <div class="card-content">
+        <h3>Notificações</h3>
+        <p>Enviar notificações aos usuários</p>
+      </div>
+      <span class="material-icons card-arrow">arrow_forward</span>
+    </a>
+
+    <a routerLink="/admin/roles" class="admin-card">
+      <div class="card-icon roles">
+        <span class="material-icons">security</span>
+      </div>
+      <div class="card-content">
+        <h3>Roles</h3>
+        <p>Gerenciar permissões e roles</p>
+      </div>
+      <span class="material-icons card-arrow">arrow_forward</span>
+    </a>
+
+    <a routerLink="/admin/posts" class="admin-card">
+      <div class="card-icon posts">
+        <span class="material-icons">article</span>
+      </div>
+      <div class="card-content">
+        <h3>Posts</h3>
+        <p>Gerenciar posts e publicações</p>
+      </div>
+      <span class="material-icons card-arrow">arrow_forward</span>
+    </a>
+
+    <a routerLink="/admin/tags" class="admin-card">
+      <div class="card-icon tags">
+        <span class="material-icons">label</span>
+      </div>
+      <div class="card-content">
+        <h3>Tags</h3>
+        <p>Gerenciar tags dos usuários</p>
+      </div>
+      <span class="material-icons card-arrow">arrow_forward</span>
+    </a>
   </div>
-
-  <div class="search-bar">
-    <span class="material-icons">search</span>
-    <input
-      type="text"
-      placeholder="Buscar..."
-      [ngModel]="searchTerm()"
-      (ngModelChange)="searchTerm.set($event)"
-    >
-  </div>
-
-  @if (isLoading()) {
-    <div class="loading-state">
-      <div class="spinner"></div>
-      <p>Carregando...</p>
-    </div>
-  } @else {
-    @if (activeTab() === 'users') {
-      <div class="admin-table">
-        <table>
-          <thead>
-            <tr>
-              <th>Nome</th>
-              <th>Email</th>
-              <th>Role</th>
-              <th>Status</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (user of filteredUsers; track user.id) {
-              <tr [class.inactive]="!user.isActive">
-                <td>
-                  <div class="user-cell">
-                    @if (user.photoUrl) {
-                      <img [src]="user.photoUrl" [alt]="user.name">
-                    } @else {
-                      <div class="avatar-placeholder">{{ user.name.charAt(0) }}</div>
-                    }
-                    {{ user.name }}
-                  </div>
-                </td>
-                <td>{{ user.email }}</td>
-                <td>
-                  <select [ngModel]="user.roleId" (ngModelChange)="changeUserRole(user.id, $event)">
-                    @for (role of roles(); track role.id) {
-                      <option [value]="role.id">{{ role.name }}</option>
-                    }
-                  </select>
-                </td>
-                <td>
-                  <span class="status-badge" [class.active]="user.isActive">
-                    {{ user.isActive ? 'Ativo' : 'Inativo' }}
-                  </span>
-                </td>
-                <td>
-                  <button class="action-btn" (click)="toggleUserStatus(user)">
-                    <span class="material-icons">{{ user.isActive ? 'block' : 'check_circle' }}</span>
-                  </button>
-                </td>
-              </tr>
-            } @empty {
-              <tr>
-                <td colspan="5" class="empty-cell">Nenhum usuário encontrado</td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
-    }
-
-    @if (activeTab() === 'pastorais') {
-      <div class="admin-table">
-        <table>
-          <thead>
-            <tr>
-              <th>Nome</th>
-              <th>Tipo</th>
-              <th>Membros</th>
-              <th>Status</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (pastoral of filteredPastorais; track pastoral.id) {
-              <tr [class.inactive]="!pastoral.isActive">
-                <td>{{ pastoral.name }}</td>
-                <td>
-                  <span class="type-badge" [attr.data-type]="pastoral.tipoPastoral">
-                    {{ pastoral.tipoPastoral }}
-                  </span>
-                </td>
-                <td>{{ pastoral.grupos || 0 }}</td>
-                <td>
-                  <span class="status-badge" [class.active]="pastoral.isActive">
-                    {{ pastoral.isActive ? 'Ativo' : 'Inativo' }}
-                  </span>
-                </td>
-                <td>
-                  <button class="action-btn" (click)="togglePastoralStatus(pastoral)">
-                    <span class="material-icons">{{ pastoral.isActive ? 'block' : 'check_circle' }}</span>
-                  </button>
-                </td>
-              </tr>
-            } @empty {
-              <tr>
-                <td colspan="5" class="empty-cell">Nenhuma pastoral encontrada</td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
-    }
-
-    @if (activeTab() === 'roles') {
-      <div class="roles-grid">
-        @for (role of roles(); track role.id) {
-          <div class="role-card">
-            <span class="material-icons">security</span>
-            <h3>{{ role.name }}</h3>
-            @if (role.description) {
-              <p>{{ role.description }}</p>
-            }
-          </div>
-        }
-      </div>
-    }
   }
 </div>

@@ -1,0 +1,292 @@
+<div class="enviar-notificacao-container">
+  <header class="page-header">
+    <div class="header-content">
+      <button class="back-btn" (click)="voltar()">
+        <span class="material-icons">arrow_back</span>
+      </button>
+      <h1>
+        <span class="material-icons">mail</span>
+        Enviar Notificação
+      </h1>
+    </div>
+  </header>
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Carregando...</p>
+    </div>
+  } @else {
+    <div class="form-container">
+      <div class="form-card">
+        <section class="form-section">
+          <h2>Tipo de Destinatário</h2>
+          <div class="tipo-destinatario-tabs">
+            @if (canUseDestinatarioTipo('individual')) {
+              <button 
+                class="tab-btn"
+                [class.active]="destinatarioTipo() === 'individual'"
+                (click)="setDestinatarioTipo('individual')"
+              >
+                <span class="material-icons">person</span>
+                <span>Individual</span>
+              </button>
+            }
+            @if (canUseDestinatarioTipo('grupo')) {
+              <button 
+                class="tab-btn"
+                [class.active]="destinatarioTipo() === 'grupo'"
+                (click)="setDestinatarioTipo('grupo')"
+              >
+                <span class="material-icons">groups</span>
+                <span>Grupo</span>
+              </button>
+            }
+            @if (canUseDestinatarioTipo('geral')) {
+              <button 
+                class="tab-btn"
+                [class.active]="destinatarioTipo() === 'geral'"
+                (click)="setDestinatarioTipo('geral')"
+              >
+                <span class="material-icons">public</span>
+                <span>Geral</span>
+              </button>
+            }
+          </div>
+        </section>
+
+        <section class="form-section">
+          <h2>
+            @if (destinatarioTipo() === 'individual') {
+              Destinatário
+            } @else if (destinatarioTipo() === 'grupo') {
+              Grupo
+            } @else {
+              Notificação Geral
+            }
+          </h2>
+          
+          @if (destinatarioTipo() === 'individual') {
+            @if (!usuarioSelecionado()) {
+              <div class="usuario-search">
+                <div class="search-input-wrapper">
+                  <span class="material-icons">search</span>
+                  <input
+                    type="text"
+                    placeholder="Buscar usuário por nome ou email..."
+                    [value]="searchUsuario"
+                    (input)="onSearchUsuario($any($event.target).value)"
+                    class="search-input"
+                  />
+                </div>
+
+                @if (searchUsuario && usuariosFiltrados().length > 0) {
+                  <div class="search-results">
+                    @for (usuario of usuariosFiltrados(); track usuario.id) {
+                      <div 
+                        class="usuario-item" 
+                        (click)="selecionarUsuario(usuario)"
+                      >
+                        @if (usuario.photoUrl) {
+                          <img [src]="usuario.photoUrl" [alt]="usuario.name" class="usuario-avatar">
+                        } @else {
+                          <div class="usuario-avatar placeholder">
+                            {{ usuario.name.charAt(0).toUpperCase() }}
+                          </div>
+                        }
+                        <div class="usuario-info">
+                          <div class="usuario-name">{{ usuario.name }}</div>
+                          <div class="usuario-email">{{ usuario.email }}</div>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                }
+
+                @if (searchUsuario && usuariosFiltrados().length === 0) {
+                  <div class="no-results">
+                    <span class="material-icons">person_off</span>
+                    <p>Nenhum usuário encontrado</p>
+                  </div>
+                }
+              </div>
+            } @else {
+              <div class="usuario-selecionado">
+                @if (usuarioSelecionado()!.photoUrl) {
+                  <img [src]="usuarioSelecionado()!.photoUrl" [alt]="usuarioSelecionado()!.name" class="usuario-avatar-grande">
+                } @else {
+                  <div class="usuario-avatar-grande placeholder">
+                    {{ usuarioSelecionado()!.name.charAt(0).toUpperCase() }}
+                  </div>
+                }
+                <div class="usuario-detalhes">
+                  <div class="usuario-name">{{ usuarioSelecionado()!.name }}</div>
+                  <div class="usuario-email">{{ usuarioSelecionado()!.email }}</div>
+                </div>
+                <button class="btn-remover" (click)="limparSelecao()" title="Remover">
+                  <span class="material-icons">close</span>
+                </button>
+              </div>
+            }
+          }
+
+          @if (destinatarioTipo() === 'grupo') {
+            @if (!grupoSelecionado()) {
+              <div class="grupo-search">
+                <div class="search-input-wrapper">
+                  <span class="material-icons">search</span>
+                  <input
+                    type="text"
+                    placeholder="Buscar grupo por nome ou sigla..."
+                    [value]="searchGrupo"
+                    (input)="onSearchGrupo($any($event.target).value)"
+                    class="search-input"
+                  />
+                </div>
+
+                @if (searchGrupo && gruposFiltrados().length > 0) {
+                  <div class="search-results">
+                    @for (grupo of gruposFiltrados(); track grupo.id) {
+                      <div 
+                        class="grupo-item" 
+                        (click)="selecionarGrupo(grupo)"
+                      >
+                        @if (grupo.logoUrl) {
+                          <img [src]="grupo.logoUrl" [alt]="grupo.name" class="grupo-logo">
+                        } @else {
+                          <div class="grupo-logo placeholder" [style.background]="grupo.primaryColor">
+                            {{ grupo.sigla || grupo.name.charAt(0).toUpperCase() }}
+                          </div>
+                        }
+                        <div class="grupo-info">
+                          <div class="grupo-name">{{ grupo.name }}</div>
+                          <div class="grupo-sigla">{{ grupo.sigla }}</div>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                }
+
+                @if (searchGrupo && gruposFiltrados().length === 0) {
+                  <div class="no-results">
+                    <span class="material-icons">groups_off</span>
+                    <p>Nenhum grupo encontrado</p>
+                  </div>
+                }
+              </div>
+            } @else {
+              <div class="grupo-selecionado">
+                @if (grupoSelecionado()!.logoUrl) {
+                  <img [src]="grupoSelecionado()!.logoUrl" [alt]="grupoSelecionado()!.name" class="grupo-logo-grande">
+                } @else {
+                  <div class="grupo-logo-grande placeholder" [style.background]="grupoSelecionado()!.primaryColor">
+                    {{ grupoSelecionado()!.sigla || grupoSelecionado()!.name.charAt(0).toUpperCase() }}
+                  </div>
+                }
+                <div class="grupo-detalhes">
+                  <div class="grupo-name">{{ grupoSelecionado()!.name }}</div>
+                  <div class="grupo-sigla">{{ grupoSelecionado()!.sigla }}</div>
+                </div>
+                <button class="btn-remover" (click)="limparSelecao()" title="Remover">
+                  <span class="material-icons">close</span>
+                </button>
+              </div>
+            }
+          }
+
+          @if (destinatarioTipo() === 'geral') {
+            <div class="info-geral">
+              <span class="material-icons">info</span>
+              <p>Esta notificação será enviada para <strong>todos os usuários</strong> cadastrados no sistema.</p>
+            </div>
+          }
+        </section>
+
+        <section class="form-section">
+          <h2>Conteúdo da Notificação</h2>
+          
+          <div class="form-group">
+            <label for="titulo">Título *</label>
+            <input
+              id="titulo"
+              type="text"
+              [(ngModel)]="notificacao.titulo"
+              placeholder="Título da notificação"
+              class="form-control"
+              maxlength="100"
+            />
+            <small class="char-count">{{ notificacao.titulo.length }}/100</small>
+          </div>
+
+          <div class="form-group">
+            <label for="mensagem">Mensagem *</label>
+            <textarea
+              id="mensagem"
+              [(ngModel)]="notificacao.mensagem"
+              placeholder="Conteúdo da notificação"
+              class="form-control textarea"
+              rows="6"
+              maxlength="1000"
+            ></textarea>
+            <small class="char-count">{{ notificacao.mensagem.length }}/1000</small>
+          </div>
+
+          <div class="form-group checkbox">
+            <input
+              id="sendEmail"
+              type="checkbox"
+              [(ngModel)]="notificacao.sendEmail"
+              class="checkbox-input"
+            />
+            <label for="sendEmail">Enviar também por email</label>
+          </div>
+        </section>
+
+        <section class="form-actions">
+          <button 
+            class="btn btn-secondary"
+            (click)="limpar()"
+            [disabled]="isSaving()"
+          >
+            <span class="material-icons">close</span>
+            Limpar
+          </button>
+          <button 
+            class="btn btn-primary"
+            (click)="send()"
+            [disabled]="isSaving() || (destinatarioTipo() === 'individual' && !usuarioSelecionado()) || (destinatarioTipo() === 'grupo' && !grupoSelecionado())"
+          >
+            @if (isSaving()) {
+              <span class="spinner-small"></span>
+              Enviando...
+            } @else {
+              <span class="material-icons">send</span>
+              Enviar Notificação
+            }
+          </button>
+        </section>
+      </div>
+
+      <aside class="info-card">
+        <div class="info-header">
+          <span class="material-icons">info</span>
+          <h3>Dicas</h3>
+        </div>
+        <ul class="info-list">
+          <li>Título é obrigatório e tem limite de 100 caracteres</li>
+          <li>Mensagem é obrigatória e tem limite de 1000 caracteres</li>
+          @if (destinatarioTipo() === 'individual') {
+            <li>Você deve selecionar um usuário para receber a notificação</li>
+          } @else if (destinatarioTipo() === 'grupo') {
+            <li>Você deve selecionar um grupo para receber a notificação</li>
+            <li>Todos os membros do grupo receberão a notificação</li>
+          } @else {
+            <li>A notificação será enviada para <strong>todos os usuários</strong></li>
+          }
+          <li>Ative "Enviar também por email" para notificar por email também</li>
+          <li>O destinatário receberá a notificação em tempo real no app</li>
+        </ul>
+      </aside>
+    </div>
+  }
+</div>

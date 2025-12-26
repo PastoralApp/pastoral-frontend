@@ -1,0 +1,106 @@
+<div class="admin-page">
+  <header class="page-header">
+    <div class="header-left">
+      <a routerLink="/admin" class="btn-back">
+        <span class="material-icons">arrow_back</span>
+      </a>
+      <div>
+        <h1>
+          <span class="material-icons">schedule</span>
+          Gerenciar Horários de Missa
+        </h1>
+        <p class="subtitle">{{ horarios().length }} horário(s) cadastrado(s)</p>
+      </div>
+    </div>
+    <a routerLink="/admin/horarios/create" class="btn btn-primary">
+      <span class="material-icons">add</span>
+      Novo Horário
+    </a>
+  </header>
+
+  @if (errorMessage()) {
+    <div class="error-message">
+      <span class="material-icons">error</span>
+      {{ errorMessage() }}
+      <button (click)="loadHorarios()">Tentar novamente</button>
+    </div>
+  }
+
+  <div class="filters-row">
+    <div class="search-bar">
+      <span class="material-icons">search</span>
+      <input type="text" placeholder="Buscar..." [ngModel]="searchTerm" (ngModelChange)="onSearch($event)">
+    </div>
+    <select class="filter-select" [(ngModel)]="filterIgreja" (ngModelChange)="applyFilters()">
+      <option value="">Todas as igrejas</option>
+      @for (igreja of igrejas(); track igreja.id) {
+        <option [value]="igreja.id">{{ igreja.nome }}</option>
+      }
+    </select>
+    <select class="filter-select" [(ngModel)]="filterDia" (ngModelChange)="applyFilters()">
+      <option value="">Todos os dias</option>
+      @for (dia of diasSemana; track dia.value) {
+        <option [value]="dia.value">{{ dia.label }}</option>
+      }
+    </select>
+  </div>
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Carregando horários...</p>
+    </div>
+  } @else {
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Igreja</th>
+            <th>Dia</th>
+            <th>Horário</th>
+            <th>Celebrante</th>
+            <th>Observação</th>
+            <th>Status</th>
+            <th class="actions-column">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (horario of filteredHorarios(); track horario.id) {
+            <tr [class.inactive]="!horario.isAtivo">
+              <td>{{ horario.igrejaNome || '-' }}</td>
+              <td>
+                <span class="dia-badge">{{ horario.diaSemanaTexto || getDiaSemanaLabel(horario.diaSemana) }}</span>
+              </td>
+              <td class="horario-time">{{ horario.horarioTexto || horario.horario }}</td>
+              <td>{{ horario.celebrante || '-' }}</td>
+              <td>{{ horario.observacao || '-' }}</td>
+              <td>
+                <span class="status-badge" [class.active]="horario.isAtivo">
+                  {{ horario.isAtivo ? 'Ativo' : 'Inativo' }}
+                </span>
+              </td>
+              <td class="actions-column">
+                <a [routerLink]="['/admin/horarios/edit', horario.id]" class="action-btn" title="Editar">
+                  <span class="material-icons">edit</span>
+                </a>
+                <button class="action-btn" (click)="toggleStatus(horario)" [title]="horario.isAtivo ? 'Desativar' : 'Ativar'">
+                  <span class="material-icons">{{ horario.isAtivo ? 'block' : 'check_circle' }}</span>
+                </button>
+                <button class="action-btn danger" (click)="delete(horario)" title="Excluir">
+                  <span class="material-icons">delete</span>
+                </button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="7" class="empty-state">
+                <span class="material-icons">schedule</span>
+                <p>Nenhum horário encontrado</p>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

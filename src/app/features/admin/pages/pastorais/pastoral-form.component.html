@@ -1,0 +1,103 @@
+<div class="admin-page">
+  <header class="page-header">
+    <div class="header-left">
+      <a routerLink="/admin/pastorais" class="btn-back">
+        <span class="material-icons">arrow_back</span>
+      </a>
+      <h1>
+        <span class="material-icons">{{ isEditMode() ? 'edit' : 'add' }}</span>
+        {{ isEditMode() ? 'Editar Pastoral' : 'Nova Pastoral' }}
+      </h1>
+    </div>
+  </header>
+
+  <div class="form-container">
+    <form (ngSubmit)="save()" #pastoralForm="ngForm">
+      <div class="form-card">
+        <h3><span class="material-icons">info</span> Informações Básicas</h3>
+        
+        <div class="form-row">
+          <div class="form-group flex-2">
+            <label for="name">Nome *</label>
+            <input type="text" id="name" name="name" [(ngModel)]="formData.name" required placeholder="Nome da pastoral">
+          </div>
+          <div class="form-group">
+            <label for="sigla">Sigla</label>
+            <input type="text" id="sigla" name="sigla" [(ngModel)]="formData.sigla" placeholder="Ex: PJ" maxlength="5">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="tipoPastoral">Tipo Pastoral *</label>
+            <select id="tipoPastoral" name="tipoPastoral" [(ngModel)]="formData.tipoPastoral" required>
+              <option value="PA">PA - Pastoral de Adolescentes</option>
+              <option value="PJ">PJ - Pastoral de Jovens</option>
+              <option value="Geral">Geral</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="type">Categoria</label>
+            <select id="type" name="type" [(ngModel)]="formData.type">
+              <option value="PA">PA</option>
+              <option value="PJ">PJ</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="description">Descrição</label>
+          <textarea id="description" name="description" [(ngModel)]="formData.description" placeholder="Descrição da pastoral" rows="3"></textarea>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <h3><span class="material-icons">palette</span> Aparência</h3>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="primaryColor">Cor Primária</label>
+            <div class="color-input">
+              <input type="color" id="primaryColor" name="primaryColor" [(ngModel)]="formData.primaryColor">
+              <span>{{ formData.primaryColor }}</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="secondaryColor">Cor Secundária</label>
+            <div class="color-input">
+              <input type="color" id="secondaryColor" name="secondaryColor" [(ngModel)]="formData.secondaryColor">
+              <span>{{ formData.secondaryColor }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="logoUrl">URL do Logo (opcional)</label>
+          <input type="url" id="logoUrl" name="logoUrl" [(ngModel)]="formData.logoUrl" placeholder="https://...">
+        </div>
+
+        <div class="form-group">
+          <label for="icon">Ícone (opcional)</label>
+          <input type="text" id="icon" name="icon" [(ngModel)]="formData.icon" placeholder="Ex: groups">
+          <small class="form-hint">Nome do ícone Material Icons</small>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <a routerLink="/admin/pastorais" class="btn btn-secondary">
+          <span class="material-icons">close</span>
+          Cancelar
+        </a>
+        <button type="submit" class="btn btn-primary" [disabled]="!pastoralForm.valid || isSubmitting()">
+          @if (isSubmitting()) {
+            <span class="spinner-sm"></span>
+            Salvando...
+          } @else {
+            <span class="material-icons">{{ isEditMode() ? 'save' : 'add' }}</span>
+            {{ isEditMode() ? 'Salvar Alterações' : 'Criar Pastoral' }}
+          }
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

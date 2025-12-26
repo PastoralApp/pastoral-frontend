@@ -1,0 +1,25 @@
+<div class="admin-container">
+  <router-outlet></router-outlet>
+
+  @if (!isChildRoute()) {
+  <header class="admin-header">
+    <h1>Painel do Coordenador Geral</h1>
+    <p class="subtitle">Gerencie recursos e usuários do sistema</p>
+  </header>
+
+  <div class="admin-grid">
+    @for (item of menuItems; track item.route) {
+      <a [routerLink]="item.route" class="admin-card">
+        <div class="card-icon" [class]="item.iconClass">
+          <span class="material-icons">{{ item.icon }}</span>
+        </div>
+        <div class="card-content">
+          <h3>{{ item.title }}</h3>
+          <p>{{ item.description }}</p>
+        </div>
+        <span class="material-icons card-arrow">arrow_forward</span>
+      </a>
+    }
+  </div>
+  }
+</div>

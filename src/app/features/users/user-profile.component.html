@@ -68,14 +68,30 @@
           </div>
         </section>
 
-        @if (user()!.grupoName) {
+        @if (user()!.grupos && user()!.grupos.length > 0) {
           <section class="info-card">
-            <h2>Grupo</h2>
-            <a [routerLink]="['/grupos', user()!.grupoId]" class="grupo-link">
-              <span class="material-icons">group</span>
-              <span>{{ user()!.grupoName }}</span>
-              <span class="material-icons arrow">chevron_right</span>
-            </a>
+            <h2>Grupos ({{ user()!.grupos.length }}/4)</h2>
+            <div class="grupos-list">
+              @for (grupo of user()!.grupos; track grupo.id) {
+                <a [routerLink]="['/grupos', grupo.grupoId]" class="grupo-card">
+                  <div class="grupo-icon" [style.background-color]="grupo.primaryColor">
+                    @if (grupo.grupoLogoUrl) {
+                      <img [src]="grupo.grupoLogoUrl" [alt]="grupo.grupoName">
+                    } @else {
+                      <span>{{ grupo.grupoSigla }}</span>
+                    }
+                  </div>
+                  <div class="grupo-info">
+                    <h3>{{ grupo.grupoName }}</h3>
+                    @if (grupo.pastoralName) {
+                      <p class="pastoral">{{ grupo.pastoralName }}</p>
+                    }
+                    <p class="data-entrada">Membro desde {{ formatDate(grupo.dataEntrada) }}</p>
+                  </div>
+                  <span class="material-icons arrow">chevron_right</span>
+                </a>
+              }
+            </div>
           </section>
         }
 

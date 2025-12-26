@@ -246,6 +246,58 @@
   }
 }
 
+.evento-organization {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: var(--bg-primary);
+  border-radius: 12px;
+  border-left: 4px solid var(--primary);
+
+  h2 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 1rem 0;
+  }
+
+  .org-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+
+  .org-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+
+    .material-icons {
+      font-size: 1.5rem;
+      color: var(--primary);
+      flex-shrink: 0;
+    }
+
+    .org-text {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+
+      .label {
+        font-size: 0.75rem;
+        color: var(--text-tertiary);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .value {
+        font-size: 0.95rem;
+        color: var(--text-primary);
+        font-weight: 500;
+      }
+    }
+  }
+}
+
 .evento-footer {
   display: flex;
   justify-content: space-between;

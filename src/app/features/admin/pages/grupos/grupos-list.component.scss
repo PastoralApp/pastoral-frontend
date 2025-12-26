@@ -1,0 +1,14 @@
+@use '../../admin-shared.styles' as *;
+
+.color-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 8px;
+}
+
+.item-info {
+  display: flex;
+  align-items: center;
+}

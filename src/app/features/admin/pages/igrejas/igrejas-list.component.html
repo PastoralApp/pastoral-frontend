@@ -1,0 +1,97 @@
+<div class="admin-page">
+  <header class="page-header">
+    <div class="header-left">
+      <a routerLink="/admin" class="btn-back">
+        <span class="material-icons">arrow_back</span>
+      </a>
+      <div>
+        <h1>
+          <span class="material-icons">church</span>
+          Gerenciar Igrejas
+        </h1>
+        <p class="subtitle">{{ igrejas().length }} igreja(s) cadastrada(s)</p>
+      </div>
+    </div>
+    <a routerLink="/admin/igrejas/create" class="btn btn-primary">
+      <span class="material-icons">add</span>
+      Nova Igreja
+    </a>
+  </header>
+
+  @if (errorMessage()) {
+    <div class="error-message">
+      <span class="material-icons">error</span>
+      {{ errorMessage() }}
+      <button (click)="loadIgrejas()">Tentar novamente</button>
+    </div>
+  }
+
+  <div class="search-bar">
+    <span class="material-icons">search</span>
+    <input type="text" placeholder="Buscar igrejas..." [ngModel]="searchTerm" (ngModelChange)="onSearch($event)">
+  </div>
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Carregando igrejas...</p>
+    </div>
+  } @else {
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Endereço</th>
+            <th>Telefone</th>
+            <th>Horários de Missa</th>
+            <th>Status</th>
+            <th class="actions-column">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (igreja of filteredIgrejas(); track igreja.id) {
+            <tr [class.inactive]="!igreja.isAtiva">
+              <td>
+                <div class="igreja-info">
+                  @if (igreja.imagemUrl) {
+                    <img [src]="igreja.imagemUrl" [alt]="igreja.nome" class="igreja-thumb">
+                  } @else {
+                    <span class="material-icons igreja-icon">church</span>
+                  }
+                  {{ igreja.nome }}
+                </div>
+              </td>
+              <td>{{ igreja.endereco || '-' }}</td>
+              <td>{{ igreja.telefone || '-' }}</td>
+              <td>{{ igreja.horariosMissas.length || 0 }} horário(s)</td>
+              <td>
+                <span class="status-badge" [class.active]="igreja.isAtiva">
+                  {{ igreja.isAtiva ? 'Ativa' : 'Inativa' }}
+                </span>
+              </td>
+              <td class="actions-column">
+                <a [routerLink]="['/admin/igrejas/edit', igreja.id]" class="action-btn" title="Editar">
+                  <span class="material-icons">edit</span>
+                </a>
+                <button class="action-btn" (click)="toggleStatus(igreja)" [title]="igreja.isAtiva ? 'Desativar' : 'Ativar'">
+                  <span class="material-icons">{{ igreja.isAtiva ? 'block' : 'check_circle' }}</span>
+                </button>
+                <button class="action-btn danger" (click)="delete(igreja)" title="Excluir">
+                  <span class="material-icons">delete</span>
+                </button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="6" class="empty-state">
+                <span class="material-icons">church</span>
+                <p>Nenhuma igreja encontrada</p>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

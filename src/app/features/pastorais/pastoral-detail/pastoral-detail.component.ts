@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { PastoralService } from '../../../core/services/pastoral.service';
 import { AuthService } from '../../../core/services/auth.service';
-import { Pastoral, Grupo, TipoPastoral } from '../../../core/models/pastoral.model';
+import { Pastoral, Grupo } from '../../../core/models/pastoral.model';
 
 @Component({
   selector: 'app-pastoral-detail',
@@ -57,11 +57,11 @@ export class PastoralDetailComponent implements OnInit {
     this.router.navigate(['/pastorais']);
   }
 
-  getTipoPastoralLabel(tipo: TipoPastoral): string {
-    const labels: Record<TipoPastoral, string> = {
-      [TipoPastoral.PA]: 'Pastoral de Adolescentes',
-      [TipoPastoral.PJ]: 'Pastoral da Juventude',
-      [TipoPastoral.Geral]: 'Pastoral Geral'
+  getTipoPastoralLabel(tipo: string): string {
+    const labels: Record<string, string> = {
+      'PA': 'Pastoral de Adolescentes',
+      'PJ': 'Pastoral da Juventude',
+      'Geral': 'Pastoral Geral'
     };
     return labels[tipo] || tipo;
   }

@@ -10,7 +10,10 @@ import {
   ShareResponse,
   SaveResponse,
   PostComment,
-  CreateCommentDto
+  CreateCommentDto,
+  TipoPastoral,
+  ChangePostTypeDto,
+  PostDetailDto
 } from '../models/post.model';
 
 @Injectable({
@@ -38,6 +41,10 @@ export class PostService {
     return this.http.get<Post[]>(`${this.API_URL}/pastoral/${pastoralId}`);
   }
 
+  getByTipoPastoral(tipoPastoral: TipoPastoral): Observable<Post[]> {
+    return this.http.get<Post[]>(`${this.API_URL}/tipo-pastoral/${tipoPastoral}`);
+  }
+
   getByGrupo(grupoId: string): Observable<Post[]> {
     return this.http.get<Post[]>(`${this.API_URL}/grupo/${grupoId}`);
   }
@@ -48,6 +55,10 @@ export class PostService {
 
   getById(id: string): Observable<Post> {
     return this.http.get<Post>(`${this.API_URL}/${id}`);
+  }
+
+  getPostDetail(id: string): Observable<PostDetailDto> {
+    return this.http.get<PostDetailDto>(`${this.API_URL}/${id}/detail`);
   }
 
   create(data: CreatePostDto): Observable<Post> {
@@ -62,8 +73,8 @@ export class PostService {
     return this.http.delete<void>(`${this.API_URL}/${id}`);
   }
 
-  pin(id: string): Observable<void> {
-    return this.http.post<void>(`${this.API_URL}/${id}/pin`, {});
+  pin(id: string, pinType: string = 'Geral'): Observable<void> {
+    return this.http.post<void>(`${this.API_URL}/${id}/pin`, { pinType });
   }
 
   unpin(id: string): Observable<void> {
@@ -74,11 +85,20 @@ export class PostService {
     return this.http.post<ReactResponse>(`${this.API_URL}/${id}/react`, {});
   }
 
+  reactToPost(id: string): Observable<ReactResponse> {
+    return this.react(id);
+  }
+
   getComments(id: string): Observable<PostComment[]> {
     return this.http.get<PostComment[]>(`${this.API_URL}/${id}/comments`);
   }
 
-  addComment(id: string, data: CreateCommentDto): Observable<PostComment> {
+  addComment(id: string, data: CreateCommentDto): Observable<PostComment>;
+  addComment(id: string, content: string): Observable<PostComment>;
+  addComment(id: string, dataOrContent: CreateCommentDto | string): Observable<PostComment> {
+    const data = typeof dataOrContent === 'string' 
+      ? { conteudo: dataOrContent } 
+      : dataOrContent;
     return this.http.post<PostComment>(`${this.API_URL}/${id}/comments`, data);
   }
 
@@ -90,11 +110,35 @@ export class PostService {
     return this.http.post<ShareResponse>(`${this.API_URL}/${id}/share`, {});
   }
 
+  sharePost(id: string): Observable<ShareResponse> {
+    return this.share(id);
+  }
+
   save(id: string): Observable<SaveResponse> {
     return this.http.post<SaveResponse>(`${this.API_URL}/${id}/save`, {});
   }
 
+  savePost(id: string): Observable<SaveResponse> {
+    return this.save(id);
+  }
+
   getSaved(): Observable<Post[]> {
     return this.http.get<Post[]>(`${this.API_URL}/saved`);
+  }
+
+  getAllAdmin(): Observable<Post[]> {
+    return this.http.get<Post[]>(`${this.API_URL}/admin/all`);
+  }
+
+  getByUserAdmin(userId: string): Observable<Post[]> {
+    return this.http.get<Post[]>(`${this.API_URL}/admin/user/${userId}`);
+  }
+
+  deleteAdmin(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.API_URL}/admin/${id}`);
+  }
+
+  changePostType(id: string, data: ChangePostTypeDto): Observable<void> {
+    return this.http.put<void>(`${this.API_URL}/admin/${id}/type`, data);
   }
 }

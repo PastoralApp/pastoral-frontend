@@ -1,0 +1,109 @@
+<div class="admin-page">
+  <header class="page-header">
+    <div class="header-left">
+      <a routerLink="/admin" class="btn-back">
+        <span class="material-icons">arrow_back</span>
+      </a>
+      <div>
+        <h1>
+          <span class="material-icons">people</span>
+          Gerenciar Usuários
+        </h1>
+        <p class="subtitle">{{ users().length }} usuário(s) cadastrado(s)</p>
+      </div>
+    </div>
+    <a routerLink="/admin/users/create" class="btn btn-primary">
+      <span class="material-icons">add</span>
+      Novo Usuário
+    </a>
+  </header>
+
+  <div class="search-bar">
+    <span class="material-icons">search</span>
+    <input
+      type="text"
+      placeholder="Buscar usuários..."
+      [ngModel]="searchTerm"
+      (ngModelChange)="onSearch($event)"
+    >
+  </div>
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Carregando usuários...</p>
+    </div>
+  } @else {
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Grupos</th>
+            <th>Status</th>
+            <th class="actions-column">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (user of filteredUsers(); track user.id) {
+            <tr [class.inactive]="!user.isActive">
+              <td>
+                <div class="user-info">
+                  <span class="material-icons">person</span>
+                  {{ user.name }}
+                </div>
+              </td>
+              <td>{{ user.email }}</td>
+              <td>
+                <span class="badge badge-role">{{ user.roleName }}</span>
+              </td>
+              <td>
+                <div class="grupos-badges">
+                  @if (user.grupos && user.grupos.length > 0) {
+                    @for (grupo of user.grupos.slice(0, 2); track grupo.id) {
+                      <span class="grupo-badge" [style.background-color]="grupo.primaryColor" [title]="grupo.grupoName">
+                        {{ grupo.grupoSigla }}
+                      </span>
+                    }
+                    @if (user.grupos.length > 2) {
+                      <span class="grupo-badge more" title="{{ user.grupos.length - 2 }} mais">
+                        +{{ user.grupos.length - 2 }}
+                      </span>
+                    }
+                  } @else {
+                    <span class="no-grupo">Nenhum</span>
+                  }
+                </div>
+              </td>
+              <td>
+                <span class="status-badge" [class.active]="user.isActive">
+                  {{ user.isActive ? 'Ativo' : 'Inativo' }}
+                </span>
+              </td>
+              <td class="actions-column">
+                <a [routerLink]="['/admin/users/edit', user.id]" class="action-btn" title="Editar">
+                  <span class="material-icons">edit</span>
+                </a>
+                <button class="action-btn" (click)="toggleStatus(user)" [title]="user.isActive ? 'Desativar' : 'Ativar'">
+                  <span class="material-icons">{{ user.isActive ? 'block' : 'check_circle' }}</span>
+                </button>
+                <button class="action-btn danger" (click)="deleteUser(user)" title="Excluir Usuário">
+                  <span class="material-icons">delete</span>
+                </button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="6" class="empty-state">
+                <span class="material-icons">people_outline</span>
+                <p>Nenhum usuário encontrado</p>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

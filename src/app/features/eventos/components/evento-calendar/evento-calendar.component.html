@@ -1,0 +1,89 @@
+<div class="calendar-container">
+  <div class="calendar-header">
+    <button class="nav-btn" (click)="previousMonth()">
+      <span class="material-icons">chevron_left</span>
+    </button>
+    <div class="month-year">
+      <h2>{{ currentMonthName() }} {{ currentYear() }}</h2>
+      <button class="today-btn" (click)="goToToday()">Hoje</button>
+    </div>
+    <button class="nav-btn" (click)="nextMonth()">
+      <span class="material-icons">chevron_right</span>
+    </button>
+  </div>
+
+  <div class="calendar-grid">
+    <div class="weekdays">
+      @for (day of weekDays; track day) {
+        <div class="weekday">{{ day }}</div>
+      }
+    </div>
+
+    <div class="days">
+      @for (day of calendarDays(); track day.date.toISOString()) {
+        <div 
+          class="day"
+          [class.other-month]="!day.isCurrentMonth"
+          [class.today]="day.isToday"
+          [class.selected]="isSelected(day)"
+          [class.has-eventos]="day.eventos.length > 0"
+          (click)="selectDay(day)"
+        >
+          <span class="day-number">{{ day.dayNumber }}</span>
+          @if (day.eventos.length > 0) {
+            <div class="event-dots">
+              @for (evento of day.eventos.slice(0, 3); track evento.id) {
+                <span class="dot"></span>
+              }
+              @if (day.eventos.length > 3) {
+                <span class="more-dots">+{{ day.eventos.length - 3 }}</span>
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+
+  @if (selectedDate()) {
+    <div class="selected-day-events">
+      <h3>
+        <span class="material-icons">event</span>
+        {{ formatSelectedDate() }}
+      </h3>
+      
+      @if (selectedDayEventos().length > 0) {
+        <div class="events-list">
+          @for (evento of selectedDayEventos(); track evento.id) {
+            <a [routerLink]="['/eventos', evento.id]" class="event-item">
+              <div class="event-time">
+                <span class="material-icons">schedule</span>
+                {{ formatEventTime(evento.eventDate) }}
+              </div>
+              <div class="event-info">
+                <h4>{{ evento.title }}</h4>
+                @if (evento.location) {
+                  <p class="event-location">
+                    <span class="material-icons">location_on</span>
+                    {{ evento.location }}
+                  </p>
+                }
+              </div>
+              <span class="material-icons arrow">chevron_right</span>
+            </a>
+          }
+        </div>
+      } @else {
+        <div class="no-events">
+          <span class="material-icons">event_busy</span>
+          <p>Nenhum evento neste dia</p>
+        </div>
+      }
+    </div>
+  } @else {
+    <div class="select-day-hint">
+      <span class="material-icons">touch_app</span>
+      <p>Selecione um dia para ver os eventos</p>
+    </div>
+  }
+</div>

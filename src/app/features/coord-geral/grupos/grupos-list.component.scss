@@ -1,0 +1,61 @@
+@use '../coord-geral-shared.styles' as *;
+
+.grupos-container {
+  @extend .coord-page;
+}
+
+.grupos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1.5rem;
+}
+
+.grupo-card {
+  @extend .card;
+  border-left: 4px solid var(--primary-color);
+
+  .grupo-header {
+    margin-bottom: 1.5rem;
+
+    h3 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .description {
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+      line-height: 1.5;
+    }
+  }
+
+  .grupo-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: var(--bg-secondary);
+    border-radius: 0.5rem;
+
+    .info-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+
+      .material-icons {
+        font-size: 18px;
+        color: var(--primary-color);
+      }
+    }
+  }
+
+  .grupo-actions {
+    @extend .btn-group;
+  }
+}
+

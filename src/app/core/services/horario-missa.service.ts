@@ -42,4 +42,12 @@ export class HorarioMissaService {
   delete(id: string): Observable<void> {
     return this.http.delete<void>(`${this.API_URL}/${id}`);
   }
+
+  ativar(id: string): Observable<void> {
+    return this.http.patch<void>(`${this.API_URL}/${id}/ativar`, {});
+  }
+
+  desativar(id: string): Observable<void> {
+    return this.http.patch<void>(`${this.API_URL}/${id}/desativar`, {});
+  }
 }

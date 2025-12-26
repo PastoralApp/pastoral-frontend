@@ -7,6 +7,7 @@ import { Post } from '../../core/models/post.model';
 import { Pastoral, TipoPastoral } from '../../core/models/pastoral.model';
 import { PostCardComponent } from './components/post-card/post-card.component';
 import { CreatePostComponent } from './components/create-post/create-post.component';
+import { ToastService } from '../../shared/services/toast.service';
 import { forkJoin } from 'rxjs';
 
 @Component({
@@ -19,13 +20,19 @@ import { forkJoin } from 'rxjs';
 export class FeedComponent implements OnInit {
   private postService = inject(PostService);
   private pastoralService = inject(PastoralService);
+  private toastService = inject(ToastService);
 
   posts = signal<Post[]>([]);
   pinnedPosts = signal<Post[]>([]);
   pastorais = signal<Pastoral[]>([]);
-  selectedFilter = signal<'all' | 'PA' | 'PJ'>('all');
+  availableFilters = signal<Array<{tipo: TipoPastoral, label: string, icon: string}>>([
+    {tipo: TipoPastoral.Geral, label: 'Todos', icon: 'public'},
+    {tipo: TipoPastoral.PA, label: 'Pastoral Adolescentes', icon: 'child_care'},
+    {tipo: TipoPastoral.PJ, label: 'Pastoral Jovens', icon: 'groups'}
+  ]);
+  selectedFilter = signal<TipoPastoral | null>(null);
   isLoading = signal(true);
-  error = signal('');
+  protected readonly TipoPastoral = TipoPastoral;
 
   ngOnInit(): void {
     this.loadPastorais();
@@ -42,7 +49,6 @@ export class FeedComponent implements OnInit {
 
   loadPosts(): void {
     this.isLoading.set(true);
-    this.error.set('');
 
     this.postService.getPinned().subscribe({
       next: (pinned) => {
@@ -53,51 +59,52 @@ export class FeedComponent implements OnInit {
     this.postService.getRecent(50).subscribe({
       next: (posts) => {
         this.posts.set(posts);
+        this.updateAvailableFilters();
         this.isLoading.set(false);
       },
       error: (err) => {
-        this.error.set('Erro ao carregar posts');
+        this.toastService.error('Erro ao carregar posts');
         this.isLoading.set(false);
       }
     });
   }
 
-  loadPostsByFilter(filter: 'PA' | 'PJ'): void {
-    this.isLoading.set(true);
-    this.error.set('');
-    
-    const pastoralIds = this.pastorais()
-      .filter(p => p.tipoPastoral === filter)
-      .map(p => p.id);
+  updateAvailableFilters(): void {
+    // Sempre mostrar todos os filtros
+    const filters = [
+      {tipo: TipoPastoral.Geral, label: 'Todos', icon: 'public'},
+      {tipo: TipoPastoral.PA, label: 'Pastoral Adolescentes', icon: 'child_care'},
+      {tipo: TipoPastoral.PJ, label: 'Pastoral Jovens', icon: 'groups'}
+    ];
 
-    if (pastoralIds.length === 0) {
-      this.posts.set([]);
-      this.pinnedPosts.set([]);
-      this.isLoading.set(false);
+    this.availableFilters.set(filters);
+  }
+
+  loadPostsByFilter(filter: TipoPastoral): void {
+    this.isLoading.set(true);
+    
+    if (filter === TipoPastoral.Geral) {
+      this.loadPosts();
       return;
     }
 
-    // Carregar posts de todas as pastorais do tipo selecionado
-    const requests = pastoralIds.map(id => this.postService.getByPastoral(id));
-    
-    forkJoin(requests).subscribe({
-      next: (results) => {
-        const allPosts = results.flat();
-        this.posts.set(allPosts);
-        this.pinnedPosts.set(allPosts.filter(p => p.isPinned));
+    this.postService.getByTipoPastoral(filter).subscribe({
+      next: (posts) => {
+        this.posts.set(posts);
+        this.pinnedPosts.set(posts.filter(p => p.isPinned));
         this.isLoading.set(false);
       },
       error: () => {
-        this.error.set('Erro ao carregar posts');
+        this.toastService.error('Erro ao carregar posts');
         this.isLoading.set(false);
       }
     });
   }
 
-  setFilter(filter: 'all' | 'PA' | 'PJ'): void {
+  setFilter(filter: TipoPastoral | null): void {
     this.selectedFilter.set(filter);
     
-    if (filter === 'all') {
+    if (filter === null || filter === TipoPastoral.Geral) {
       this.loadPosts();
     } else {
       this.loadPostsByFilter(filter);
@@ -106,6 +113,7 @@ export class FeedComponent implements OnInit {
 
   onPostCreated(post: Post): void {
     this.posts.update(posts => [post, ...posts]);
+    this.updateAvailableFilters();
   }
 
   onPostDeleted(postId: string): void {

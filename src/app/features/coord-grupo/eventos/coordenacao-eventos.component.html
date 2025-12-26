@@ -1,0 +1,124 @@
+<div class="coordenacao-eventos-container">
+  <header class="page-header">
+    <a routerLink="/coord-grupo" class="btn-back">
+      <span class="material-icons">arrow_back</span>
+    </a>
+    <h1>
+      <span class="material-icons">event</span>
+      Gerenciar Eventos
+    </h1>
+    <a routerLink="/coord-grupo/eventos/create" class="btn btn-primary">
+      <span class="material-icons">add</span>
+      Novo Evento
+    </a>
+  </header>
+
+  <div class="toolbar">
+    <div class="search-bar">
+      <span class="material-icons">search</span>
+      <input
+        type="text"
+        placeholder="Buscar eventos..."
+        [ngModel]="searchTerm()"
+        (ngModelChange)="searchTerm.set($event)"
+      >
+    </div>
+
+    <div class="filters">
+      <select 
+        [ngModel]="filterStatus()"
+        (ngModelChange)="filterStatus.set($event)"
+        class="filter-select"
+      >
+        <option value="all">Todos os eventos</option>
+        <option value="upcoming">Próximos</option>
+        <option value="past">Passados</option>
+      </select>
+    </div>
+  </div>
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Carregando eventos...</p>
+    </div>
+  } @else {
+    <div class="eventos-grid">
+      @for (evento of filteredEventos; track evento.id) {
+        <div class="evento-card" [class.past]="isEventPast(evento.eventDate)">
+          <div class="evento-image-container">
+            @if (evento.imageUrl) {
+              <img [src]="evento.imageUrl" [alt]="evento.title" class="evento-image">
+            } @else {
+              <div class="evento-image-placeholder">
+                <span class="material-icons">event</span>
+              </div>
+            }
+            @if (isEventPast(evento.eventDate)) {
+              <span class="badge badge-past">Encerrado</span>
+            } @else {
+              <span class="badge badge-upcoming">Ativo</span>
+            }
+          </div>
+          
+          <div class="evento-content">
+            <h3 class="evento-title">{{ evento.title }}</h3>
+            
+            <div class="evento-meta">
+              <div class="meta-item">
+                <span class="material-icons">schedule</span>
+                <span>{{ formatDate(evento.eventDate) }}</span>
+              </div>
+              @if (evento.location) {
+                <div class="meta-item">
+                  <span class="material-icons">location_on</span>
+                  <span>{{ evento.location }}</span>
+                </div>
+              }
+              <div class="meta-item">
+                <span class="material-icons">people</span>
+                <span>{{ getParticipantsInfo(evento) }} participantes</span>
+              </div>
+            </div>
+
+            @if (evento.description) {
+              <p class="evento-desc">
+                {{ evento.description.length > 100 ? evento.description.substring(0, 100) + '...' : evento.description }}
+              </p>
+            }
+          </div>
+
+          <div class="evento-actions">
+            <a 
+              [routerLink]="['/eventos', evento.id]"
+              class="btn-icon btn-view" 
+              title="Visualizar"
+            >
+              <span class="material-icons">visibility</span>
+            </a>
+            <a 
+              [routerLink]="['/coord-grupo/eventos/edit', evento.id]"
+              class="btn-icon btn-edit" 
+              title="Editar"
+            >
+              <span class="material-icons">edit</span>
+            </a>
+            <button 
+              class="btn-icon btn-delete" 
+              (click)="deleteEvento(evento)"
+              title="Excluir"
+            >
+              <span class="material-icons">delete</span>
+            </button>
+          </div>
+        </div>
+      } @empty {
+        <div class="empty-state">
+          <span class="material-icons">event_busy</span>
+          <h3>Nenhum evento encontrado</h3>
+          <p>Crie seu primeiro evento clicando no botão acima</p>
+        </div>
+      }
+    </div>
+  }
+</div>

@@ -1,0 +1,127 @@
+<div class="posts-container">
+  <header class="page-header">
+    <div class="header-left">
+      <a routerLink="/coord-geral" class="btn-back">
+        <span class="material-icons">arrow_back</span>
+      </a>
+      <div>
+        <h1>Gerenciar Posts</h1>
+        <p>Visualize, fixe ou exclua posts de usuários</p>
+      </div>
+    </div>
+  </header>
+
+  <div class="filters-bar">
+    <div class="search-box">
+      <span class="material-icons">search</span>
+      <input
+        type="text"
+        placeholder="Buscar posts..."
+        [(ngModel)]="searchTerm"
+        (ngModelChange)="onSearch()"
+      />
+    </div>
+
+    <select class="user-filter" [(ngModel)]="selectedUserId" (ngModelChange)="onUserFilter()">
+      <option [value]="null">Todos os usuários</option>
+      @for (user of usuarios(); track user.id) {
+        <option [value]="user.id">{{ user.name }}</option>
+      }
+    </select>
+
+    <div class="pin-selector">
+      <label>Tipo de Fixação:</label>
+      <select [(ngModel)]="selectedPinType">
+        <option value="Geral">Geral</option>
+        <option value="PA">PA</option>
+        <option value="PJ">PJ</option>
+      </select>
+    </div>
+  </div>
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Carregando posts...</p>
+    </div>
+  }
+
+  @if (!isLoading()) {
+    <div class="posts-list">
+      @for (post of filteredPosts(); track post.id) {
+        <div class="post-card">
+          <div class="post-header">
+            <div class="author-info">
+              @if (post.authorPhotoUrl) {
+                <img [src]="post.authorPhotoUrl" [alt]="post.authorName" class="author-avatar" />
+              } @else {
+                <div class="author-avatar-placeholder">
+                  <span class="material-icons">person</span>
+                </div>
+              }
+              <div>
+                <h4>{{ post.authorName }}</h4>
+                <span class="post-date">{{ formatDate(post.createdAt) }}</span>
+              </div>
+            </div>
+
+            @if (post.isPinned && post.pinType) {
+              <span class="pin-badge" [ngClass]="getPinBadgeClass(post.pinType)">
+                <span class="material-icons">push_pin</span>
+                {{ post.pinType }}
+              </span>
+            }
+          </div>
+
+          <div class="post-content">
+            <p>{{ post.content }}</p>
+            
+            @if (post.imageUrl) {
+              <img [src]="post.imageUrl" alt="Post image" class="post-image" />
+            }
+          </div>
+
+          <div class="post-stats">
+            <span>
+              <span class="material-icons">thumb_up</span>
+              {{ post.likesCount || 0 }} curtidas
+            </span>
+            <span>
+              <span class="material-icons">comment</span>
+              {{ post.commentsCount || 0 }} comentários
+            </span>
+          </div>
+
+          <div class="post-actions">
+            @if (!post.isPinned) {
+              <button class="btn-pin" (click)="pinPost(post.id)">
+                <span class="material-icons">push_pin</span>
+                Fixar como {{ selectedPinType() }}
+              </button>
+            } @else {
+              <button class="btn-unpin" (click)="unpinPost(post.id)">
+                <span class="material-icons">push_pin</span>
+                Desfixar
+              </button>
+            }
+
+            <button class="btn-delete" (click)="deletePost(post.id)">
+              <span class="material-icons">delete</span>
+              Excluir
+            </button>
+          </div>
+        </div>
+      } @empty {
+        <div class="empty-state">
+          <span class="material-icons">post_add</span>
+          <h3>Nenhum post encontrado</h3>
+          <p>Não há posts que correspondam aos filtros selecionados</p>
+        </div>
+      }
+    </div>
+
+    <div class="results-info">
+      Mostrando {{ filteredPosts().length }} de {{ posts().length }} posts
+    </div>
+  }
+</div>

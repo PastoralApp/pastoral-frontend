@@ -1,0 +1,101 @@
+<div class="admin-page">
+  <header class="page-header">
+    <div class="header-left">
+      <a routerLink="/admin" class="btn-back">
+        <span class="material-icons">arrow_back</span>
+      </a>
+      <div>
+        <h1>
+          <span class="material-icons">notifications</span>
+          Gerenciar Notificações
+        </h1>
+        <p class="subtitle">{{ notificacoes().length }} notificação(ões) cadastrada(s)</p>
+      </div>
+    </div>
+    <a routerLink="/admin/notificacoes/create" class="btn btn-primary">
+      <span class="material-icons">add</span>
+      Nova Notificação
+    </a>
+  </header>
+
+  @if (errorMessage()) {
+    <div class="error-message">
+      <span class="material-icons">error</span>
+      {{ errorMessage() }}
+      <button (click)="loadNotificacoes()">Tentar novamente</button>
+    </div>
+  }
+
+  <div class="search-bar">
+    <span class="material-icons">search</span>
+    <input type="text" placeholder="Buscar notificações..." [ngModel]="searchTerm" (ngModelChange)="onSearch($event)">
+  </div>
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Carregando notificações...</p>
+    </div>
+  } @else {
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Título</th>
+            <th>Tipo</th>
+            <th>Destinatário</th>
+            <th>Remetente</th>
+            <th>Data Envio</th>
+            <th>Status</th>
+            <th class="actions-column">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (notif of filteredNotificacoes(); track notif.id) {
+            <tr [class.inactive]="!notif.isAtiva">
+              <td>
+                <div class="notif-title">
+                  <span class="material-icons" [class.global]="notif.isGeral">
+                    {{ notif.isGeral ? 'public' : 'group' }}
+                  </span>
+                  {{ notif.titulo }}
+                </div>
+              </td>
+              <td>
+                <span class="tipo-badge" [class.geral]="notif.isGeral">
+                  {{ notif.isGeral ? 'Geral' : 'Grupo' }}
+                </span>
+              </td>
+              <td>{{ notif.isGeral ? 'Todos os usuários' : (notif.grupoNome || '-') }}</td>
+              <td>{{ notif.remetenteNome || '-' }}</td>
+              <td>{{ notif.dataEnvio | date:'dd/MM/yyyy HH:mm' }}</td>
+              <td>
+                <span class="status-badge" [class.active]="notif.isAtiva">
+                  {{ notif.isAtiva ? 'Ativa' : 'Inativa' }}
+                </span>
+              </td>
+              <td class="actions-column">
+                <a [routerLink]="['/admin/notificacoes/edit', notif.id]" class="action-btn" title="Editar">
+                  <span class="material-icons">edit</span>
+                </a>
+                <button class="action-btn" (click)="toggleStatus(notif)" [title]="notif.isAtiva ? 'Desativar' : 'Ativar'">
+                  <span class="material-icons">{{ notif.isAtiva ? 'block' : 'check_circle' }}</span>
+                </button>
+                <button class="action-btn danger" (click)="delete(notif)" title="Excluir">
+                  <span class="material-icons">delete</span>
+                </button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="7" class="empty-state">
+                <span class="material-icons">notifications_off</span>
+                <p>Nenhuma notificação encontrada</p>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

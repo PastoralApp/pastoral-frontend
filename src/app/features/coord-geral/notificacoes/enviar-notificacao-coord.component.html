@@ -1,0 +1,147 @@
+<div class="notificacao-container">
+  <header class="page-header">
+    <div class="header-left">
+      <a routerLink="/coord-geral" class="btn-back">
+        <span class="material-icons">arrow_back</span>
+      </a>
+      <div>
+        <h1>Enviar Notificação</h1>
+        <p>Envie notificações para grupos ou pessoas específicas</p>
+      </div>
+    </div>
+    <div class="coord-info">
+      <span class="material-icons">account_circle</span>
+      <span>Enviado por: <strong>{{ coordenadorName() }}</strong></span>
+    </div>
+  </header>
+
+  <div class="form-container">
+    <form (ngSubmit)="enviarNotificacao()">
+      <div class="tipo-destino">
+        <label>Enviar para:</label>
+        <div class="radio-group">
+          <label class="radio-option" [class.selected]="tipoDestino() === 'grupo'">
+            <input
+              type="radio"
+              name="tipoDestino"
+              value="grupo"
+              [checked]="tipoDestino() === 'grupo'"
+              (change)="onTipoDestinoChange('grupo')"
+            />
+            <span class="material-icons">group_work</span>
+            <span>Grupo</span>
+          </label>
+
+          <label class="radio-option" [class.selected]="tipoDestino() === 'pessoa'">
+            <input
+              type="radio"
+              name="tipoDestino"
+              value="pessoa"
+              [checked]="tipoDestino() === 'pessoa'"
+              (change)="onTipoDestinoChange('pessoa')"
+            />
+            <span class="material-icons">person</span>
+            <span>Pessoa</span>
+          </label>
+        </div>
+      </div>
+
+      @if (tipoDestino() === 'grupo') {
+        <div class="form-group">
+          <label>
+            <span class="material-icons">group_work</span>
+            Selecione o Grupo
+          </label>
+          <select [(ngModel)]="grupoId" name="grupoId" required>
+            <option [value]="null">Selecione...</option>
+            @for (grupo of grupos(); track grupo.id) {
+              <option [value]="grupo.id">{{ grupo.name }}</option>
+            }
+          </select>
+        </div>
+      }
+
+      @if (tipoDestino() === 'pessoa') {
+        <div class="form-group">
+          <label>
+            <span class="material-icons">person</span>
+            Selecione a Pessoa
+          </label>
+          <select [(ngModel)]="usuarioId" name="usuarioId" required>
+            <option [value]="null">Selecione...</option>
+            @for (usuario of usuarios(); track usuario.id) {
+              <option [value]="usuario.id">{{ usuario.name }}</option>
+            }
+          </select>
+        </div>
+      }
+
+      <div class="form-group">
+        <label>
+          <span class="material-icons">title</span>
+          Título da Notificação
+        </label>
+        <input
+          type="text"
+          [(ngModel)]="titulo"
+          name="titulo"
+          placeholder="Digite o título..."
+          maxlength="100"
+          required
+        />
+        <small>{{ titulo().length }}/100 caracteres</small>
+      </div>
+
+      <div class="form-group">
+        <label>
+          <span class="material-icons">message</span>
+          Mensagem
+        </label>
+        <textarea
+          [(ngModel)]="mensagem"
+          name="mensagem"
+          placeholder="Digite sua mensagem..."
+          rows="6"
+          maxlength="500"
+          required
+        ></textarea>
+        <small>{{ mensagem().length }}/500 caracteres</small>
+      </div>
+
+      @if (titulo() || mensagem()) {
+        <div class="preview-section">
+          <h3>
+            <span class="material-icons">preview</span>
+            Pré-visualização
+          </h3>
+          <div class="notification-preview">
+            <div class="preview-header">
+              <span class="material-icons">notifications</span>
+              <strong>{{ titulo() || 'Título da notificação' }}</strong>
+            </div>
+            <p>{{ mensagem() || 'Mensagem da notificação' }}</p>
+            <div class="preview-footer">
+              <small>Enviado por: {{ coordenadorName() }}</small>
+            </div>
+          </div>
+        </div>
+      }
+
+      <div class="form-actions">
+        <button type="button" class="btn-cancel" (click)="resetForm()" [disabled]="isLoading()">
+          <span class="material-icons">close</span>
+          Limpar
+        </button>
+        <button type="submit" class="btn-submit" [disabled]="isLoading()">
+          @if (isLoading()) {
+            <div class="spinner-small"></div>
+            Enviando...
+          } @else {
+            <span class="material-icons">send</span>
+            Enviar Notificação
+          }
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

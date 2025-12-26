@@ -52,6 +52,12 @@
     font-size: 1.5rem;
   }
 
+  .logo-img {
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+  }
+
   .logo-text {
     @media (max-width: 480px) {
       display: none;
@@ -203,6 +209,12 @@
 
     .material-icons {
       font-size: 1.25rem;
+    }
+
+    .nav-img {
+      width: 20px;
+      height: 20px;
+      object-fit: contain;
     }
   }
 }

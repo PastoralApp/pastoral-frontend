@@ -5,6 +5,7 @@ import { PostService } from '../../core/services/post.service';
 import { AuthService } from '../../core/services/auth.service';
 import { Post } from '../../core/models/post.model';
 import { PostCardComponent } from '../feed/components/post-card/post-card.component';
+import { ToastService } from '../../shared/services/toast.service';
 
 @Component({
   selector: 'app-meus-posts',
@@ -16,10 +17,10 @@ import { PostCardComponent } from '../feed/components/post-card/post-card.compon
 export class MeusPostsComponent implements OnInit {
   private postService = inject(PostService);
   private authService = inject(AuthService);
+  private toastService = inject(ToastService);
 
   posts = signal<Post[]>([]);
   isLoading = signal(true);
-  error = signal('');
 
   ngOnInit(): void {
     this.loadMyPosts();
@@ -27,11 +28,10 @@ export class MeusPostsComponent implements OnInit {
 
   loadMyPosts(): void {
     this.isLoading.set(true);
-    this.error.set('');
 
     const currentUser = this.authService.currentUser();
     if (!currentUser) {
-      this.error.set('Usuário não autenticado');
+      this.toastService.error('Usuário não autenticado');
       this.isLoading.set(false);
       return;
     }
@@ -42,7 +42,7 @@ export class MeusPostsComponent implements OnInit {
         this.isLoading.set(false);
       },
       error: (err) => {
-        this.error.set('Erro ao carregar seus posts');
+        this.toastService.error('Erro ao carregar seus posts');
         this.isLoading.set(false);
       }
     });

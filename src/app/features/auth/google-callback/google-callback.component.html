@@ -38,6 +38,13 @@
           </div>
         }
 
+        @if (successMessage) {
+          <div class="alert alert-success">
+            <span class="material-icons">check_circle</span>
+            {{ successMessage }}
+          </div>
+        }
+
         <form [formGroup]="completeForm" (ngSubmit)="onCompleteSubmit()">
           <div class="form-group">
             <label for="name">Nome</label>
@@ -54,6 +61,38 @@
             @if (completeForm.get('name')?.invalid && completeForm.get('name')?.touched) {
               <span class="error-text">Nome deve ter no mínimo 3 caracteres</span>
             }
+          </div>
+
+          <div class="form-group">
+            <label for="verificationCode">Código de Verificação</label>
+            <div class="input-wrapper code-input-wrapper">
+              <input
+                type="text"
+                id="verificationCode"
+                formControlName="verificationCode"
+                placeholder="000000"
+                maxlength="6"
+                class="code-input"
+                [class.is-invalid]="completeForm.get('verificationCode')?.invalid && completeForm.get('verificationCode')?.touched"
+              >
+            </div>
+            @if (completeForm.get('verificationCode')?.invalid && completeForm.get('verificationCode')?.touched) {
+              <span class="error-text">Código deve ter 6 dígitos</span>
+            }
+            
+            <div class="resend-section">
+              @if (canResendCode) {
+                <button type="button" class="btn-link" (click)="resendCode()" [disabled]="isLoading">
+                  <span class="material-icons">refresh</span>
+                  Reenviar código
+                </button>
+              } @else {
+                <p class="text-muted">
+                  <span class="material-icons">schedule</span>
+                  Reenviar código em {{ resendCountdownFormatted }}
+                </p>
+              }
+            </div>
           </div>
 
           <div class="form-group">

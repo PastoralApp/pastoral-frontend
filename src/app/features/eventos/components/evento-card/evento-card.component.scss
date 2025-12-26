@@ -5,6 +5,7 @@
   overflow: hidden;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s, box-shadow 0.2s;
+  border-left: 4px solid var(--primary-color);
 
   &:hover {
     transform: translateY(-2px);
@@ -74,6 +75,16 @@
   border-radius: 1rem;
   font-size: 0.6875rem;
   font-weight: 500;
+}
+
+.grupo-badge {
+  padding: 0.25rem 0.625rem;
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  border-radius: 1rem;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  white-space: nowrap;
 }
 
 .evento-info {

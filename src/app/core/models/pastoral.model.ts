@@ -1,58 +1,18 @@
+import type { Grupo } from './grupo.model';
+export { Grupo, CreateGrupoDto, UpdateGrupoDto } from './grupo.model';
+
 export enum TipoPastoral {
   PA = 'PA',
   PJ = 'PJ',
   Geral = 'Geral'
 }
 
-export enum PastoralType {
-  PA = 'PA',
-  PJ = 'PJ'
-}
-
-export interface Grupo {
-  id: string;
-  name: string;
-  sigla: string;
-  description: string;
-  pastoralId: string;
-  pastoralName?: string;
-  pastoralSigla?: string;
-  primaryColor: string;
-  secondaryColor: string;
-  logoUrl?: string;
-  icon?: string;
-  isActive: boolean;
-  membersCount: number;
-}
-
-export interface CreateGrupoDto {
-  name: string;
-  sigla: string;
-  description: string;
-  pastoralId: string;
-  primaryColor: string;
-  secondaryColor: string;
-  logoUrl?: string;
-  icon?: string;
-}
-
-export interface UpdateGrupoDto {
-  name: string;
-  sigla: string;
-  description: string;
-  pastoralId: string;
-  primaryColor: string;
-  secondaryColor: string;
-  logoUrl?: string;
-  icon?: string;
-}
-
 export interface Pastoral {
   id: string;
   name: string;
   sigla: string;
-  tipoPastoral: TipoPastoral;
-  type: PastoralType;
+  tipoPastoral: string;
+  type: string;
   description: string;
   primaryColor: string;
   secondaryColor: string;
@@ -60,13 +20,15 @@ export interface Pastoral {
   icon?: string;
   isActive: boolean;
   grupos: Grupo[];
+  membrosCount?: number;
+  gruposCount?: number;
 }
 
 export interface CreatePastoralDto {
   name: string;
   sigla: string;
-  tipoPastoral: TipoPastoral;
-  type: PastoralType;
+  tipoPastoral: string;
+  type: string;
   description: string;
   primaryColor: string;
   secondaryColor: string;
@@ -77,8 +39,8 @@ export interface CreatePastoralDto {
 export interface UpdatePastoralDto {
   name: string;
   sigla: string;
-  tipoPastoral: TipoPastoral;
-  type: PastoralType;
+  tipoPastoral: string;
+  type: string;
   description: string;
   primaryColor: string;
   secondaryColor: string;

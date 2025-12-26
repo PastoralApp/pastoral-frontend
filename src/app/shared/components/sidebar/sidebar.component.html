@@ -1,9 +1,7 @@
 <aside class="sidebar" [class.open]="isOpen">
-  <!-- Overlay para fechar no mobile -->
   <div class="sidebar-overlay" (click)="onClose()"></div>
   
   <div class="sidebar-content">
-    <!-- Header com info do usuário -->
     <div class="sidebar-header">
       @if (currentUser) {
         <div class="user-info">
@@ -24,7 +22,6 @@
     </div>
 
     <nav class="sidebar-nav">
-      <!-- Main Section -->
       <div class="nav-section">
         <div class="section-title">Principal</div>
         <ul class="nav-list">
@@ -36,7 +33,11 @@
                 class="nav-link"
                 (click)="onItemClick(item)"
               >
-                <span class="material-icons nav-icon">{{ item.icon }}</span>
+                @if (isImageIcon(item.icon)) {
+                  <img [src]="item.icon" [alt]="item.label" class="nav-icon img-icon" />
+                } @else {
+                  <span class="material-icons nav-icon">{{ item.icon }}</span>
+                }
                 <span class="nav-label">{{ item.label }}</span>
                 @if (item.id === 'notificacoes' && getNotificationBadge() > 0) {
                   <span class="nav-badge">{{ getNotificationBadge() > 99 ? '99+' : getNotificationBadge() }}</span>
@@ -47,7 +48,6 @@
         </ul>
       </div>
 
-      <!-- Profile Section -->
       <div class="nav-section">
         <div class="section-title">Minha Conta</div>
         <ul class="nav-list">
@@ -59,7 +59,11 @@
                 class="nav-link"
                 (click)="onItemClick(item)"
               >
-                <span class="material-icons nav-icon">{{ item.icon }}</span>
+                @if (isImageIcon(item.icon)) {
+                  <img [src]="item.icon" [alt]="item.label" class="nav-icon img-icon" />
+                } @else {
+                  <span class="material-icons nav-icon">{{ item.icon }}</span>
+                }
                 <span class="nav-label">{{ item.label }}</span>
               </a>
             </li>
@@ -67,7 +71,6 @@
         </ul>
       </div>
 
-      <!-- Coordenação Section -->
       @if (isCoordenador) {
         <div class="nav-section">
           <div class="section-title">Coordenação</div>
@@ -81,7 +84,11 @@
                     class="nav-link"
                     (click)="onItemClick(item)"
                   >
-                    <span class="material-icons nav-icon">{{ item.icon }}</span>
+                    @if (isImageIcon(item.icon)) {
+                      <img [src]="item.icon" [alt]="item.label" class="nav-icon img-icon" />
+                    } @else {
+                      <span class="material-icons nav-icon">{{ item.icon }}</span>
+                    }
                     <span class="nav-label">{{ item.label }}</span>
                   </a>
                 </li>
@@ -91,29 +98,60 @@
         </div>
       }
 
-      <!-- Admin Section -->
-      @if (isAdmin) {
+      @if (isCoordenadorGeral) {
         <div class="nav-section">
-          <div class="section-title">Administração</div>
+          <div class="section-title">Coordenador Geral</div>
           <ul class="nav-list">
-            @for (item of adminMenuItems; track item.id) {
-              <li class="nav-item">
-                <a 
-                  [routerLink]="item.route"
-                  routerLinkActive="active"
-                  class="nav-link"
-                  (click)="onItemClick(item)"
-                >
-                  <span class="material-icons nav-icon">{{ item.icon }}</span>
-                  <span class="nav-label">{{ item.label }}</span>
-                </a>
-              </li>
+            @for (item of coordGeralMenuItems; track item.id) {
+              @if (hasAccess(item)) {
+                <li class="nav-item">
+                  <a 
+                    [routerLink]="item.route"
+                    routerLinkActive="active"
+                    class="nav-link"
+                    (click)="onItemClick(item)"
+                  >
+                    @if (isImageIcon(item.icon)) {
+                      <img [src]="item.icon" [alt]="item.label" class="nav-icon img-icon" />
+                    } @else {
+                      <span class="material-icons nav-icon">{{ item.icon }}</span>
+                    }
+                    <span class="nav-label">{{ item.label }}</span>
+                  </a>
+                </li>
+              }
             }
           </ul>
         </div>
       }
 
-      <!-- Logout -->
+      @if (hasAdminAccess()) {
+        <div class="nav-section">
+          <div class="section-title">Administração</div>
+          <ul class="nav-list">
+            @for (item of adminMenuItems; track item.id) {
+              @if (hasAccess(item)) {
+                <li class="nav-item">
+                  <a 
+                    [routerLink]="item.route"
+                    routerLinkActive="active"
+                    class="nav-link"
+                    (click)="onItemClick(item)"
+                  >
+                    @if (isImageIcon(item.icon)) {
+                      <img [src]="item.icon" [alt]="item.label" class="nav-icon img-icon" />
+                    } @else {
+                      <span class="material-icons nav-icon">{{ item.icon }}</span>
+                    }
+                    <span class="nav-label">{{ item.label }}</span>
+                  </a>
+                </li>
+              }
+            }
+          </ul>
+        </div>
+      }
+
       <div class="nav-section nav-section-bottom">
         <ul class="nav-list">
           <li class="nav-item">

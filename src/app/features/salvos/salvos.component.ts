@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { PostService } from '../../core/services/post.service';
 import { Post } from '../../core/models/post.model';
 import { PostCardComponent } from '../feed/components/post-card/post-card.component';
+import { ToastService } from '../../shared/services/toast.service';
 
 @Component({
   selector: 'app-salvos',
@@ -13,10 +14,10 @@ import { PostCardComponent } from '../feed/components/post-card/post-card.compon
 })
 export class SalvosComponent implements OnInit {
   private postService = inject(PostService);
+  private toastService = inject(ToastService);
 
   posts = signal<Post[]>([]);
   isLoading = signal(true);
-  error = signal('');
 
   ngOnInit(): void {
     this.loadSalvos();
@@ -24,7 +25,6 @@ export class SalvosComponent implements OnInit {
 
   loadSalvos(): void {
     this.isLoading.set(true);
-    this.error.set('');
 
     this.postService.getSaved().subscribe({
       next: (posts) => {
@@ -32,7 +32,7 @@ export class SalvosComponent implements OnInit {
         this.isLoading.set(false);
       },
       error: (err) => {
-        this.error.set('Erro ao carregar posts salvos');
+        this.toastService.error('Erro ao carregar posts salvos');
         this.isLoading.set(false);
       }
     });

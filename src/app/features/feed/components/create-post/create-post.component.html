@@ -24,15 +24,19 @@
         autofocus
       ></textarea>
 
-      @if (error()) {
-        <div class="error-message">{{ error() }}</div>
-      }
-
       <div class="post-options">
-        <select [ngModel]="tipo()" (ngModelChange)="tipo.set($event)">
-          <option [ngValue]="PostType.Comum">Post Comum</option>
-          <option [ngValue]="PostType.Oficial">Post Oficial</option>
-          <option [ngValue]="PostType.Anuncio">Anúncio</option>
+        @if (!isCommonUser) {
+          <select [ngModel]="tipo()" (ngModelChange)="tipo.set($event)" class="select-control">
+            <option [ngValue]="PostType.Comum">Post Comum</option>
+            <option [ngValue]="PostType.Oficial">Post Oficial</option>
+            <option [ngValue]="PostType.Anuncio">Anúncio</option>
+          </select>
+        }
+
+        <select [ngModel]="tipoPastoral()" (ngModelChange)="tipoPastoral.set($event)" class="select-control">
+          <option [ngValue]="TipoPastoral.Geral">Geral (Todos)</option>
+          <option [ngValue]="TipoPastoral.PA">Pastoral Adolescente (PA)</option>
+          <option [ngValue]="TipoPastoral.PJ">Pastoral da Juventude (PJ)</option>
         </select>
       </div>
 

@@ -3,49 +3,78 @@
    ============================================ */
 
 :root {
-  --primary-color: #6366f1;
-  --primary-dark: #4f46e5;
-  --primary-light: rgba(99, 102, 241, 0.1);
-  --primary-lighter: rgba(99, 102, 241, 0.05);
+  /* === BRAND COLORS (ICON) === */
+  --primary-color: #dd2e43;        /* vermelho */
+  --primary-dark: #b72435;
+  --primary-light: rgba(221, 46, 67, 0.12);
+  --primary-lighter: rgba(221, 46, 67, 0.06);
+  --primary-100: var(--primary-light);
+  --primary-50: var(--primary-lighter);
 
-  --secondary-color: #ec4899;
-  --secondary-dark: #db2777;
-  --secondary-light: #f472b6;
+  --secondary-color: #ffd984;      /* amarelo */
+  --secondary-dark: #e6c16f;
+  --secondary-light: #fff1c2;
 
+  --accent-color: #662013;         /* marrom */
+
+  /* === SURFACES === */
   --surface-color: #ffffff;
-  --bg-secondary: #f1f5f9;
-  --bg-tertiary: #e2e8f0;
-  --border-color: #e2e8f0;
+  --background-color: #fafafa;
+  --bg-secondary: #f5f5f5;
+  --bg-tertiary: #eeeeee;
+  --border-color: #e0e0e0;
 
-  --text-primary: #1e293b;
-  --text-secondary: #64748b;
-  --text-tertiary: #94a3b8;
+  /* === TEXT === */
+  --text-primary: #2b1b14;
+  --text-secondary: #5a4a42;
+  --text-tertiary: #8a7f79;
+  --text-muted: #9e9e9e;
 
-  --success-color: #22c55e;
-  --success-light: rgba(34, 197, 94, 0.1);
-  --warning-color: #f59e0b;
-  --warning-light: rgba(245, 158, 11, 0.1);
-  --error-color: #ef4444;
-  --error-light: rgba(239, 68, 68, 0.1);
-  --error-dark: #dc2626;
-  --info-color: #3b82f6;
+  /* === STATES === */
+  --success-color: #2e7d32;
+  --success-light: rgba(46, 125, 50, 0.12);
+
+  --warning-color: #f9a825;
+  --warning-light: rgba(249, 168, 37, 0.15);
+
+  --error-color: #c62828;
+  --error-dark: #8e0000;
+  --error-light: rgba(198, 40, 40, 0.15);
+
+  --info-color: #8d6e63;
+
+  /* === RADIUS & SHADOW === */
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-full: 999px;
+
+  --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 6px 18px rgba(0, 0, 0, 0.12);
+
+  /* === TRANSITIONS === */
+  --transition-fast: 0.2s ease;
 }
 
 [data-theme="dark"] {
-  --surface-color: #1e293b;
-  --bg-secondary: #334155;
-  --bg-tertiary: #475569;
-  --border-color: #475569;
+  --surface-color: #1f1410;
+  --background-color: #140c09;
+  --bg-secondary: #2a1a14;
+  --bg-tertiary: #3a241c;
+  --border-color: #4a2e24;
 
-  --text-primary: #f1f5f9;
-  --text-secondary: #94a3b8;
-  --text-tertiary: #64748b;
+  --text-primary: #fff3e0;
+  --text-secondary: #e0cfc2;
+  --text-tertiary: #bdbfc0;
+  --text-muted: #9e9e9e;
 
-  --primary-light: rgba(99, 102, 241, 0.2);
-  --primary-lighter: rgba(99, 102, 241, 0.1);
-  --success-light: rgba(34, 197, 94, 0.2);
-  --warning-light: rgba(245, 158, 11, 0.2);
-  --error-light: rgba(239, 68, 68, 0.2);
+  --primary-light: rgba(221, 46, 67, 0.25);
+  --primary-lighter: rgba(221, 46, 67, 0.15);
+  --primary-100: var(--primary-light);
+  --primary-50: var(--primary-lighter);
+
+  --success-light: rgba(46, 125, 50, 0.25);
+  --warning-light: rgba(249, 168, 37, 0.25);
+  --error-light: rgba(198, 40, 40, 0.25);
 }
 
 *,

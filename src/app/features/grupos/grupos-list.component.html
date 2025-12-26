@@ -1,0 +1,142 @@
+<div class="grupos-container">
+  <header class="page-header">
+    <h1>Grupos</h1>
+    <p class="subtitle">Participe de grupos e conecte-se com a comunidade</p>
+  </header>
+
+
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Carregando grupos...</p>
+    </div>
+  } @else {
+    @if (meusGrupos().length > 0) {
+      <section class="section">
+        <div class="section-header">
+          <h2>Meus Grupos</h2>
+          <span class="badge">{{ meusGrupos().length }}/4</span>
+        </div>
+        <div class="grupos-grid">
+          @for (userGrupo of meusGrupos(); track userGrupo.grupoId) {
+            <div class="grupo-card my-grupo">
+              <a [routerLink]="['/grupos', userGrupo.grupoId]" class="grupo-link">
+                <div class="grupo-header" [style.background-color]="userGrupo.primaryColor">
+                  <div class="grupo-avatar">
+                    @if (userGrupo.grupoLogoUrl) {
+                      <img [src]="userGrupo.grupoLogoUrl" [alt]="userGrupo.grupoName">
+                    } @else {
+                      <span>{{ userGrupo.grupoSigla.charAt(0) || 'G' }}</span>
+                    }
+                  </div>
+                </div>
+                <div class="grupo-content">
+                  <h3>{{ userGrupo.grupoName }}</h3>
+                  <span class="grupo-sigla">{{ userGrupo.grupoSigla }}</span>
+                  @if (userGrupo.pastoralName) {
+                    <span class="grupo-pastoral">{{ userGrupo.pastoralName }}</span>
+                  }
+                </div>
+              </a>
+              <div class="grupo-actions">
+                <button 
+                  class="btn btn-danger btn-sm" 
+                  (click)="sairDoGrupo(userGrupo.grupoId)"
+                  [disabled]="isLoadingAction() === userGrupo.grupoId"
+                >
+                  @if (isLoadingAction() === userGrupo.grupoId) {
+                    <span class="spinner-sm"></span>
+                  } @else {
+                    <span class="material-icons">logout</span>
+                  }
+                  Sair
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      </section>
+    }
+
+    <section class="section">
+      <div class="section-header">
+        <h2>Todos os Grupos</h2>
+        <span class="grupo-count">{{ grupos().length }} grupos disponíveis</span>
+      </div>
+      
+      @if (grupos().length === 0) {
+        <div class="empty-state">
+          <span class="material-icons">groups</span>
+          <p>Nenhum grupo disponível no momento</p>
+        </div>
+      } @else {
+        <div class="grupos-grid">
+          @for (grupo of grupos(); track grupo.id) {
+            <div class="grupo-card" [class.is-member]="isUserInGroup(grupo.id)">
+              <a [routerLink]="['/grupos', grupo.id]" class="grupo-link">
+                <div class="grupo-header" [style.background-color]="grupo.primaryColor">
+                  <div class="grupo-avatar">
+                    @if (grupo.logoUrl) {
+                      <img [src]="grupo.logoUrl" [alt]="grupo.name">
+                    } @else {
+                      <span>{{ getGrupoInitial(grupo) }}</span>
+                    }
+                  </div>
+                  @if (isUserInGroup(grupo.id)) {
+                    <span class="member-badge">
+                      <span class="material-icons">check</span>
+                    </span>
+                  }
+                </div>
+                <div class="grupo-content">
+                  <h3>{{ grupo.name }}</h3>
+                  <span class="grupo-sigla">{{ grupo.sigla }}</span>
+                  @if (grupo.pastoralName) {
+                    <span class="grupo-pastoral">{{ grupo.pastoralName }}</span>
+                  }
+                  <div class="grupo-stats">
+                    <span class="stat">
+                      <span class="material-icons">people</span>
+                      {{ grupo.membersCount }} membros
+                    </span>
+                  </div>
+                </div>
+              </a>
+              <div class="grupo-actions">
+                @if (isUserInGroup(grupo.id)) {
+                  <button 
+                    class="btn btn-outline btn-sm" 
+                    (click)="sairDoGrupo(grupo.id)"
+                    [disabled]="isLoadingAction() === grupo.id"
+                  >
+                    @if (isLoadingAction() === grupo.id) {
+                      <span class="spinner-sm"></span>
+                    } @else {
+                      <span class="material-icons">logout</span>
+                    }
+                    Sair
+                  </button>
+                } @else {
+                  <button 
+                    class="btn btn-primary btn-sm" 
+                    (click)="entrarNoGrupo(grupo.id)"
+                    [disabled]="isLoadingAction() === grupo.id || !canJoinMoreGroups()"
+                    [title]="!canJoinMoreGroups() ? 'Limite de 4 grupos atingido' : ''"
+                  >
+                    @if (isLoadingAction() === grupo.id) {
+                      <span class="spinner-sm"></span>
+                    } @else {
+                      <span class="material-icons">group_add</span>
+                    }
+                    Entrar
+                  </button>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </section>
+  }
+</div>

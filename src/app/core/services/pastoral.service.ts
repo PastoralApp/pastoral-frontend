@@ -48,6 +48,10 @@ export class PastoralService {
     return this.http.delete<void>(`${this.API_URL}/${id}`);
   }
 
+  updateColor(id: string, color: string): Observable<void> {
+    return this.http.patch<void>(`${this.API_URL}/${id}/cor`, { cor: color });
+  }
+
   selectPastoral(pastoral: Pastoral | null): void {
     this.selectedPastoralSignal.set(pastoral);
   }

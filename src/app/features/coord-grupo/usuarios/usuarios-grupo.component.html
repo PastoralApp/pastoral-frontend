@@ -1,0 +1,186 @@
+<div class="usuarios-grupo-container">
+  <header class="page-header">
+    <div class="header-left">
+      <a routerLink="/coord-grupo" class="btn-back">
+        <span class="material-icons">arrow_back</span>
+      </a>
+      <div>
+        <h1>
+          <span class="material-icons">people</span>
+          Usuários do Meu Grupo
+        </h1>
+        <p class="subtitle">Visualize e gerencie tags dos membros do seu grupo</p>
+      </div>
+    </div>
+  </header>
+
+  <div class="search-bar">
+    <div class="search-input-wrapper">
+      <span class="material-icons">search</span>
+      <input
+        type="text"
+        [(ngModel)]="searchTerm"
+        (input)="onSearch()"
+        placeholder="Buscar por nome, email ou role..."
+        class="search-input"
+      />
+      @if (searchTerm) {
+        <button class="clear-btn" (click)="clearSearch()">
+          <span class="material-icons">close</span>
+        </button>
+      }
+    </div>
+    <div class="search-stats">
+      <span class="stats-text">
+        {{ usuariosFiltrados().length }} 
+        {{ usuariosFiltrados().length === 1 ? 'usuário' : 'usuários' }}
+      </span>
+    </div>
+  </div>
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Carregando usuários...</p>
+    </div>
+  } @else if (usuariosFiltrados().length === 0) {
+    <div class="empty-state">
+      <span class="material-icons">person_off</span>
+      <h3>Nenhum usuário encontrado</h3>
+      <p>{{ searchTerm ? 'Tente ajustar sua pesquisa' : 'Não há usuários nos seus grupos' }}</p>
+    </div>
+  } @else {
+    <div class="usuarios-grid">
+      @for (usuario of usuariosFiltrados(); track usuario.id) {
+        <div class="usuario-card">
+          <div class="usuario-header">
+            @if (usuario.photoUrl) {
+              <img [src]="usuario.photoUrl" [alt]="usuario.name" class="usuario-avatar">
+            } @else {
+              <div class="usuario-avatar placeholder">
+                {{ usuario.name.charAt(0).toUpperCase() }}
+              </div>
+            }
+            <div class="usuario-info">
+              <h3>{{ usuario.name }}</h3>
+              <p class="usuario-email">{{ usuario.email }}</p>
+            </div>
+            <span 
+              class="status-badge" 
+              [class]="getStatusBadgeClass(usuario.isActive)"
+            >
+              {{ usuario.isActive ? 'Ativo' : 'Inativo' }}
+            </span>
+          </div>
+
+          <div class="usuario-body">
+            <div class="info-item">
+              <span class="material-icons">badge</span>
+              <div class="info-content">
+                <span class="info-label">Role</span>
+                <span class="role-badge" [class]="getRoleBadgeClass(usuario.roleName)">
+                  {{ usuario.roleName }}
+                </span>
+              </div>
+            </div>
+
+            <div class="info-item">
+              <span class="material-icons">groups</span>
+              <div class="info-content">
+                <span class="info-label">Grupos</span>
+                <span class="info-value">{{ getGruposText(usuario) }}</span>
+              </div>
+            </div>
+
+            @if (usuario.telefone) {
+              <div class="info-item">
+                <span class="material-icons">phone</span>
+                <div class="info-content">
+                  <span class="info-label">Telefone</span>
+                  <a [href]="'tel:' + usuario.telefone" class="info-value">{{ usuario.telefone }}</a>
+                </div>
+              </div>
+            }
+
+            @if (usuario.tags && usuario.tags.length > 0) {
+              <div class="tags-section">
+                <span class="tags-label">Tags:</span>
+                <div class="tags-list">
+                  @for (tag of usuario.tags; track tag.id) {
+                    <span class="tag-badge" [style.background-color]="tag.color">
+                      {{ tag.name }}
+                    </span>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+
+          <div class="usuario-footer">
+            <button 
+              class="btn btn-secondary"
+              (click)="openTagModal(usuario)"
+            >
+              <span class="material-icons">label</span>
+              Gerenciar Tags
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
+
+@if (showTagModal() && selectedUser()) {
+  <div class="modal-overlay" (click)="closeTagModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>
+          <span class="material-icons">label</span>
+          Gerenciar Tags
+        </h2>
+        <button class="close-btn" (click)="closeTagModal()">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="user-info">
+          <div class="user-avatar-small">
+            @if (selectedUser()!.photoUrl) {
+              <img [src]="selectedUser()!.photoUrl" [alt]="selectedUser()!.name">
+            } @else {
+              {{ selectedUser()!.name.charAt(0).toUpperCase() }}
+            }
+          </div>
+          <div>
+            <div class="user-name">{{ selectedUser()!.name }}</div>
+            <div class="user-email">{{ selectedUser()!.email }}</div>
+          </div>
+        </div>
+
+        <div class="tags-grid">
+          @for (tag of tags(); track tag.id) {
+            <button
+              class="tag-item"
+              [class.selected]="hasTag(selectedUser()!, tag.id)"
+              (click)="toggleTag(tag.id)"
+            >
+              <span class="tag-color" [style.background-color]="tag.color"></span>
+              <span class="tag-name">{{ tag.name }}</span>
+              @if (hasTag(selectedUser()!, tag.id)) {
+                <span class="material-icons check-icon">check_circle</span>
+              }
+            </button>
+          }
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeTagModal()">
+          Fechar
+        </button>
+      </div>
+    </div>
+  </div>
+}

@@ -15,6 +15,11 @@
     color: var(--text-primary);
     margin: 0;
   }
+
+  .header-actions {
+    display: flex;
+    gap: 0.75rem;
+  }
 }
 
 .loading-state,
@@ -260,7 +265,8 @@
   }
 
   input,
-  textarea {
+  textarea,
+  select {
     width: 100%;
     padding: 0.625rem 0.75rem;
     border: 1px solid var(--border-color);
@@ -280,8 +286,27 @@
     }
   }
 
+  input[type="color"] {
+    height: 40px;
+    padding: 0.25rem;
+    cursor: pointer;
+  }
+
   textarea {
     resize: vertical;
+  }
+
+  &.form-group-small {
+    flex: 0 0 100px;
+  }
+}
+
+.form-row {
+  display: flex;
+  gap: 1rem;
+
+  .form-group {
+    flex: 1;
   }
 }
 

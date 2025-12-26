@@ -1,0 +1,91 @@
+<div class="usuarios-container">
+  <header class="page-header">
+    <div class="header-left">
+      <a routerLink="/coord-geral" class="btn-back">
+        <span class="material-icons">arrow_back</span>
+      </a>
+      <div>
+        <h1>Usuários</h1>
+        <p>Visualize todos os usuários cadastrados no sistema</p>
+      </div>
+    </div>
+  </header>
+
+  <div class="filters-bar">
+    <div class="search-box">
+      <span class="material-icons">search</span>
+      <input
+        type="text"
+        placeholder="Buscar por nome..."
+        [(ngModel)]="searchTerm"
+        (ngModelChange)="onSearch()"
+      />
+    </div>
+
+    <select class="role-filter" [(ngModel)]="selectedRole" (ngModelChange)="onRoleFilter()">
+      <option value="all">Todas as funções</option>
+      @for (role of getUniqueRoles(); track role) {
+        <option [value]="role">{{ role }}</option>
+      }
+    </select>
+  </div>
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Carregando usuários...</p>
+    </div>
+  }
+
+  @if (!isLoading()) {
+    <div class="usuarios-grid">
+      @for (usuario of filteredUsuarios(); track usuario.id) {
+        <div class="usuario-card">
+          <div class="usuario-avatar">
+            @if (usuario.photoUrl) {
+              <img [src]="usuario.photoUrl" [alt]="usuario.name" />
+            } @else {
+              <div class="avatar-placeholder">
+                <span class="material-icons">person</span>
+              </div>
+            }
+          </div>
+
+          <div class="usuario-info">
+            <h3>{{ usuario.name }}</h3>
+            <span class="role-badge" [ngClass]="getRoleClass(usuario.roleName)">
+              {{ usuario.roleName }}
+            </span>
+
+            @if (usuario.tags && usuario.tags.length > 0) {
+              <div class="tags-list">
+                @for (tag of usuario.tags; track tag.id) {
+                  <span class="tag" [style.background-color]="tag.color">
+                    {{ tag.name }}
+                  </span>
+                }
+              </div>
+            }
+
+            @if (usuario.grupos && usuario.grupos.length > 0) {
+              <div class="grupos-list">
+                <span class="material-icons">group_work</span>
+                <span>{{ usuario.grupos.length }} grupo(s)</span>
+              </div>
+            }
+          </div>
+        </div>
+      } @empty {
+        <div class="empty-state">
+          <span class="material-icons">person_off</span>
+          <h3>Nenhum usuário encontrado</h3>
+          <p>Tente ajustar os filtros de busca</p>
+        </div>
+      }
+    </div>
+
+    <div class="results-info">
+      Mostrando {{ filteredUsuarios().length }} de {{ usuarios().length }} usuários
+    </div>
+  }
+</div>

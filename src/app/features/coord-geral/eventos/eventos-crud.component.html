@@ -1,0 +1,262 @@
+<div class="crud-page">
+  <header class="page-header">
+    <div class="header-left">
+      <a routerLink="/coord-geral" class="btn-back">
+        <span class="material-icons">arrow_back</span>
+      </a>
+      <div>
+        <h1>
+          <span class="material-icons">event</span>
+          Gerenciar Eventos
+        </h1>
+        <p class="subtitle">{{ eventos().length }} evento(s) cadastrado(s)</p>
+      </div>
+    </div>
+    <button class="btn btn-primary" (click)="openCreateModal()">
+      <span class="material-icons">add</span>
+      Novo Evento
+    </button>
+  </header>
+
+  <div class="toolbar">
+    <div class="search-bar">
+      <span class="material-icons">search</span>
+      <input
+        type="text"
+        placeholder="Buscar eventos..."
+        [ngModel]="searchTerm()"
+        (ngModelChange)="searchTerm.set($event)"
+      >
+    </div>
+
+    <div class="filters">
+      <select 
+        [ngModel]="filterStatus()"
+        (ngModelChange)="filterStatus.set($event)"
+        class="filter-select"
+      >
+        <option value="all">Todos os eventos</option>
+        <option value="upcoming">Próximos</option>
+        <option value="past">Passados</option>
+      </select>
+    </div>
+  </div>
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Carregando eventos...</p>
+    </div>
+  } @else {
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Evento</th>
+            <th>Data</th>
+            <th>Local</th>
+            <th>Participantes</th>
+            <th>Status</th>
+            <th class="actions-column">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (evento of filteredEventos; track evento.id) {
+            <tr [class.past]="isEventPast(evento.eventDate)">
+              <td>
+                <div class="evento-cell">
+                  @if (evento.imageUrl) {
+                    <img [src]="evento.imageUrl" [alt]="evento.title" class="evento-image">
+                  } @else {
+                    <div class="evento-image-placeholder">
+                      <span class="material-icons">event</span>
+                    </div>
+                  }
+                  <div class="evento-info">
+                    <span class="evento-title">{{ evento.title }}</span>
+                    @if (evento.description) {
+                      <span class="evento-desc">{{ evento.description.length > 60 ? evento.description.substring(0, 60) + '...' : evento.description }}</span>
+                    }
+                  </div>
+                </div>
+              </td>
+              <td class="date-cell">
+                {{ formatDate(evento.eventDate) }}
+              </td>
+              <td>
+                @if (evento.location) {
+                  <span class="location">
+                    <span class="material-icons">location_on</span>
+                    {{ evento.location }}
+                  </span>
+                } @else {
+                  <span class="no-location">-</span>
+                }
+              </td>
+              <td class="participants-cell">
+                <span class="participants">
+                  <span class="material-icons">people</span>
+                  {{ getParticipantsInfo(evento) }}
+                </span>
+              </td>
+              <td>
+                @if (isEventPast(evento.eventDate)) {
+                  <span class="badge badge-past">Encerrado</span>
+                } @else {
+                  <span class="badge badge-upcoming">Ativo</span>
+                }
+              </td>
+              <td class="actions-column">
+                <button class="action-btn" (click)="openEditModal(evento)" title="Editar">
+                  <span class="material-icons">edit</span>
+                </button>
+                <button class="action-btn danger" (click)="deleteEvento(evento)" title="Excluir">
+                  <span class="material-icons">delete</span>
+                </button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="6" class="empty-state">
+                <span class="material-icons">event_busy</span>
+                <p>Nenhum evento encontrado</p>
+                <button class="btn btn-primary" (click)="openCreateModal()">
+                  Criar primeiro evento
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>
+
+@if (isModalOpen()) {
+  <div class="modal-overlay" (click)="closeModal()">
+    <div class="modal modal-large" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>{{ isEditing() ? 'Editar Evento' : 'Novo Evento' }}</h2>
+        <button class="btn-close" (click)="closeModal()">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Título *</label>
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Digite o título do evento"
+            [ngModel]="formData().title"
+            (ngModelChange)="updateField('title', $event)"
+          >
+        </div>
+
+        <div class="form-group">
+          <label>Descrição *</label>
+          <textarea
+            class="form-control"
+            placeholder="Descreva o evento"
+            rows="4"
+            [ngModel]="formData().description"
+            (ngModelChange)="updateField('description', $event)"
+          ></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Data e Hora *</label>
+            <input
+              type="datetime-local"
+              class="form-control"
+              [ngModel]="formData().eventDate"
+              (ngModelChange)="updateField('eventDate', $event)"
+            >
+          </div>
+
+          <div class="form-group">
+            <label>Local</label>
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Onde será o evento"
+              [ngModel]="formData().location"
+              (ngModelChange)="updateField('location', $event)"
+            >
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>URL da Imagem</label>
+          <input
+            type="url"
+            class="form-control"
+            placeholder="https://exemplo.com/imagem.jpg"
+            [ngModel]="formData().imageUrl"
+            (ngModelChange)="updateField('imageUrl', $event)"
+          >
+          @if (formData().imageUrl) {
+            <div class="image-preview">
+              <img [src]="formData().imageUrl" alt="Preview">
+            </div>
+          }
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Tipo de Evento</label>
+            <select
+              class="form-control"
+              [ngModel]="formData().type"
+              (ngModelChange)="updateField('type', $event)"
+            >
+              @for (type of eventoTypes; track type) {
+                <option [value]="type">{{ EventoTypeLabels[type] }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Máximo de Participantes</label>
+            <input
+              type="number"
+              class="form-control"
+              placeholder="0 = sem limite"
+              min="0"
+              [ngModel]="formData().maxParticipants"
+              (ngModelChange)="updateField('maxParticipants', $event)"
+            >
+            <small class="helper-text">0 = sem limite de participantes</small>
+          </div>
+        </div>
+
+        <div class="form-group checkbox-group">
+          <label class="checkbox-label">
+            <input
+              type="checkbox"
+              [ngModel]="formData().requireInscription"
+              (ngModelChange)="updateField('requireInscription', $event)"
+            >
+            <span>Requer inscrição prévia</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeModal()">
+          Cancelar
+        </button>
+        <button class="btn btn-primary" (click)="saveEvento()" [disabled]="isSaving()">
+          @if (isSaving()) {
+            <div class="spinner-small"></div>
+            Salvando...
+          } @else {
+            {{ isEditing() ? 'Salvar' : 'Criar' }}
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+}

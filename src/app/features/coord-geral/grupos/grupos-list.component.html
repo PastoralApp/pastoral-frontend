@@ -1,0 +1,88 @@
+<div class="grupos-container">
+  <header class="page-header">
+    <div class="header-left">
+      <a routerLink="/coord-geral" class="btn-back">
+        <span class="material-icons">arrow_back</span>
+      </a>
+      <div>
+        <h1>Gerenciar Grupos</h1>
+        <p>Crie, edite e gerencie todos os grupos</p>
+      </div>
+    </div>
+    <button class="btn-novo" (click)="novoGrupo()">
+      <span class="material-icons">add</span>
+      Novo Grupo
+    </button>
+  </header>
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Carregando grupos...</p>
+    </div>
+  }
+
+  @if (!isLoading()) {
+    <div class="grupos-grid">
+      @for (grupo of grupos(); track grupo.id) {
+        <div class="grupo-card">
+          <div class="grupo-header">
+            <h3>{{ grupo.name }}</h3>
+            @if (grupo.description) {
+              <p class="description">{{ grupo.description }}</p>
+            }
+          </div>
+
+          <div class="grupo-info">
+            @if (grupo.pastoralName) {
+              <div class="info-item">
+                <span class="material-icons">groups</span>
+                <span>{{ grupo.pastoralName }}</span>
+              </div>
+            }
+
+            @if (grupo.igrejaNome) {
+              <div class="info-item">
+                <span class="material-icons">church</span>
+                <span>{{ grupo.igrejaNome }}</span>
+              </div>
+            }
+
+            <div class="info-item">
+              <span class="material-icons">group</span>
+              <span>{{ grupo.membersCount || 0 }} membros</span>
+            </div>
+
+            @if (grupo.coordenadorName) {
+              <div class="info-item">
+                <span class="material-icons">person</span>
+                <span>Coord: {{ grupo.coordenadorName }}</span>
+              </div>
+            }
+          </div>
+
+          <div class="grupo-actions">
+            <button class="btn-edit" (click)="editarGrupo(grupo.id)">
+              <span class="material-icons">edit</span>
+              Editar
+            </button>
+            <button class="btn-delete" (click)="excluirGrupo(grupo.id, grupo.name)">
+              <span class="material-icons">delete</span>
+              Excluir
+            </button>
+          </div>
+        </div>
+      } @empty {
+        <div class="empty-state">
+          <span class="material-icons">group_work</span>
+          <h3>Nenhum grupo cadastrado</h3>
+          <p>Comece criando o primeiro grupo</p>
+          <button class="btn-novo-empty" (click)="novoGrupo()">
+            <span class="material-icons">add</span>
+            Criar Primeiro Grupo
+          </button>
+        </div>
+      }
+    </div>
+  }
+</div>

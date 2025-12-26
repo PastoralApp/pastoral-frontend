@@ -4,6 +4,8 @@ export interface AuthUser {
   email: string;
   photoUrl?: string;
   role: string;
+  roleName?: string;
+  grupoId?: string;
 }
 
 export interface LoginDto {
@@ -42,9 +44,44 @@ export interface GoogleCompleteDto {
   registrationToken: string;
   name: string;
   password: string;
+  verificationCode: string;
 }
 
 export interface GoogleCompleteResponse {
   token: string;
   user: AuthUser;
+}
+
+export interface SendCodeDto {
+  name: string;
+  email: string;
+}
+
+export interface SendCodeResponse {
+  message: string;
+  email: string;
+}
+
+export interface RegisterDto {
+  name: string;
+  email: string;
+  password: string;
+  verificationCode: string;
+}
+
+export interface RegisterResponse {
+  token: string;
+  user: AuthUser;
+}
+
+export interface ResendCodeDto {
+  email: string;
+}
+
+export interface ResendCodeResponse {
+  message: string;
+}
+
+export interface GoogleLoginNewResponseWithCode extends GoogleLoginNewResponse {
+  message?: string;
 }

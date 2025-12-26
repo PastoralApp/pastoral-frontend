@@ -59,6 +59,14 @@ export class GrupoService {
     return this.http.post<void>(`${this.API_URL}/${grupoId}/ativar-notificacoes`, {});
   }
 
+  entrarNoGrupo(grupoId: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.API_URL}/${grupoId}/entrar`, {});
+  }
+
+  sairDoGrupo(grupoId: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.API_URL}/${grupoId}/sair`, {});
+  }
+
   ativar(id: string): Observable<void> {
     return this.http.patch<void>(`${this.API_URL}/${id}/ativar`, {});
   }

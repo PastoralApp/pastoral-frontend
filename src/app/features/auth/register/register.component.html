@@ -1,9 +1,39 @@
 <div class="register-container">
   <div class="register-card">
     <div class="register-header">
-      <img src="assets/logo.png" alt="Pastoral App" class="logo">
+      <img src="assets/logosemfundo.png" alt="Pastoral App" class="logo" onerror="this.style.display='none'">
       <h1>Criar Conta</h1>
-      <p>Preencha os dados para se cadastrar</p>
+      
+      <div class="stepper">
+        <div class="step" [class.active]="currentStep === RegistrationStep.EMAIL_STEP" [class.completed]="currentStep !== RegistrationStep.EMAIL_STEP">
+          <div class="step-circle">
+            @if (currentStep !== RegistrationStep.EMAIL_STEP) {
+              <span class="material-icons">check</span>
+            } @else {
+              <span>1</span>
+            }
+          </div>
+          <span class="step-label">Dados</span>
+        </div>
+        <div class="step-line" [class.completed]="currentStep !== RegistrationStep.EMAIL_STEP"></div>
+        <div class="step" [class.active]="currentStep === RegistrationStep.CODE_STEP" [class.completed]="currentStep === RegistrationStep.PASSWORD_STEP">
+          <div class="step-circle">
+            @if (currentStep === RegistrationStep.PASSWORD_STEP) {
+              <span class="material-icons">check</span>
+            } @else {
+              <span>2</span>
+            }
+          </div>
+          <span class="step-label">Código</span>
+        </div>
+        <div class="step-line" [class.completed]="currentStep === RegistrationStep.PASSWORD_STEP"></div>
+        <div class="step" [class.active]="currentStep === RegistrationStep.PASSWORD_STEP">
+          <div class="step-circle">
+            <span>3</span>
+          </div>
+          <span class="step-label">Senha</span>
+        </div>
+      </div>
     </div>
 
     @if (errorMessage) {
@@ -13,90 +43,175 @@
       </div>
     }
 
-    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
-      <div class="form-group">
-        <label for="name">Nome completo</label>
-        <div class="input-wrapper">
-          <span class="material-icons">person</span>
-          <input
-            type="text"
-            id="name"
-            formControlName="name"
-            placeholder="Seu nome"
-            [class.is-invalid]="registerForm.get('name')?.invalid && registerForm.get('name')?.touched"
-          >
+    @if (successMessage) {
+      <div class="alert alert-success">
+        <span class="material-icons">check_circle</span>
+        {{ successMessage }}
+      </div>
+    }
+
+    @if (currentStep === RegistrationStep.EMAIL_STEP) {
+      <form [formGroup]="emailForm" (ngSubmit)="onEmailSubmit()">
+        <div class="form-group">
+          <label for="name">Nome completo</label>
+          <div class="input-wrapper">
+            <span class="material-icons">person</span>
+            <input
+              type="text"
+              id="name"
+              formControlName="name"
+              placeholder="Seu nome"
+              [class.is-invalid]="emailForm.get('name')?.invalid && emailForm.get('name')?.touched"
+            >
+          </div>
+          @if (emailForm.get('name')?.invalid && emailForm.get('name')?.touched) {
+            <span class="error-text">Nome deve ter no mínimo 3 caracteres</span>
+          }
         </div>
-        @if (registerForm.get('name')?.invalid && registerForm.get('name')?.touched) {
-          <span class="error-text">Nome deve ter no mínimo 3 caracteres</span>
-        }
+
+        <div class="form-group">
+          <label for="email">Email</label>
+          <div class="input-wrapper">
+            <span class="material-icons">email</span>
+            <input
+              type="email"
+              id="email"
+              formControlName="email"
+              placeholder="seu@email.com"
+              [class.is-invalid]="emailForm.get('email')?.invalid && emailForm.get('email')?.touched"
+            >
+          </div>
+          @if (emailForm.get('email')?.invalid && emailForm.get('email')?.touched) {
+            <span class="error-text">Email inválido</span>
+          }
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block" [disabled]="emailForm.invalid || isLoading">
+          @if (isLoading) {
+            <span class="spinner"></span>
+            Enviando...
+          } @else {
+            Enviar Código
+          }
+        </button>
+      </form>
+    }
+
+    @if (currentStep === RegistrationStep.CODE_STEP) {
+      <div class="verification-info">
+        <span class="material-icons">mail_outline</span>
+        <p>Enviamos um código de 6 dígitos para <strong>{{ email }}</strong></p>
+        <p class="text-muted">Verifique sua caixa de entrada e spam</p>
       </div>
 
-      <div class="form-group">
-        <label for="email">Email</label>
-        <div class="input-wrapper">
-          <span class="material-icons">email</span>
-          <input
-            type="email"
-            id="email"
-            formControlName="email"
-            placeholder="seu@email.com"
-            [class.is-invalid]="registerForm.get('email')?.invalid && registerForm.get('email')?.touched"
-          >
+      <form [formGroup]="codeForm" (ngSubmit)="onCodeSubmit()">
+        <div class="form-group">
+          <label for="code">Código de Verificação</label>
+          <div class="input-wrapper code-input-wrapper">
+            <input
+              type="text"
+              id="code"
+              formControlName="code"
+              placeholder="000000"
+              maxlength="6"
+              class="code-input"
+              [class.is-invalid]="codeForm.get('code')?.invalid && codeForm.get('code')?.touched"
+            >
+          </div>
+          @if (codeForm.get('code')?.invalid && codeForm.get('code')?.touched) {
+            <span class="error-text">Código deve ter 6 dígitos</span>
+          }
         </div>
-        @if (registerForm.get('email')?.invalid && registerForm.get('email')?.touched) {
-          <span class="error-text">Email inválido</span>
-        }
-      </div>
 
-      <div class="form-group">
-        <label for="password">Senha</label>
-        <div class="input-wrapper">
-          <span class="material-icons">lock</span>
-          <input
-            [type]="showPassword ? 'text' : 'password'"
-            id="password"
-            formControlName="password"
-            placeholder="Crie uma senha"
-            [class.is-invalid]="registerForm.get('password')?.invalid && registerForm.get('password')?.touched"
-          >
-          <button type="button" class="toggle-password" (click)="togglePassword()">
-            <span class="material-icons">{{ showPassword ? 'visibility_off' : 'visibility' }}</span>
+        <div class="resend-section">
+          @if (canResendCode) {
+            <button type="button" class="btn-link" (click)="resendCode()" [disabled]="isLoading">
+              <span class="material-icons">refresh</span>
+              Reenviar código
+            </button>
+          } @else {
+            <p class="text-muted">
+              <span class="material-icons">schedule</span>
+              Reenviar código em {{ resendCountdownFormatted }}
+            </p>
+          }
+        </div>
+
+        <div class="button-group">
+          <button type="button" class="btn btn-secondary" (click)="goBackToEmail()" [disabled]="isLoading">
+            Voltar
+          </button>
+          <button type="submit" class="btn btn-primary" [disabled]="codeForm.invalid || isLoading">
+            @if (isLoading) {
+              <span class="spinner"></span>
+            }
+            Continuar
           </button>
         </div>
-        @if (registerForm.get('password')?.invalid && registerForm.get('password')?.touched) {
-          <span class="error-text">Senha deve ter no mínimo 6 caracteres</span>
-        }
+      </form>
+    }
+
+    @if (currentStep === RegistrationStep.PASSWORD_STEP) {
+      <div class="verification-info">
+        <span class="material-icons">check_circle</span>
+        <p>Email verificado com sucesso!</p>
+        <p class="text-muted">Agora crie uma senha segura</p>
       </div>
 
-      <div class="form-group">
-        <label for="confirmPassword">Confirmar senha</label>
-        <div class="input-wrapper">
-          <span class="material-icons">lock</span>
-          <input
-            [type]="showConfirmPassword ? 'text' : 'password'"
-            id="confirmPassword"
-            formControlName="confirmPassword"
-            placeholder="Confirme sua senha"
-            [class.is-invalid]="registerForm.get('confirmPassword')?.errors && registerForm.get('confirmPassword')?.touched"
-          >
-          <button type="button" class="toggle-password" (click)="toggleConfirmPassword()">
-            <span class="material-icons">{{ showConfirmPassword ? 'visibility_off' : 'visibility' }}</span>
+      <form [formGroup]="passwordForm" (ngSubmit)="onPasswordSubmit()">
+        <div class="form-group">
+          <label for="password">Senha</label>
+          <div class="input-wrapper">
+            <span class="material-icons">lock</span>
+            <input
+              [type]="showPassword ? 'text' : 'password'"
+              id="password"
+              formControlName="password"
+              placeholder="Crie uma senha"
+              [class.is-invalid]="passwordForm.get('password')?.invalid && passwordForm.get('password')?.touched"
+            >
+            <button type="button" class="toggle-password" (click)="togglePassword()">
+              <span class="material-icons">{{ showPassword ? 'visibility_off' : 'visibility' }}</span>
+            </button>
+          </div>
+          @if (passwordForm.get('password')?.invalid && passwordForm.get('password')?.touched) {
+            <span class="error-text">Senha deve ter no mínimo 6 caracteres</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="confirmPassword">Confirmar senha</label>
+          <div class="input-wrapper">
+            <span class="material-icons">lock</span>
+            <input
+              [type]="showConfirmPassword ? 'text' : 'password'"
+              id="confirmPassword"
+              formControlName="confirmPassword"
+              placeholder="Confirme sua senha"
+              [class.is-invalid]="passwordForm.get('confirmPassword')?.errors && passwordForm.get('confirmPassword')?.touched"
+            >
+            <button type="button" class="toggle-password" (click)="toggleConfirmPassword()">
+              <span class="material-icons">{{ showConfirmPassword ? 'visibility_off' : 'visibility' }}</span>
+            </button>
+          </div>
+          @if (passwordForm.get('confirmPassword')?.errors?.['mismatch'] && passwordForm.get('confirmPassword')?.touched) {
+            <span class="error-text">As senhas não coincidem</span>
+          }
+        </div>
+
+        <div class="button-group">
+          <button type="button" class="btn btn-secondary" (click)="goBackToCode()" [disabled]="isLoading">
+            Voltar
+          </button>
+          <button type="submit" class="btn btn-primary" [disabled]="passwordForm.invalid || isLoading">
+            @if (isLoading) {
+              <span class="spinner"></span>
+            }
+            Criar Conta
           </button>
         </div>
-        @if (registerForm.get('confirmPassword')?.errors?.['mismatch'] && registerForm.get('confirmPassword')?.touched) {
-          <span class="error-text">As senhas não conferem</span>
-        }
-      </div>
-
-      <button type="submit" class="btn btn-primary btn-block" [disabled]="registerForm.invalid || isLoading">
-        @if (isLoading) {
-          <span class="spinner"></span>
-          Criando conta...
-        } @else {
-          Criar conta
-        }
-      </button>
-    </form>
+      </form>
+    }
 
     <div class="divider">
       <span>ou</span>

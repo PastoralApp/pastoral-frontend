@@ -1,31 +1,16 @@
 <div class="feed-container">
   <div class="feed-content">
-    <!-- Filtro de Pastoral -->
     <div class="feed-filters">
-      <button 
-        class="filter-btn" 
-        [class.active]="selectedFilter() === 'all'"
-        (click)="setFilter('all')"
-      >
-        <span class="material-icons">public</span>
-        Todos
-      </button>
-      <button 
-        class="filter-btn filter-pa" 
-        [class.active]="selectedFilter() === 'PA'"
-        (click)="setFilter('PA')"
-      >
-        <span class="material-icons">child_care</span>
-        Adolescentes
-      </button>
-      <button 
-        class="filter-btn filter-pj" 
-        [class.active]="selectedFilter() === 'PJ'"
-        (click)="setFilter('PJ')"
-      >
-        <span class="material-icons">groups</span>
-        Jovens
-      </button>
+      @for (filter of availableFilters(); track filter.tipo) {
+        <button 
+          class="filter-btn"
+          [class.active]="selectedFilter() === filter.tipo || (selectedFilter() === null && filter.tipo === TipoPastoral.Geral)"
+          (click)="setFilter(filter.tipo === TipoPastoral.Geral ? null : filter.tipo)"
+        >
+          <span class="material-icons">{{ filter.icon }}</span>
+          {{ filter.label }}
+        </button>
+      }
     </div>
 
     <app-create-post (postCreated)="onPostCreated($event)"></app-create-post>
@@ -37,16 +22,8 @@
       </div>
     }
 
-    @if (error()) {
-      <div class="error-state">
-        <span class="material-icons">error</span>
-        <p>{{ error() }}</p>
-        <button class="btn btn-primary" (click)="loadPosts()">Tentar novamente</button>
-      </div>
-    }
-
-    @if (!isLoading() && !error()) {
-      @if (pinnedPosts().length > 0) {
+    @if (!isLoading()) {
+      @if (pinnedPosts().length > 0) {  
         <div class="pinned-section">
           <h3><span class="material-icons">push_pin</span> Posts Fixados</h3>
           @for (post of pinnedPosts(); track post.id) {
@@ -70,12 +47,12 @@
         } @empty {
           <div class="empty-state">
             <span class="material-icons">article</span>
-            @if (selectedFilter() === 'all') {
+              @if (selectedFilter() === null || selectedFilter() === TipoPastoral.Geral) {
               <h3>Nenhum post ainda</h3>
               <p>Seja o primeiro a compartilhar algo!</p>
             } @else {
               <h3>Nenhum post nesta pastoral</h3>
-              <p>Não há posts da {{ selectedFilter() === 'PA' ? 'Pastoral de Adolescentes' : 'Pastoral de Jovens' }} ainda.</p>
+              <p>Não há posts da {{ selectedFilter() === TipoPastoral.PA ? 'Pastoral de Adolescentes' : 'Pastoral de Jovens' }} ainda.</p>
             }
           </div>
         }

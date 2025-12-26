@@ -8,7 +8,10 @@ import {
   CreateUserDto,
   UpdateUserDto,
   UpdateProfileDto,
-  UpdateRoleDto
+  UpdateRoleDto,
+  UpdateUserProfileDto,
+  UpdateUserRoleDto,
+  UpdateUserAdminDto
 } from '../models/user.model';
 
 @Injectable({
@@ -31,8 +34,8 @@ export class UserService {
     return this.http.get<User>(`${this.API_URL}/me`);
   }
 
-  getByGrupo(grupoId: string): Observable<UserSimple[]> {
-    return this.http.get<UserSimple[]>(`${this.API_URL}/grupo/${grupoId}`);
+  getByGrupo(grupoId: string): Observable<User[]> {
+    return this.http.get<User[]>(`${this.API_URL}/grupo/${grupoId}`);
   }
 
   create(data: CreateUserDto): Observable<User> {
@@ -45,6 +48,14 @@ export class UserService {
 
   updateMyProfile(data: UpdateProfileDto): Observable<void> {
     return this.http.put<void>(`${this.API_URL}/me/profile`, data);
+  }
+
+  updateUserProfile(userId: string, data: UpdateUserProfileDto): Observable<void> {
+    return this.http.put<void>(`${this.API_URL}/${userId}/profile`, data);
+  }
+
+  updateUserRole(userId: string, data: UpdateUserRoleDto): Observable<void> {
+    return this.http.put<void>(`${this.API_URL}/${userId}/role`, data);
   }
 
   updateRole(id: string, data: UpdateRoleDto): Observable<void> {
@@ -69,5 +80,21 @@ export class UserService {
 
   delete(id: string): Observable<void> {
     return this.http.delete<void>(`${this.API_URL}/${id}`);
+  }
+
+  createAdmin(data: CreateUserDto): Observable<User> {
+    return this.http.post<User>(`${this.API_URL}/admin`, data);
+  }
+
+  updateAdmin(id: string, data: UpdateUserAdminDto): Observable<void> {
+    return this.http.put<void>(`${this.API_URL}/admin/${id}`, data);
+  }
+
+  addTag(userId: string, tagId: string): Observable<void> {
+    return this.http.post<void>(`${this.API_URL.replace('/users', '/tags')}/${tagId}/users/${userId}`, {});
+  }
+
+  removeTag(userId: string, tagId: string): Observable<void> {
+    return this.http.delete<void>(`${this.API_URL.replace('/users', '/tags')}/${tagId}/users/${userId}`);
   }
 }

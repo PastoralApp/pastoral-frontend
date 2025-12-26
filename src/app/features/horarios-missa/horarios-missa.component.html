@@ -2,6 +2,13 @@
   <header class="horarios-header">
     <h1>Horários de Missa</h1>
     <p class="subtitle">Confira os horários das missas em nossa região</p>
+    
+    <div class="header-actions">
+      <button class="btn-calendar" (click)="openCalendar()">
+        <span class="material-icons">calendar_today</span>
+        <span>{{ getFormattedSelectedDate() }}</span>
+      </button>
+    </div>
   </header>
 
   <div class="dias-tabs">
@@ -44,9 +51,42 @@
         @for (entry of getHorariosByIgreja() | keyvalue; track entry.key) {
           <div class="igreja-card">
             <div class="igreja-header">
-              <span class="material-icons">church</span>
-              <h2>{{ entry.key }}</h2>
+              <div class="igreja-title">
+                <span class="material-icons">church</span>
+                <h2>{{ entry.key }}</h2>
+              </div>
+              @if (getIgrejaDetails(entry.key)) {
+                <button 
+                  class="btn-info"
+                  (click)="toggleIgrejaInfo(entry.key)"
+                  [title]="isIgrejaInfoVisible(entry.key) ? 'Ocultar informações' : 'Mostrar informações'"
+                >
+                  <span class="material-icons">
+                    {{ isIgrejaInfoVisible(entry.key) ? 'expand_less' : 'expand_more' }}
+                  </span>
+                </button>
+              }
             </div>
+            
+            @if (isIgrejaInfoVisible(entry.key)) {
+              <div class="igreja-info">
+                @if (getIgrejaDetails(entry.key)?.endereco) {
+                  <div class="info-item">
+                    <span class="material-icons">place</span>
+                    <span>{{ getIgrejaDetails(entry.key)!.endereco }}</span>
+                  </div>
+                }
+                @if (getIgrejaDetails(entry.key)?.telefone) {
+                  <div class="info-item">
+                    <span class="material-icons">phone</span>
+                    <a href="tel:{{ getIgrejaDetails(entry.key)!.telefone }}">
+                      {{ getIgrejaDetails(entry.key)!.telefone }}
+                    </a>
+                  </div>
+                }
+              </div>
+            }
+            
             <div class="horarios-list">
               @for (horario of entry.value; track horario.id) {
                 <div class="horario-item">
@@ -74,3 +114,51 @@
     }
   </div>
 </div>
+
+@if (showCalendar()) {
+  <div class="calendar-modal-overlay" (click)="closeCalendar()">
+    <div class="calendar-modal" (click)="$event.stopPropagation()">
+      <div class="calendar-header">
+        <button class="btn-icon" (click)="previousMonth()">
+          <span class="material-icons">chevron_left</span>
+        </button>
+        <h3>{{ getMonthYearText() }}</h3>
+        <button class="btn-icon" (click)="nextMonth()">
+          <span class="material-icons">chevron_right</span>
+        </button>
+      </div>
+      
+      <div class="calendar-grid">
+        <div class="calendar-weekdays">
+          <div class="weekday">Dom</div>
+          <div class="weekday">Seg</div>
+          <div class="weekday">Ter</div>
+          <div class="weekday">Qua</div>
+          <div class="weekday">Qui</div>
+          <div class="weekday">Sex</div>
+          <div class="weekday">Sáb</div>
+        </div>
+        
+        <div class="calendar-days">
+          @for (date of getCalendarDays(); track date.getTime()) {
+            <button
+              class="calendar-day"
+              [class.other-month]="!isCurrentMonth(date)"
+              [class.today]="isToday(date)"
+              [class.selected]="isSelectedDate(date)"
+              (click)="selectDateFromCalendar(date)"
+            >
+              {{ date.getDate() }}
+            </button>
+          }
+        </div>
+      </div>
+      
+      <div class="calendar-footer">
+        <button class="btn btn-secondary" (click)="closeCalendar()">
+          Cancelar
+        </button>
+      </div>
+    </div>
+  </div>
+}

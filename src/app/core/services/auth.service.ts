@@ -8,9 +8,16 @@ import {
   LoginResponse,
   GoogleLoginDto,
   GoogleLoginResponse,
+  GoogleLoginExistingResponse,
   GoogleCompleteDto,
   GoogleCompleteResponse,
-  AuthUser
+  AuthUser,
+  SendCodeDto,
+  SendCodeResponse,
+  RegisterDto,
+  RegisterResponse,
+  ResendCodeDto,
+  ResendCodeResponse
 } from '../models/auth.model';
 
 @Injectable({
@@ -40,13 +47,34 @@ export class AuthService {
   }
 
   googleLogin(data: GoogleLoginDto): Observable<GoogleLoginResponse> {
-    return this.http.post<GoogleLoginResponse>(`${this.API_URL}/google`, data);
+    return this.http.post<GoogleLoginResponse>(`${this.API_URL}/google`, data).pipe(
+      tap(response => {
+        if (!response.requiresCompletion) {
+          const existingResponse = response as GoogleLoginExistingResponse;
+          this.handleAuthSuccess(existingResponse.token, existingResponse.user);
+        }
+      })
+    );
   }
 
   googleComplete(data: GoogleCompleteDto): Observable<GoogleCompleteResponse> {
     return this.http.post<GoogleCompleteResponse>(`${this.API_URL}/google/complete`, data).pipe(
       tap(response => this.handleAuthSuccess(response.token, response.user))
     );
+  }
+
+  sendVerificationCode(data: SendCodeDto): Observable<SendCodeResponse> {
+    return this.http.post<SendCodeResponse>(`${this.API_URL}/register/send-code`, data);
+  }
+
+  register(data: RegisterDto): Observable<RegisterResponse> {
+    return this.http.post<RegisterResponse>(`${this.API_URL}/register`, data).pipe(
+      tap(response => this.handleAuthSuccess(response.token, response.user))
+    );
+  }
+
+  resendVerificationCode(data: ResendCodeDto): Observable<ResendCodeResponse> {
+    return this.http.post<ResendCodeResponse>(`${this.API_URL}/resend-verification-code`, data);
   }
 
   getGoogleLoginUrl(): string {
@@ -91,6 +119,22 @@ export class AuthService {
   hasAnyRole(roleNames: string[]): boolean {
     const user = this.getCurrentUser();
     return user ? roleNames.includes(user.role) : false;
+  }
+
+  loginWithToken(token: string): void {
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const user: AuthUser = {
+        id: payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'] || payload.sub,
+        name: payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'] || payload.name,
+        email: payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'] || payload.email,
+        photoUrl: payload['photo_url'],
+        role: payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || payload.role
+      };
+      this.handleAuthSuccess(token, user);
+    } catch (e) {
+      console.error('Erro ao decodificar token:', e);
+    }
   }
 
   private handleAuthSuccess(token: string, user: AuthUser): void {

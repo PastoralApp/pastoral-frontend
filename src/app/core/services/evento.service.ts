@@ -6,7 +6,10 @@ import {
   Evento,
   CreateEventoDto,
   UpdateEventoDto,
-  EventoSaveResponse
+  EventoSaveResponse,
+  EventoParticiparResponse,
+  EventoParticipante,
+  EventoType
 } from '../models/evento.model';
 
 @Injectable({
@@ -27,6 +30,14 @@ export class EventoService {
 
   getPast(): Observable<Evento[]> {
     return this.http.get<Evento[]>(`${this.API_URL}/past`);
+  }
+
+  getByType(type: EventoType): Observable<Evento[]> {
+    return this.http.get<Evento[]>(`${this.API_URL}/type/${type}`);
+  }
+
+  getEventoTypes(): Observable<{ value: number; name: string }[]> {
+    return this.http.get<{ value: number; name: string }[]>(`${this.API_URL}/types`);
   }
 
   getByGrupo(grupoId: string): Observable<Evento[]> {
@@ -59,5 +70,17 @@ export class EventoService {
 
   getSaved(): Observable<Evento[]> {
     return this.http.get<Evento[]>(`${this.API_URL}/saved`);
+  }
+
+  participar(id: string): Observable<EventoParticiparResponse> {
+    return this.http.post<EventoParticiparResponse>(`${this.API_URL}/${id}/participar`, {});
+  }
+
+  cancelarParticipacao(id: string): Observable<EventoParticiparResponse> {
+    return this.http.delete<EventoParticiparResponse>(`${this.API_URL}/${id}/participar`);
+  }
+
+  getParticipantes(id: string): Observable<EventoParticipante[]> {
+    return this.http.get<EventoParticipante[]>(`${this.API_URL}/${id}/participantes`);
   }
 }

@@ -251,6 +251,80 @@
   }
 }
 
+.grupos-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.grupo-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: var(--bg-primary);
+  border-radius: 12px;
+  text-decoration: none;
+  color: var(--text-primary);
+  transition: all 0.2s;
+
+  &:hover {
+    background: var(--bg-tertiary);
+    transform: translateX(4px);
+  }
+
+  .grupo-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    span {
+      color: white;
+      font-weight: 600;
+      font-size: 1rem;
+    }
+  }
+
+  .grupo-info {
+    flex: 1;
+
+    h3 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin: 0 0 0.25rem 0;
+      color: var(--text-primary);
+    }
+
+    .pastoral {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      margin: 0 0 0.25rem 0;
+    }
+
+    .data-entrada {
+      font-size: 0.75rem;
+      color: var(--text-tertiary);
+      margin: 0;
+    }
+  }
+
+  .arrow {
+    color: var(--text-tertiary);
+    font-size: 1.25rem;
+  }
+}
+
 .tags-list {
   display: flex;
   flex-wrap: wrap;

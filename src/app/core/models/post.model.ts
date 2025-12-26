@@ -5,13 +5,24 @@ export enum PostType {
   Anuncio = 'Anuncio'
 }
 
+export enum TipoPastoral {
+  PA = 'PA',
+  PJ = 'PJ',
+  Geral = 'Geral'
+}
+
 export interface Post {
   id: string;
   content: string;
   imageUrl?: string;
   type: PostType;
+  tipoPastoral: TipoPastoral;
+  pastoralId?: string;
   isPinned: boolean;
+  pinType?: string | null;
   likesCount: number;
+  commentsCount: number;
+  isLiked?: boolean;
   authorId: string;
   authorName: string;
   authorPhotoUrl?: string;
@@ -23,11 +34,17 @@ export interface CreatePostDto {
   content: string;
   imageUrl?: string;
   type?: PostType;
+  tipoPastoral?: TipoPastoral;
+  pastoralId?: string;
 }
 
 export interface UpdatePostDto {
   content: string;
   imageUrl?: string;
+}
+
+export interface ChangePostTypeDto {
+  type: string;
 }
 
 export interface ReactResponse {
@@ -56,4 +73,26 @@ export interface PostComment {
 
 export interface CreateCommentDto {
   conteudo: string;
+}
+
+export interface PostDetailDto {
+  id: string;
+  content: string;
+  imageUrl?: string;
+  type: PostType;
+  tipoPastoral: TipoPastoral;
+  pastoralId?: string;
+  isPinned: boolean;
+  pinType?: string | null;
+  likesCount: number;
+  commentsCount: number;
+  sharesCount: number;
+  isLiked: boolean;
+  isSaved: boolean;
+  authorId: string;
+  authorName: string;
+  authorPhotoUrl?: string;
+  createdAt: string;
+  updatedAt?: string;
+  comments: PostComment[];
 }

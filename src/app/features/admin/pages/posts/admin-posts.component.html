@@ -1,0 +1,167 @@
+<div class="admin-posts-container">
+  <header class="page-header">
+    <a routerLink="/admin" class="btn-back">
+      <span class="material-icons">arrow_back</span>
+    </a>
+    <h1>
+      <span class="material-icons">article</span>
+      Gerenciar Posts
+    </h1>
+  </header>
+
+  <div class="toolbar">
+    <div class="search-bar">
+      <span class="material-icons">search</span>
+      <input
+        type="text"
+        placeholder="Buscar posts..."
+        [ngModel]="searchTerm()"
+        (ngModelChange)="searchTerm.set($event)"
+      >
+    </div>
+
+    <div class="filters">
+      <select 
+        [ngModel]="selectedUserId()"
+        (ngModelChange)="selectedUserId.set($event)"
+        class="filter-select"
+      >
+        <option value="all">Todos os usuários</option>
+        @for (user of users(); track user.id) {
+          <option [value]="user.id">{{ user.name }}</option>
+        }
+      </select>
+
+      <select 
+        [ngModel]="selectedTipoPastoral()"
+        (ngModelChange)="selectedTipoPastoral.set($event)"
+        class="filter-select"
+      >
+        <option value="all">Todas as pastorais</option>
+        <option [value]="TipoPastoral.PA">PA</option>
+        <option [value]="TipoPastoral.PJ">PJ</option>
+        <option [value]="TipoPastoral.Geral">Geral</option>
+      </select>
+    </div>
+  </div>
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Carregando posts...</p>
+    </div>
+  } @else {
+    <div class="posts-table">
+      <table>
+        <thead>
+          <tr>
+            <th>Autor</th>
+            <th>Conteúdo</th>
+            <th>Tipo</th>
+            <th>Pastoral</th>
+            <th>Data</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (post of filteredPosts; track post.id) {
+            <tr>
+              <td>
+                <div class="user-cell">
+                  @if (post.authorPhotoUrl) {
+                    <img [src]="post.authorPhotoUrl" [alt]="post.authorName" class="avatar">
+                  } @else {
+                    <div class="avatar-placeholder">
+                      {{ post.authorName.charAt(0) }}
+                    </div>
+                  }
+                  <span>{{ post.authorName }}</span>
+                </div>
+              </td>
+              <td class="content-cell">
+                {{ post.content.length > 100 ? post.content.substring(0, 100) + '...' : post.content }}
+              </td>
+              <td>
+                <span class="badge" [class]="getTypeClass(post.type)">
+                  {{ getTypeLabel(post.type) }}
+                </span>
+              </td>
+              <td>
+                <span class="badge badge-pastoral">
+                  {{ getTipoPastoralLabel(post.tipoPastoral) }}
+                </span>
+              </td>
+              <td class="date-cell">
+                {{ formatDate(post.createdAt) }}
+              </td>
+              <td>
+                <div class="action-buttons">
+             
+                  <button 
+                    class="btn-icon btn-delete" 
+                    (click)="deletePost(post)"
+                    title="Excluir"
+                  >
+                    <span class="material-icons">delete</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="6" class="empty-state">
+                <span class="material-icons">inbox</span>
+                <p>Nenhum post encontrado</p>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>
+
+@if (isTypeModalOpen()) {
+  <div class="modal-overlay" (click)="closeTypeModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Alterar Tipo do Post</h2>
+        <button class="btn-close" (click)="closeTypeModal()">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Tipo do Post</label>
+          <select 
+            [ngModel]="selectedType()"
+            (ngModelChange)="selectedType.set($event)"
+            class="form-control"
+          >
+            <option [value]="PostType.Comum">Comum</option>
+            <option [value]="PostType.Oficial">Oficial</option>
+            <option [value]="PostType.Fixada">Fixada</option>
+            <option [value]="PostType.Anuncio">Anúncio</option>
+          </select>
+        </div>
+
+        <div class="type-descriptions">
+          <p><strong>Comum:</strong> Posts normais dos usuários</p>
+          <p><strong>Oficial:</strong> Posts oficiais da pastoral</p>
+          <p><strong>Fixada:</strong> Posts fixados no topo do feed</p>
+          <p><strong>Anúncio:</strong> Anúncios importantes</p>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeTypeModal()">
+          Cancelar
+        </button>
+        <button class="btn btn-primary" (click)="changePostType()">
+          Salvar
+        </button>
+      </div>
+    </div>
+  </div>
+}

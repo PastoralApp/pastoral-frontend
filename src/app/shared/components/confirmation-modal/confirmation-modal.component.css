@@ -1,0 +1,221 @@
+/* ============================================
+   MODAL OVERLAY
+   ============================================ */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 1rem;
+  opacity: 0;
+  animation: fadeIn 0.15s ease-out forwards;
+  backdrop-filter: blur(4px);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ============================================
+   MODAL CONTAINER
+   ============================================ */
+.modal-container {
+  background-color: var(--surface-color);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+  max-width: 500px;
+  width: 100%;
+  opacity: 0;
+  transform: translateY(20px) scale(0.95);
+  animation: slideUp 0.2s ease-out 0.05s forwards;
+  overflow: hidden;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ============================================
+   MODAL HEADER
+   ============================================ */
+.modal-header {
+  padding: 1.5rem 1.5rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.modal-header-danger {
+  border-bottom-color: var(--error-color);
+}
+
+.modal-header-warning {
+  border-bottom-color: var(--warning-color);
+}
+
+.modal-header-info {
+  border-bottom-color: var(--info-color);
+}
+
+.modal-header-primary {
+  border-bottom-color: var(--primary-color);
+}
+
+.modal-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.modal-header-danger .modal-icon {
+  background-color: var(--error-light);
+  color: var(--error-color);
+}
+
+.modal-header-warning .modal-icon {
+  background-color: var(--warning-light);
+  color: var(--warning-color);
+}
+
+.modal-header-info .modal-icon {
+  background-color: rgba(141, 110, 99, 0.15);
+  color: var(--info-color);
+}
+
+.modal-header-primary .modal-icon {
+  background-color: var(--primary-light);
+  color: var(--primary-color);
+}
+
+.modal-title {
+  font-size: 1.375rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+  flex: 1;
+}
+
+/* ============================================
+   MODAL BODY
+   ============================================ */
+.modal-body {
+  padding: 1.5rem;
+}
+
+.modal-message {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* ============================================
+   MODAL FOOTER
+   ============================================ */
+.modal-footer {
+  padding: 1rem 1.5rem 1.5rem;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+/* ============================================
+   BUTTONS (complementando os estilos globais)
+   ============================================ */
+.btn {
+  min-width: 100px;
+}
+
+.btn-info {
+  background-color: var(--info-color);
+  color: white;
+}
+
+.btn-info:hover:not(:disabled) {
+  background-color: #6d4c41;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-warning {
+  background-color: var(--warning-color);
+  color: var(--text-primary);
+}
+
+.btn-warning:hover:not(:disabled) {
+  background-color: #f57f17;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 576px) {
+  .modal-container {
+    max-width: calc(100vw - 2rem);
+  }
+
+  .modal-header {
+    padding: 1.25rem 1.25rem 0.875rem;
+  }
+
+  .modal-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 1.25rem;
+  }
+
+  .modal-title {
+    font-size: 1.25rem;
+  }
+
+  .modal-body {
+    padding: 1.25rem;
+  }
+
+  .modal-footer {
+    padding: 0.875rem 1.25rem 1.25rem;
+    flex-direction: column-reverse;
+  }
+
+  .btn {
+    width: 100%;
+  }
+}
+
+/* ============================================
+   DARK THEME ADJUSTMENTS
+   ============================================ */
+[data-theme="dark"] .modal-overlay {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+[data-theme="dark"] .modal-container {
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+}

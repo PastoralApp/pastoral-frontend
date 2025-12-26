@@ -1,1 +1,10 @@
 <router-outlet></router-outlet>
+
+<app-confirmation-modal
+  [config]="confirmationConfig()"
+  [isOpen]="showConfirmationModal()"
+  (confirmed)="onConfirmed()"
+  (cancelled)="onCancelled()"
+/>
+
+<app-toast></app-toast>

@@ -11,12 +11,6 @@
       <div class="spinner"></div>
       <p>Carregando grupo...</p>
     </div>
-  } @else if (error()) {
-    <div class="error-state">
-      <span class="material-icons">error_outline</span>
-      <p>{{ error() }}</p>
-      <button class="btn btn-primary" (click)="goBack()">Voltar</button>
-    </div>
   } @else if (grupo()) {
     <article class="grupo-content">
       <div class="grupo-header" [style.background-color]="grupo()!.primaryColor || '#667eea'">
