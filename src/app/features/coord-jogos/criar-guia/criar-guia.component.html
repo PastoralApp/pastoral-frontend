@@ -1,0 +1,105 @@
+<div class="criar-guia-container">
+  <header class="page-header">
+    <button class="btn-back" (click)="voltar()">
+      <i class="fas fa-arrow-left"></i> Voltar
+    </button>
+    <h1>Novo Guia</h1>
+  </header>
+
+  <form [formGroup]="form" (ngSubmit)="salvar()" class="guia-form">
+    <div class="form-section">
+      <h2>Informações Básicas</h2>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="nome">Nome do Guia *</label>
+          <input id="nome" type="text" formControlName="nome" placeholder="Ex: Guia dos Padres 2025" class="form-control">
+          <span class="error" *ngIf="form.get('nome')?.invalid && form.get('nome')?.touched">Campo obrigatório</span>
+        </div>
+        <div class="form-group">
+          <label for="ano">Ano *</label>
+          <input id="ano" type="number" formControlName="ano" min="2020" max="2100" class="form-control">
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="descricao">Descrição *</label>
+        <textarea id="descricao" formControlName="descricao" rows="3" placeholder="Descreva os objetivos e características do guia" class="form-control"></textarea>
+      </div>
+      <div class="form-group">
+        <label for="temaPrincipal">Tema Principal *</label>
+        <input id="temaPrincipal" type="text" formControlName="temaPrincipal" placeholder="Tema principal do guia" class="form-control">
+      </div>
+      <div class="form-group">
+        <label for="pastoralId">Pastoral *</label>
+        <select id="pastoralId" formControlName="pastoralId" class="form-control">
+          <option value="">Selecione uma pastoral</option>
+          <ng-container *ngFor="let pastoral of pastorais()">
+            <option [value]="pastoral.id">{{ pastoral.name }}</option>
+          </ng-container>
+        </select>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="dataInicio">Data de Início *</label>
+          <input id="dataInicio" type="date" formControlName="dataInicio" class="form-control">
+        </div>
+        <div class="form-group">
+          <label for="dataFim">Data de Término *</label>
+          <input id="dataFim" type="date" formControlName="dataFim" class="form-control">
+        </div>
+      </div>
+    </div>
+    <div class="form-section">
+      <h2>Configurações</h2>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="quantidadeProvas">Quantidade de Provas</label>
+          <input id="quantidadeProvas" type="number" formControlName="quantidadeProvas" min="1" class="form-control">
+        </div>
+        <div class="form-group">
+          <label for="duracaoEstimadaDias">Duração Estimada (dias)</label>
+          <input id="duracaoEstimadaDias" type="number" formControlName="duracaoEstimadaDias" min="1" class="form-control">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="requisitoIdadeMinima">Idade Mínima</label>
+          <input id="requisitoIdadeMinima" type="number" formControlName="requisitoIdadeMinima" min="0" class="form-control">
+        </div>
+        <div class="form-group">
+          <label for="requisitoIdadeMaxima">Idade Máxima</label>
+          <input id="requisitoIdadeMaxima" type="number" formControlName="requisitoIdadeMaxima" min="0" class="form-control">
+        </div>
+        <div class="form-group">
+          <label for="limiteTotalParticipantes">Limite de Participantes</label>
+          <input id="limiteTotalParticipantes" type="number" formControlName="limiteTotalParticipantes" min="0" class="form-control">
+        </div>
+      </div>
+    </div>
+    <div class="form-section">
+      <h2>Informações Adicionais</h2>
+      <div class="form-group">
+        <label for="imagemCapaUrl">URL da Imagem de Capa</label>
+        <input id="imagemCapaUrl" type="url" formControlName="imagemCapaUrl" placeholder="https://exemplo.com/imagem.jpg" class="form-control">
+      </div>
+      <div class="form-group">
+        <label for="regulamentoUrl">URL do Regulamento</label>
+        <input id="regulamentoUrl" type="url" formControlName="regulamentoUrl" placeholder="https://exemplo.com/regulamento.pdf" class="form-control">
+      </div>
+      <div class="form-group">
+        <label for="observacoesGerais">Observações Gerais</label>
+        <textarea id="observacoesGerais" formControlName="observacoesGerais" rows="3" placeholder="Informações adicionais, regras especiais, etc." class="form-control"></textarea>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button type="button" class="btn btn-secondary" (click)="voltar()">Cancelar</button>
+      <button type="submit" class="btn btn-primary" [disabled]="form.invalid || salvando()">
+        <ng-container *ngIf="salvando(); else criarLabel">
+          <i class="fas fa-spinner fa-spin"></i> Salvando...
+        </ng-container>
+        <ng-template #criarLabel>
+          <i class="fas fa-save"></i> Criar Guia
+        </ng-template>
+      </button>
+    </div>
+  </form>
+</div>

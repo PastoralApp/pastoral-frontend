@@ -307,6 +307,41 @@ export const routes: Routes = [
         data: { roles: ['Coordenador Geral', 'Administrador'] },
         loadChildren: () => import('./features/coord-geral/coord-geral.routes').then(m => m.coordGeralRoutes)
       },
+      {
+        path: 'coord-jogos',
+        canActivate: [roleGuard],
+        data: { roles: ['Coordenador de Jogo', 'Coordenador Geral', 'Administrador'] },
+        children: [
+          {
+            path: '',
+            loadComponent: () => import('./features/coord-jogos/jogos-dashboard.component').then(m => m.JogosDashboardComponent)
+          },
+          {
+            path: 'olimpiadas/criar',
+            loadComponent: () => import('./features/coord-jogos/criar-olimpiedas/criar-olimpiadas.component').then(m => m.CriarOlimpiadasComponent)
+          },
+          {
+            path: 'olimpiadas/:id',
+            loadComponent: () => import('./features/coord-jogos/olimpiadas-detail.component').then(m => m.OlimpiadasDetailComponent)
+          },
+          {
+            path: 'guia/criar',
+            loadComponent: () => import('./features/coord-jogos/criar-guia.component').then(m => m.CriarGuiaComponent)
+          },
+          {
+            path: 'guia/:id',
+            loadComponent: () => import('./features/coord-jogos/guia-detail.component').then(m => m.GuiaDetailComponent)
+          },
+          {
+            path: 'medalhas',
+            loadComponent: () => import('./features/coord-jogos/medalhas-list.component').then(m => m.MedalhasListComponent)
+          },
+          {
+            path: 'trofeus',
+            loadComponent: () => import('./features/coord-jogos/trofeus-list.component').then(m => m.TrofeusListComponent)
+          }
+        ]
+      },
       { path: '', redirectTo: 'feed', pathMatch: 'full' }
     ]
   },

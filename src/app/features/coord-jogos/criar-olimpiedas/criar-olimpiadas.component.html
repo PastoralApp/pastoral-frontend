@@ -1,0 +1,199 @@
+ <div class="criar-olimpiadas-container">
+      <header class="page-header">
+        <button class="btn-back" (click)="voltar()">
+          <i class="fas fa-arrow-left"></i> Voltar
+        </button>
+        <h1>Nova Olimpíada</h1>
+      </header>
+
+      <form [formGroup]="form" (ngSubmit)="salvar()" class="olimpiadas-form">
+        <div class="form-section">
+          <h2>Informações Básicas</h2>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="nome">Nome da Olimpíada *</label>
+              <input 
+                id="nome"
+                type="text" 
+                formControlName="nome"
+                placeholder="Ex: Olimpíadas Pastoral 2025"
+                class="form-control">
+              @if (form.get('nome')?.invalid && form.get('nome')?.touched) {
+                <span class="error">Campo obrigatório</span>
+              }
+            </div>
+
+            <div class="form-group">
+              <label for="ano">Ano *</label>
+              <input 
+                id="ano"
+                type="number" 
+                formControlName="ano"
+                min="2020"
+                max="2100"
+                class="form-control">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="descricao">Descrição *</label>
+            <textarea 
+              id="descricao"
+              formControlName="descricao"
+              rows="3"
+              placeholder="Descreva os objetivos e características da olimpíada"
+              class="form-control"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="pastoralId">Pastoral *</label>
+            <select id="pastoralId" formControlName="pastoralId" class="form-control">
+              <option value="">Selecione uma pastoral</option>
+              @for (pastoral of pastorais(); track pastoral.id) {
+                <option [value]="pastoral.id">{{ pastoral.name }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="dataInicio">Data de Início *</label>
+              <input 
+                id="dataInicio"
+                type="date" 
+                formControlName="dataInicio"
+                class="form-control">
+            </div>
+
+            <div class="form-group">
+              <label for="dataFim">Data de Término *</label>
+              <input 
+                id="dataFim"
+                type="date" 
+                formControlName="dataFim"
+                class="form-control">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h2>Configurações</h2>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="quantidadeFinaisSemana">Quantidade de Finais de Semana</label>
+              <input 
+                id="quantidadeFinaisSemana"
+                type="number" 
+                formControlName="quantidadeFinaisSemana"
+                min="1"
+                class="form-control">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="pontosOuro">Pontos - Ouro</label>
+              <input 
+                id="pontosOuro"
+                type="number" 
+                formControlName="pontosOuro"
+                min="0"
+                class="form-control">
+            </div>
+
+            <div class="form-group">
+              <label for="pontosPrata">Pontos - Prata</label>
+              <input 
+                id="pontosPrata"
+                type="number" 
+                formControlName="pontosPrata"
+                min="0"
+                class="form-control">
+            </div>
+
+            <div class="form-group">
+              <label for="pontosBronze">Pontos - Bronze</label>
+              <input 
+                id="pontosBronze"
+                type="number" 
+                formControlName="pontosBronze"
+                min="0"
+                class="form-control">
+            </div>
+
+            <div class="form-group">
+              <label for="pontosParticipacao">Pontos - Participação</label>
+              <input 
+                id="pontosParticipacao"
+                type="number" 
+                formControlName="pontosParticipacao"
+                min="0"
+                class="form-control">
+            </div>
+          </div>
+
+          <div class="form-group checkbox-group">
+            <label>
+              <input type="checkbox" formControlName="usaFaseGrupos">
+              <span>Usa Fase de Grupos</span>
+            </label>
+          </div>
+
+          <div class="form-group checkbox-group">
+            <label>
+              <input type="checkbox" formControlName="usaMataMata">
+              <span>Usa Mata-Mata</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h2>Informações Adicionais</h2>
+          
+          <div class="form-group">
+            <label for="imagemCapaUrl">URL da Imagem de Capa</label>
+            <input 
+              id="imagemCapaUrl"
+              type="url" 
+              formControlName="imagemCapaUrl"
+              placeholder="https://exemplo.com/imagem.jpg"
+              class="form-control">
+          </div>
+
+          <div class="form-group">
+            <label for="regulamentoUrl">URL do Regulamento</label>
+            <input 
+              id="regulamentoUrl"
+              type="url" 
+              formControlName="regulamentoUrl"
+              placeholder="https://exemplo.com/regulamento.pdf"
+              class="form-control">
+          </div>
+
+          <div class="form-group">
+            <label for="observacoesGerais">Observações Gerais</label>
+            <textarea 
+              id="observacoesGerais"
+              formControlName="observacoesGerais"
+              rows="3"
+              placeholder="Informações adicionais, regras especiais, etc."
+              class="form-control"></textarea>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" (click)="voltar()">
+            Cancelar
+          </button>
+          <button type="submit" class="btn btn-primary" [disabled]="form.invalid || salvando()">
+            @if (salvando()) {
+              <i class="fas fa-spinner fa-spin"></i> Salvando...
+            } @else {
+              <i class="fas fa-save"></i> Criar Olimpíada
+            }
+          </button>
+        </div>
+      </form>
+    </div>
