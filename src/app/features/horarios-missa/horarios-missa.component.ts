@@ -96,7 +96,6 @@ export class HorariosMissaComponent implements OnInit {
       }
       map.get(igreja)!.push(h);
     }
-    // Sort by time within each church
     map.forEach((horarios, igreja) => {
       horarios.sort((a, b) => a.horario.localeCompare(b.horario));
     });
@@ -117,7 +116,6 @@ export class HorariosMissaComponent implements OnInit {
     return this.showIgrejaInfo().get(igrejaNome) || false;
   }
 
-  // Funções do calendário
   openCalendar(): void {
     this.showCalendar.set(true);
   }
@@ -133,20 +131,17 @@ export class HorariosMissaComponent implements OnInit {
     const lastDay = new Date(year, month + 1, 0);
     const days: Date[] = [];
 
-    // Add days from previous month
     const firstDayOfWeek = firstDay.getDay();
     for (let i = firstDayOfWeek - 1; i >= 0; i--) {
       const date = new Date(year, month, -i);
       days.push(date);
     }
 
-    // Add days from current month
     for (let day = 1; day <= lastDay.getDate(); day++) {
       days.push(new Date(year, month, day));
     }
 
-    // Add days from next month to complete the grid
-    const remainingDays = 42 - days.length; // 6 weeks x 7 days
+    const remainingDays = 42 - days.length; 
     for (let i = 1; i <= remainingDays; i++) {
       days.push(new Date(year, month + 1, i));
     }

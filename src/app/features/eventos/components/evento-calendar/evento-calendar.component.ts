@@ -77,7 +77,7 @@ export class EventoCalendarComponent {
       });
     }
 
-    const remainingDays = 42 - days.length; // 6 semanas * 7 dias
+    const remainingDays = 42 - days.length; 
     for (let i = 1; i <= remainingDays; i++) {
       const date = new Date(year, month + 1, i);
       days.push({

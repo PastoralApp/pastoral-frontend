@@ -21,6 +21,18 @@
         PJ
       </button>
       <button 
+        [class.active]="selectedType() === TipoPastoral.PJA"
+        (click)="filterByType(TipoPastoral.PJA)"
+      >
+        PJA
+      </button>
+      <button 
+        [class.active]="selectedType() === TipoPastoral.PANSA"
+        (click)="filterByType(TipoPastoral.PANSA)"
+      >
+        Pansa
+      </button>
+      <button 
         [class.active]="selectedType() === TipoPastoral.Geral"
         (click)="filterByType(TipoPastoral.Geral)"
       >

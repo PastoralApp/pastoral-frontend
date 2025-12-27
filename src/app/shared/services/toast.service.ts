@@ -36,7 +36,7 @@ export class ToastService {
   }
 
   error(message: string, duration?: number): void {
-    this.show('error', message, duration || 8000); // Erros ficam mais tempo
+    this.show('error', message, duration || 8000); 
   }
 
   warning(message: string, duration?: number): void {

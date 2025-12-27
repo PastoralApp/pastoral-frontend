@@ -25,18 +25,15 @@ export class NotificacoesComponent implements OnInit, OnDestroy {
   isLoading = signal(true);
   isConnected = signal(false);
   
-  // Permissões
   isAdmin = computed(() => this.authService.hasRole('Administrador'));
   isCoordenadorGeral = computed(() => this.authService.hasRole('Coordenador Geral'));
   isCoordenadorGrupo = computed(() => this.authService.hasRole('Coordenador de Grupo'));
   
-  // Pode enviar notificação se for Admin, Coord Geral ou Coord Grupo
   canSendNotification = computed(() => 
     this.isAdmin() || this.isCoordenadorGeral() || this.isCoordenadorGrupo()
   );
 
   constructor() {
-    // Monitorar notificações em tempo real
     effect(() => {
       const novaNotificacao = this.signalRService.novaNotificacao();
       if (novaNotificacao) {
@@ -44,7 +41,6 @@ export class NotificacoesComponent implements OnInit, OnDestroy {
       }
     });
 
-    // Monitorar conexão SignalR
     effect(() => {
       this.isConnected.set(this.signalRService.isConnected());
     });
@@ -62,10 +58,8 @@ export class NotificacoesComponent implements OnInit, OnDestroy {
   }
 
   private handleNovaNotificacao(notificacao: Notificacao): void {
-    // Adiciona a nova notificação à lista
     this.notificacoes.update(list => [notificacao, ...list]);
     
-    // Adiciona às não lidas se não tiver sido lida
     if (!notificacao.lida) {
       this.naoLidas.update(list => [
         {

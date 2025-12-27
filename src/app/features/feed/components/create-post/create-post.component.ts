@@ -36,6 +36,14 @@ export class CreatePostComponent {
     return user?.role === 'Usuário' || !user?.role;
   }
 
+  get canCreateAnuncioAviso(): boolean {
+    const user = this.authService.currentUser();
+    const role = user?.role || '';
+    return role === 'Administrador' || 
+           role === 'Admin Jogos' || 
+           role === 'Coordenador Geral';
+  }
+
   get userName(): string {
     const user = this.authService.currentUser();
     return user?.name || 'Usuário';

@@ -78,7 +78,6 @@ export class CoordenacaoEventosComponent implements OnInit {
     let result = this.eventos();
     const now = new Date();
     
-    // Filter by status
     const status = this.filterStatus();
     if (status === 'upcoming') {
       result = result.filter(e => new Date(e.eventDate) >= now);

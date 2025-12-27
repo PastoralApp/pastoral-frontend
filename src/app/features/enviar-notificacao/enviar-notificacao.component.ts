@@ -69,7 +69,6 @@ export class EnviarNotificacaoComponent implements OnInit {
       this.router.navigate(['/notificacoes']);
     }
     
-    // Coord Grupo só pode enviar para grupos
     if (this.isCoordenadorGrupo() && !this.isAdmin() && !this.isCoordenadorGeral()) {
       this.destinatarioTipo.set('grupo');
     }
@@ -88,8 +87,8 @@ export class EnviarNotificacaoComponent implements OnInit {
 
   canUseDestinatarioTipo(tipo: DestinatarioTipo): boolean {
     if (this.isAdmin()) return true;
-    if (this.isCoordenadorGeral()) return true; // Coord Geral pode tudo
-    if (this.isCoordenadorGrupo()) return tipo === 'grupo'; // Coord Grupo só pode grupo
+    if (this.isCoordenadorGeral()) return true;  
+    if (this.isCoordenadorGrupo()) return tipo === 'grupo'; 
     return false;
   }
 

@@ -21,7 +21,6 @@ export class CoordenacaoListComponent implements OnInit {
   isLoading = signal(true);
   errorMessage = signal<string | null>(null);
 
-  // Filtrar apenas coordenadores
   coordenadores = computed(() => {
     return this.allUsers().filter(user => 
       user.roleName === 'Coordenador de Grupo' || 

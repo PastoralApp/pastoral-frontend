@@ -23,7 +23,6 @@ export class LayoutComponent implements OnInit {
   unreadCount = signal(0);
 
   constructor() {
-    // Monitorar novas notificações e atualizar contador
     effect(() => {
       const novaNotificacao = this.signalRService.novaNotificacao();
       if (novaNotificacao) {
@@ -61,14 +60,12 @@ export class LayoutComponent implements OnInit {
   ngOnInit(): void {
     this.loadUnreadCount();
     
-    // Só conectar SignalR se houver usuário autenticado
     if (this.currentUser) {
       this.connectSignalR();
     }
   }
 
   connectSignalR(): void {
-    // Verificar novamente se há token antes de conectar
     if (!localStorage.getItem('token')) {
       console.warn('Token não disponível, SignalR não será conectado');
       return;
@@ -76,7 +73,6 @@ export class LayoutComponent implements OnInit {
 
     this.signalRService.connect().catch((err) => {
       console.error('Erro ao conectar SignalR no layout:', err);
-      // Não tentar reconectar automaticamente se não houver token
       if (localStorage.getItem('token')) {
         setTimeout(() => this.connectSignalR(), 5000);
       }

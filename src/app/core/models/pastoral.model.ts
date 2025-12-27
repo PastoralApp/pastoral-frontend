@@ -1,9 +1,18 @@
 import type { Grupo } from './grupo.model';
 export { Grupo, CreateGrupoDto, UpdateGrupoDto } from './grupo.model';
 
+export enum TipoPastoralNumeric {
+  PA = 1,
+  PJ = 2,
+  Geral = 3
+}
+
 export enum TipoPastoral {
   PA = 'PA',
   PJ = 'PJ',
+  PJA = 'PJA',
+  PANSA = 'PANSA',
+  OUTRA = 'OUTRA',
   Geral = 'Geral'
 }
 

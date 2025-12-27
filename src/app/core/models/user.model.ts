@@ -23,6 +23,8 @@ export interface User {
   isActive: boolean;
   roleId: string;
   roleName: string;
+  igrejaId?: string;
+  igrejaNome?: string;
   grupoId?: string;
   grupoName?: string;
   tags: Tag[];

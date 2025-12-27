@@ -214,7 +214,6 @@ export class AdminTagsComponent implements OnInit {
         );
         this.availableUsers.set([...this.availableUsers(), user]);
         
-        // Update tags list
         const updatedTags = this.tags().map(t => 
           t.id === tag.id ? { ...t, users: (t.users || []).filter(u => u.id !== userId) } : t
         );

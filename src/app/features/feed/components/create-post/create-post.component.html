@@ -29,7 +29,10 @@
           <select [ngModel]="tipo()" (ngModelChange)="tipo.set($event)" class="select-control">
             <option [ngValue]="PostType.Comum">Post Comum</option>
             <option [ngValue]="PostType.Oficial">Post Oficial</option>
-            <option [ngValue]="PostType.Anuncio">Anúncio</option>
+            @if (canCreateAnuncioAviso) {
+              <option [ngValue]="PostType.Anuncio">Anúncio</option>
+              <option [ngValue]="PostType.Aviso">Aviso</option>
+            }
           </select>
         }
 
@@ -37,6 +40,9 @@
           <option [ngValue]="TipoPastoral.Geral">Geral (Todos)</option>
           <option [ngValue]="TipoPastoral.PA">Pastoral Adolescente (PA)</option>
           <option [ngValue]="TipoPastoral.PJ">Pastoral da Juventude (PJ)</option>
+          <option [ngValue]="TipoPastoral.PJA">Pastoral Jovem Adulto (PJA)</option>
+          <option [ngValue]="TipoPastoral.PANSA">Pansa</option>
+          <option [ngValue]="TipoPastoral.OUTRA">Outra</option>
         </select>
       </div>
 

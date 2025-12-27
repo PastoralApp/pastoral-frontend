@@ -78,7 +78,6 @@ export class GrupoDetailComponent implements OnInit {
         this.meusGrupos.set(user.grupos || []);
       },
       error: () => {
-        // Silently fail - user won't be able to edit
         this.meusGrupos.set([]);
       }
     });
@@ -88,12 +87,10 @@ export class GrupoDetailComponent implements OnInit {
     const user = this.authService.currentUser();
     if (!user) return false;
     
-    // Admin e Coordenador Geral podem editar qualquer grupo
     if (user.role === 'Administrador' || user.role === 'Coordenador Geral') {
       return true;
     }
     
-    // Coordenador de Grupo só pode editar grupos dos quais faz parte
     if (user.role === 'Coordenador de Grupo') {
       const grupo = this.grupo();
       if (!grupo) return false;

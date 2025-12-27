@@ -170,7 +170,6 @@ export class UserFormComponent implements OnInit {
     });
   }
 
-  // Grupos
   addGrupoToUser(grupoId: string): void {
     if (!this.userId || !grupoId) return;
 

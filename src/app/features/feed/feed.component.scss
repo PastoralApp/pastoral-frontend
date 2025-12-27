@@ -1,13 +1,31 @@
 .feed-container {
-  max-width: 600px;
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 2rem;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 1rem;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr;
+    max-width: 600px;
+  }
 }
 
 .feed-content {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+}
+
+.feed-sidebar {
+  position: sticky;
+  top: 5rem;
+  height: fit-content;
+
+  @media (max-width: 1024px) {
+    display: none;
+  }
 }
 
 .feed-filters {

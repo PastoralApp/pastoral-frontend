@@ -48,7 +48,6 @@ export class CoordenacaoTagsComponent implements OnInit {
   loadCurrentUserGroups(): void {
     this.userService.getMe().subscribe({
       next: (user) => {
-        // Pegar o primeiro grupo ativo do coordenador
         const grupo = user.grupos?.find(g => g);
         if (grupo) {
           this.currentUserGrupoId.set(grupo.grupoId);

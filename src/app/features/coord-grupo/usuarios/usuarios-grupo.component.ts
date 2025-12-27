@@ -34,7 +34,6 @@ export class UsuariosGrupoComponent implements OnInit {
   selectedUser = signal<User | null>(null);
   showTagModal = signal(false);
   
-  // Coordenador de Grupo só vê usuários dos seus grupos
   meusGruposIds = computed(() => {
     const user = this.currentUserData();
     return user?.grupos.map(g => g.grupoId) || [];

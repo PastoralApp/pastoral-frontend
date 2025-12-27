@@ -7,13 +7,13 @@ import { Post } from '../../core/models/post.model';
 import { Pastoral, TipoPastoral } from '../../core/models/pastoral.model';
 import { PostCardComponent } from './components/post-card/post-card.component';
 import { CreatePostComponent } from './components/create-post/create-post.component';
+import { FeedSidebarComponent } from './components/feed-sidebar/feed-sidebar.component';
 import { ToastService } from '../../shared/services/toast.service';
-import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-feed',
   standalone: true,
-  imports: [CommonModule, PostCardComponent, CreatePostComponent],
+  imports: [CommonModule, PostCardComponent, CreatePostComponent, FeedSidebarComponent],
   templateUrl: './feed.component.html',
   styleUrl: './feed.component.scss'
 })
@@ -28,7 +28,9 @@ export class FeedComponent implements OnInit {
   availableFilters = signal<Array<{tipo: TipoPastoral, label: string, icon: string}>>([
     {tipo: TipoPastoral.Geral, label: 'Todos', icon: 'public'},
     {tipo: TipoPastoral.PA, label: 'Pastoral Adolescentes', icon: 'child_care'},
-    {tipo: TipoPastoral.PJ, label: 'Pastoral Jovens', icon: 'groups'}
+    {tipo: TipoPastoral.PJ, label: 'Pastoral Jovens', icon: 'groups'},
+    {tipo: TipoPastoral.PJA, label: 'Pastoral Jovem Adulto', icon: 'person'},
+    {tipo: TipoPastoral.PANSA, label: 'Pansa', icon: 'stars'}
   ]);
   selectedFilter = signal<TipoPastoral | null>(null);
   isLoading = signal(true);
@@ -70,11 +72,12 @@ export class FeedComponent implements OnInit {
   }
 
   updateAvailableFilters(): void {
-    // Sempre mostrar todos os filtros
     const filters = [
       {tipo: TipoPastoral.Geral, label: 'Todos', icon: 'public'},
       {tipo: TipoPastoral.PA, label: 'Pastoral Adolescentes', icon: 'child_care'},
-      {tipo: TipoPastoral.PJ, label: 'Pastoral Jovens', icon: 'groups'}
+      {tipo: TipoPastoral.PJ, label: 'Pastoral Jovens', icon: 'groups'},
+      {tipo: TipoPastoral.PJA, label: 'Pastoral Jovem Adulto', icon: 'person'},
+      {tipo: TipoPastoral.PANSA, label: 'Pansa', icon: 'stars'}
     ];
 
     this.availableFilters.set(filters);

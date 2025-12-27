@@ -126,6 +126,16 @@ export class PostService {
     return this.http.get<Post[]>(`${this.API_URL}/saved`);
   }
 
+  getAnuncios(count: number = 10): Observable<Post[]> {
+    const params = new HttpParams().set('count', count.toString());
+    return this.http.get<Post[]>(`${this.API_URL}/anuncios`, { params });
+  }
+
+  getAvisos(count: number = 10): Observable<Post[]> {
+    const params = new HttpParams().set('count', count.toString());
+    return this.http.get<Post[]>(`${this.API_URL}/avisos`, { params });
+  }
+
   getAllAdmin(): Observable<Post[]> {
     return this.http.get<Post[]>(`${this.API_URL}/admin/all`);
   }

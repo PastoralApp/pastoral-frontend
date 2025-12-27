@@ -55,8 +55,11 @@ export class PastoraisComponent implements OnInit {
 
   getTypeLabel(type: TipoPastoral): string {
     const labels: Record<TipoPastoral, string> = {
-      [TipoPastoral.PA]: 'Pastoral de Adultos',
+      [TipoPastoral.PA]: 'Pastoral de Adolescentes',
       [TipoPastoral.PJ]: 'Pastoral da Juventude',
+      [TipoPastoral.PJA]: 'Pastoral Jovem Adulto',
+      [TipoPastoral.PANSA]: 'Pansa',
+      [TipoPastoral.OUTRA]: 'Outra',
       [TipoPastoral.Geral]: 'Geral'
     };
     return labels[type];

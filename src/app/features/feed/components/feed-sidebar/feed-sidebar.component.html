@@ -1,0 +1,63 @@
+<div class="sidebar">
+  <div class="sidebar-section">
+    <div class="section-header">
+      <span class="material-icons">campaign</span>
+      <h3>Anúncios</h3>
+    </div>
+
+    @if (isLoadingAnuncios()) {
+      <div class="loading">
+        <div class="spinner-small"></div>
+      </div>
+    } @else if (anuncios().length === 0) {
+      <div class="empty-message">
+        <p>Nenhum anúncio recente</p>
+      </div>
+    } @else {
+      <div class="items-list">
+        @for (anuncio of anuncios(); track anuncio.id) {
+          <a [routerLink]="['/feed', anuncio.id]" class="sidebar-item anuncio-item">
+            <div class="item-content">
+              <p class="item-text">{{ truncateContent(anuncio.content) }}</p>
+              <div class="item-meta">
+                <span class="author">{{ anuncio.authorName }}</span>
+                <span class="date">{{ formatDate(anuncio.createdAt) }}</span>
+              </div>
+            </div>
+          </a>
+        }
+      </div>
+    }
+  </div>
+
+  <div class="sidebar-section">
+    <div class="section-header">
+      <span class="material-icons">warning</span>
+      <h3>Avisos</h3>
+    </div>
+
+    @if (isLoadingAvisos()) {
+      <div class="loading">
+        <div class="spinner-small"></div>
+      </div>
+    } @else if (avisos().length === 0) {
+      <div class="empty-message">
+        <p>Nenhum aviso recente</p>
+      </div>
+    } @else {
+      <div class="items-list">
+        @for (aviso of avisos(); track aviso.id) {
+          <a [routerLink]="['/feed', aviso.id]" class="sidebar-item aviso-item">
+            <div class="item-content">
+              <p class="item-text">{{ truncateContent(aviso.content) }}</p>
+              <div class="item-meta">
+                <span class="author">{{ aviso.authorName }}</span>
+                <span class="date">{{ formatDate(aviso.createdAt) }}</span>
+              </div>
+            </div>
+          </a>
+        }
+      </div>
+    }
+  </div>
+</div>

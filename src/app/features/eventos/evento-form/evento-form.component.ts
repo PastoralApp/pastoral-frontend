@@ -32,11 +32,9 @@ export class EventoFormComponent implements OnInit {
   isLoading = signal(false);
   isSaving = signal(false);
   
-  // Dados para seleção
   grupos = signal<Grupo[]>([]);
   coordenadores = signal<User[]>([]);
   
-  // Cores disponíveis
   coresDisponiveis = [
     { nome: 'Padrão', valor: '' },
     { nome: 'Azul', valor: '#3b82f6' },
@@ -49,7 +47,6 @@ export class EventoFormComponent implements OnInit {
     { nome: 'Ciano', valor: '#06b6d4' },
   ];
   
-  // Permissões baseadas no role
   currentUserRole = computed(() => this.authService.currentUser()?.roleName || '');
   isAdmin = computed(() => this.currentUserRole() === 'Administrador');
   isCoordGeral = computed(() => this.currentUserRole() === 'Coordenador Geral');
@@ -152,7 +149,6 @@ export class EventoFormComponent implements OnInit {
       return;
     }
     
-    // Coord Grupo deve ter grupo vinculado
     if (this.isCoordGrupo() && !formData.grupoId) {
       this.toastService.warning('Você deve vincular o evento ao seu grupo');
       return;
@@ -232,7 +228,6 @@ export class EventoFormComponent implements OnInit {
     return this.isEditMode() ? 'Salvar Alterações' : 'Criar Evento';
   }
   
-  // Helper para exibir nome do grupo selecionado
   get grupoSelecionadoNome(): string {
     const grupoId = this.form().grupoId;
     if (!grupoId) return 'Seu grupo';

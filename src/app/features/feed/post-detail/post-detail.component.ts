@@ -155,7 +155,6 @@ export class PostDetailComponent implements OnInit {
       navigator.clipboard.writeText(url).then(() => {
         this.toastService.success('Link copiado para a área de transferência!');
         
-        // Registra o compartilhamento no backend
         this.postService.sharePost(postData.id).subscribe({
           next: (response) => {
             this.post.update(p => p ? { ...p, sharesCount: response.sharesCount } : null);
@@ -169,7 +168,6 @@ export class PostDetailComponent implements OnInit {
         this.toastService.error('Erro ao copiar link');
       });
     } else {
-      // Fallback para navegadores que não suportam clipboard API
       this.toastService.info(`Link: ${url}`);
     }
   }

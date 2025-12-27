@@ -140,7 +140,8 @@ export class AdminPostsComponent implements OnInit {
       [PostType.Comum]: 'Comum',
       [PostType.Oficial]: 'Oficial',
       [PostType.Fixada]: 'Fixada',
-      [PostType.Anuncio]: 'Anúncio'
+      [PostType.Anuncio]: 'Anúncio',
+      [PostType.Aviso]: 'Aviso'
     };
     return labels[type] || type;
   }
@@ -154,6 +155,9 @@ export class AdminPostsComponent implements OnInit {
     const labels = {
       [TipoPastoral.PA]: 'PA',
       [TipoPastoral.PJ]: 'PJ',
+      [TipoPastoral.PJA]: 'PJA',
+      [TipoPastoral.PANSA]: 'PANSA',
+      [TipoPastoral.OUTRA]: 'OUTRA',
       [TipoPastoral.Geral]: 'Geral'
     };
     return labels[tipo] || tipo;

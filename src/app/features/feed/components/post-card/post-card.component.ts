@@ -75,7 +75,8 @@ export class PostCardComponent {
       [PostType.Comum]: 'Comum',
       [PostType.Oficial]: 'Oficial',
       [PostType.Fixada]: 'Fixado',
-      [PostType.Anuncio]: 'Anúncio'
+      [PostType.Anuncio]: 'Anúncio',
+      [PostType.Aviso]: 'Aviso'
     };
     return labels[this.post.type] || '';
   }
@@ -84,6 +85,9 @@ export class PostCardComponent {
     const labels: Record<TipoPastoral, string> = {
       [TipoPastoral.PA]: 'PA',
       [TipoPastoral.PJ]: 'PJ',
+      [TipoPastoral.PJA]: 'PJA',
+      [TipoPastoral.PANSA]: 'PANSA',
+      [TipoPastoral.OUTRA]: 'OUTRA',
       [TipoPastoral.Geral]: 'GERAL'
     };
     return labels[this.post.tipoPastoral] || '';
@@ -93,6 +97,9 @@ export class PostCardComponent {
     const labels: Record<TipoPastoral, string> = {
       [TipoPastoral.PA]: 'Pastoral Adolescentes',
       [TipoPastoral.PJ]: 'Pastoral Jovens',
+      [TipoPastoral.PJA]: 'Pastoral Jovem Adulto',
+      [TipoPastoral.PANSA]: 'Pansa',
+      [TipoPastoral.OUTRA]: 'Outra',
       [TipoPastoral.Geral]: 'Geral'
     };
     return labels[this.post.tipoPastoral] || '';
@@ -164,7 +171,6 @@ export class PostCardComponent {
       navigator.clipboard.writeText(url).then(() => {
         this.toastService.success('Link copiado para a área de transferência!');
         
-        // Registra o compartilhamento no backend
         this.postService.share(this.post.id).subscribe({
           next: () => {
             this.updated.emit(this.post);
@@ -177,7 +183,6 @@ export class PostCardComponent {
         this.toastService.error('Erro ao copiar link');
       });
     } else {
-      // Fallback para navegadores que não suportam clipboard API
       this.toastService.info(`Link: ${url}`);
       this.postService.share(this.post.id).subscribe({
         next: () => {
@@ -267,7 +272,6 @@ export class PostCardComponent {
         next: () => {
           this.toastService.success('Post fixado');
           this.isPinning.set(false);
-          // Recarrega a página ou atualiza o feed para refletir o novo estado
           window.location.reload();
         },
         error: (err) => {

@@ -33,7 +33,6 @@ export class GruposListComponent implements OnInit {
   loadData(): void {
     this.isLoading.set(true);
 
-    // Load all groups and user's groups in parallel
     Promise.all([
       new Promise<Grupo[]>((resolve, reject) => {
         this.grupoService.getAll().subscribe({

@@ -103,7 +103,6 @@ export class CoordenacaoEventoFormComponent implements OnInit {
   loadCoordenadores(): void {
     this.userService.getAll().subscribe({
       next: (users) => {
-        // Filtrar apenas coordenadores (Coord Geral e Coord Grupo)
         const coordenadores = users.filter(u => 
           u.roleName === 'Coordenador Geral' || 
           u.roleName === 'Coordenador de Grupo' ||
@@ -159,7 +158,6 @@ export class CoordenacaoEventoFormComponent implements OnInit {
       return;
     }
     
-    // Coord Grupo deve ter grupo vinculado
     if (this.isCoordGrupo() && !formData.grupoId) {
       this.toastService.warning('Você deve vincular o evento ao seu grupo');
       return;

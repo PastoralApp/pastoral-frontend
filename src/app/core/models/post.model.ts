@@ -2,12 +2,16 @@ export enum PostType {
   Comum = 'Comum',
   Oficial = 'Oficial',
   Fixada = 'Fixada',
-  Anuncio = 'Anuncio'
+  Anuncio = 'Anuncio',
+  Aviso = 'Aviso'
 }
 
 export enum TipoPastoral {
   PA = 'PA',
   PJ = 'PJ',
+  PJA = 'PJA',
+  PANSA = 'PANSA',
+  OUTRA = 'OUTRA',
   Geral = 'Geral'
 }
 
